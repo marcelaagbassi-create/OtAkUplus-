@@ -1,0 +1,23 @@
+{
+  "name": "OtAkU+",
+  "short_name": "OtAkU+",
+  "description": "Streaming anime et lecture manga gratuit",
+  "start_url": "/OtAkUplus-/",
+  "scope": "/OtAkUplus-/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#f97316",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/f97316/ffffff?text=O%2B",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512/f97316/ffffff?text=O%2B",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
