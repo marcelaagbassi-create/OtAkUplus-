@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OtAkU+</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#f97316">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OtAkU+">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() { navigator.serviceWorker.register('sw.js'); });
+        }
+    </script>
+    <style>
+        :root { --bg: #020617; --card: #0f172a; --primary: #f97316; --text: #f8fafc; }
+        * { box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 90px; overflow-x: hidden; }
+        nav { background: rgba(2,6,23,0.85); backdrop-filter: blur(12px); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; width: 100%; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .nav-left { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { display: flex; flex-direction: column; gap: 4px; cursor: pointer; width: 20px; }
+        .menu-btn span { width: 100%; height: 2px; background: var(--text); border-radius: 2px; }
+        .logo-txt { font-size: 20px; font-weight: 900; color: var(--primary); letter-spacing: -1px; cursor: pointer; }
+        .search-box { background: rgba(30,41,59,0.5); border-radius: 20px; padding: 5px 12px; width: 45%; border: 1px solid rgba(255,255,255,0.1); }
+        .search-box input { background: none; border: none; color: white; width: 100%; outline: none; font-size: 12px; }
+        #searchSuggestions { display: none; position: fixed; top: 60px; right: 15px; width: 70%; max-width: 300px; max-height: 400px; background: rgba(15,23,42,0.98); backdrop-filter: blur(20px); z-index: 2001; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .suggestion-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #0f172a; z-index: 2000; transition: 0.4s; padding: 30px 20px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; }
+        .side-menu.open { left: 0; }
+        .profile-section { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .profile-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(45deg, var(--primary), #fbbf24); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; cursor: pointer; position: relative; overflow: hidden; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.15); }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; border-radius: 50%; }
+        .avatar-overlay { position: absolute; inset: 0; border-radius: 50%; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; font-size: 16px; }
+        .profile-avatar:active .avatar-overlay { opacity: 1; }
+        .menu-link { padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text); display: block; font-weight: 600; cursor: pointer; }
+        .menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1999; display: none; }
+        .view { display: none; padding: 75px 0 20px; min-height: 100vh; }
+        .active { display: block; }
+        .section-title { font-size: 14px; font-weight: 900; border-left: 3px solid var(--primary); padding-left: 8px; margin: 15px; text-transform: uppercase; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px 15px; }
+        .manga-card { background: var(--card); border-radius: 8px; overflow: hidden; cursor: pointer; }
+        .manga-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        .manga-card p { font-size: 10px; padding: 6px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .vid-container { background: #000; width: 100%; aspect-ratio: 16/9; position: relative; }
+        .vid-container iframe { width: 100%; height: 100%; border: none; display: block; }
+        .vid-loading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; color: #94a3b8; font-size: 12px; gap: 10px; }
+        .vid-spinner { width: 30px; height: 30px; border: 3px solid #1e293b; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .lang-tabs { display: flex; gap: 8px; padding: 10px 15px 4px; }
+        .lang-tab { padding: 7px 18px; border-radius: 20px; font-size: 12px; font-weight: 900; cursor: pointer; border: 2px solid rgba(255,255,255,0.1); background: #1e293b; color: #94a3b8; transition: all 0.2s; }
+        .lang-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .stream-status { padding: 4px 15px 8px; font-size: 11px; color: #94a3b8; min-height: 22px; }
+        .stream-status.ok { color: #22c55e; }
+        .stream-status.err { color: #ef4444; }
+        .stream-status.warn { color: #f59e0b; }
+        .ep-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 15px; }
+        .ep-btn { background: #1e293b; color: white; padding: 10px; border-radius: 4px; text-align: center; font-size: 12px; cursor: pointer; border: 1px solid transparent; }
+        .ep-btn.active { background: var(--primary); }
+        .biblio-bar { display: flex; gap: 8px; padding: 0 15px 10px; }
+        .biblio-bar input { flex: 1; background: rgba(30,41,59,0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 9px 12px; color: white; font-family: 'Inter', sans-serif; font-size: 12px; outline: none; }
+        .biblio-bar input:focus { border-color: var(--primary); }
+        .biblio-bar button { background: var(--primary); border: none; border-radius: 8px; padding: 9px 14px; color: white; font-weight: 700; font-size: 12px; cursor: pointer; }
+        .filter-row { display: flex; gap: 6px; overflow-x: auto; padding: 0 15px 10px; }
+        .filter-row::-webkit-scrollbar { display: none; }
+        .filter-chip { flex-shrink: 0; padding: 5px 12px; border-radius: 20px; background: rgba(30,41,59,0.8); border: 1px solid rgba(255,255,255,0.1); font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        .filter-chip.active { background: var(--primary); border-color: var(--primary); }
+        .sort-row { display: flex; gap: 6px; padding: 0 15px 12px; align-items: center; }
+        .sort-btn { padding: 4px 12px; border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: #1e293b; color: #94a3b8; }
+        .sort-btn.active { background: #334155; color: white; }
+        .manga-dex-card { background: var(--card); border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; }
+        .manga-dex-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        .manga-dex-card p { font-size: 10px; padding: 6px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .fav-btn { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.6); border: none; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; }
+        .history-item { display: flex; gap: 12px; align-items: center; background: var(--card); border-radius: 10px; padding: 10px; margin: 0 15px 10px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
+        .history-item img { width: 50px; height: 70px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+        .history-title { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .history-chap { font-size: 10px; color: #94a3b8; margin-top: 3px; }
+        .manga-detail-header { display: flex; gap: 12px; padding: 15px; }
+        .manga-detail-cover { width: 100px; height: 145px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+        .manga-detail-title { font-size: 15px; font-weight: 900; margin-bottom: 6px; }
+        .manga-detail-desc { font-size: 11px; color: #94a3b8; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+        .manga-status-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 700; margin-top: 5px; }
+        .status-ongoing { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .status-completed { background: rgba(99,102,241,0.15); color: #818cf8; }
+        .chapter-list { padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .chapter-item { background: var(--card); border-radius: 8px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        .chapter-item.read { opacity: 0.5; }
+        .chapter-num { font-size: 13px; font-weight: 700; }
+        .chapter-date { font-size: 10px; color: #94a3b8; }
+        .chapter-read-btn { background: var(--primary); border: none; color: white; padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
+        #readerView { display: none; padding: 58px 0 20px; min-height: 100vh; background: #000; }
+        .reader-nav { position: fixed; top: 58px; width: 100%; background: rgba(2,6,23,0.95); padding: 8px 15px; display: flex; align-items: center; justify-content: space-between; z-index: 999; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .reader-title { font-size: 12px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 55%; }
+        .reader-controls { display: flex; gap: 8px; }
+        .reader-btn { background: #1e293b; border: none; color: white; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
+        .reader-btn.primary { background: var(--primary); }
+        .chapter-pages { padding-top: 46px; }
+        .chapter-pages img { width: 100%; display: block; }
+        .about-content { padding: 15px; color: #94a3b8; font-size: 13px; line-height: 1.6; }
+        .about-content h4 { color: var(--primary); margin: 20px 0 10px; text-transform: uppercase; font-size: 14px; }
+        .about-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        footer { position: fixed; bottom: 0; width: 100%; height: 65px; background: rgba(15,23,42,0.95); backdrop-filter: blur(10px); display: flex; z-index: 1000; border-top: 1px solid rgba(255,255,255,0.05); }
+        .tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9px; color: #94a3b8; cursor: pointer; gap: 2px; }
+        .tab span:first-child { font-size: 16px; }
+        .tab.active-tab { color: var(--primary); }
+        .loading-txt { text-align: center; color: #94a3b8; padding: 30px; font-size: 13px; }
+        .load-more-btn { display: block; margin: 10px auto 20px; padding: 10px 30px; background: #1e293b; border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 8px; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; }
+    </style>
+</head>
+<body>
+<input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="handleAvatarChange(event)">
+<div id="menuOverlay" class="menu-overlay" onclick="toggleMenu()"></div>
+<div id="sideMenu" class="side-menu">
+    <div class="profile-section">
+        <div class="profile-avatar" onclick="document.getElementById('avatarInput').click()">
+            <span id="avatarLetter">D</span>
+            <img id="avatarImg" src="" alt="" style="display:none;">
+            <div class="avatar-overlay">📷</div>
+        </div>
+        <div>
+            <h4 style="margin:0;font-size:14px;">Davieslay 💥</h4>
+            <p style="margin:0;font-size:11px;color:#94a3b8;">Créateur OtAkU+</p>
+        </div>
+    </div>
+    <div class="menu-link" onclick="loadHome()">🏠 ACCUEIL</div>
+    <div class="menu-link" onclick="loadDiscover()">🔭 DÉCOUVRIR</div>
+    <div class="menu-link" onclick="loadCalendar()">📅 CALENDRIER</div>
+    <div class="menu-link" onclick="loadBibliotheque()">📚 BIBLIOTHÈQUE MANGA</div>
+    <div class="menu-link" onclick="loadCommunity()">🌐 COMMUNAUTÉ</div>
+    <div class="menu-link" onclick="loadAbout()">💡 À PROPOS</div>
+    <div class="menu-link" style="color:#64748b;margin-top:40px;" onclick="loadSettings()">⚙️ PARAMÈTRES</div>
+    <div class="menu-link" style="color:#ef4444;" onclick="toggleMenu(false)">✕ FERMER</div>
+</div>
+<nav>
+    <div class="nav-left">
+        <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+        <div class="logo-txt" onclick="loadHome()">OtAkU<span>+</span></div>
+    </div>
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Recherche rapide..." autocomplete="off">
+    </div>
+</nav>
+<div id="searchSuggestions"><div id="suggestionsList"></div></div>
+<div id="homeView" class="view active">
+    <h3 class="section-title">En ce moment</h3>
+    <div id="recentScroll" style="display:flex;gap:10px;overflow-x:auto;padding:0 15px 15px;"></div>
+    <h3 class="section-title">Top Populaires</h3>
+    <div class="grid" id="popGrid"></div>
+</div>
+<div id="discoverView" class="view">
+    <h3 class="section-title" id="discoverTitle">Découvrir</h3>
+    <div class="grid" id="discoverGrid"></div>
+</div>
+<div id="calendarView" class="view">
+    <h3 class="section-title">Agenda des sorties</h3>
+    <div id="calendarContent" style="padding:15px;"></div>
+</div>
+<div id="bibliothequeView" class="view">
+    <h3 class="section-title">📚 Bibliothèque Manga</h3>
+    <div style="display:flex;padding:0 15px 12px;">
+        <div id="tabBiblio" onclick="switchBiblioTab('biblio')" style="flex:1;padding:9px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;background:var(--primary);color:white;border-radius:8px 0 0 8px;">TOUS LES MANGAS</div>
+        <div id="tabHistorique" onclick="switchBiblioTab('historique')" style="flex:1;padding:9px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;background:#1e293b;color:#94a3b8;border-radius:0 8px 8px 0;">EN COURS DE LECTURE</div>
+    </div>
+    <div id="panelBiblio">
+        <div class="biblio-bar">
+            <input type="text" id="biblioSearch" placeholder="Rechercher un manga..." autocomplete="off">
+            <button onclick="searchBiblio()">🔍</button>
+        </div>
+        <div class="filter-row" id="biblioGenres"></div>
+        <div class="sort-row">
+            <span style="font-size:10px;color:#94a3b8;">TRIER :</span>
+            <div class="sort-btn active" id="sort-pop" onclick="setSortBiblio('followedCount')">Popularité</div>
+            <div class="sort-btn" id="sort-new" onclick="setSortBiblio('latestUploadedChapter')">Récents</div>
+            <div class="sort-btn" id="sort-az" onclick="setSortBiblio('title')">A-Z</div>
+        </div>
+        <div class="grid" id="biblioGrid"></div>
+        <button class="load-more-btn" id="biblioMoreBtn" onclick="loadMoreBiblio()" style="display:none;">CHARGER PLUS</button>
+    </div>
+    <div id="panelHistorique" style="display:none;">
+        <div id="historiqueList"></div>
+        <div id="historiqueEmpty" style="display:none;" class="loading-txt">📖 Aucun manga en cours de lecture.</div>
+    </div>
+</div>
+<div id="mangaDetailView" class="view">
+    <div id="mangaDetailContent"></div>
+    <h3 class="section-title">Chapitres</h3>
+    <div id="chapterList" class="chapter-list"></div>
+    <div style="padding:0 15px 10px;">
+        <button class="ep-btn" style="width:100%;background:#334155;" id="retourDetailBtn">← RETOUR</button>
+    </div>
+</div>
+<div id="readerView">
+    <div class="reader-nav">
+        <div class="reader-title" id="readerTitle">Lecture</div>
+        <div class="reader-controls">
+            <button class="reader-btn" onclick="navigateChapter(-1)">◀</button>
+            <button class="reader-btn primary" onclick="navigateChapter(1)">▶</button>
+            <button class="reader-btn" onclick="closeReader()">✕</button>
+        </div>
+    </div>
+    <div class="chapter-pages" id="chapterPages"></div>
+</div>
+<div id="communityView" class="view">
+    <h3 class="section-title">Communauté</h3>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:15px;">
+        <p style="font-size:13px;color:#94a3b8;">Rejoignez le ralliement des passionnés !</p>
+        <a href="https://discord.gg/w3Tst5te8" target="_blank" style="text-decoration:none;">
+            <div class="ep-btn" style="background:#5865F2;font-weight:bold;">REJOINDRE LE DISCORD</div>
+        </a>
+        <div class="ep-btn" style="background:#E1306C;font-weight:bold;">SUIVRE SUR INSTAGRAM</div>
+        <div class="ep-btn" style="background:#1e293b;color:#94a3b8;">CONTACT : davidlaurens090@gmail.com</div>
+    </div>
+</div>
+<div id="aboutView" class="view">
+    <h3 class="section-title">À Propos de OtAkU+</h3>
+    <div class="about-content">
+        <div class="about-card">
+            <h2 style="color:#fff;font-size:18px;margin:0 0 10px 0;">Bienvenue dans l'univers OtAkU+ !</h2>
+            <p>OtAkU+ est une plateforme ultra-fluide, gratuite et optimisée pour mobile.</p>
+        </div>
+        <h4>Notre Mission</h4>
+        <ul style="padding-left:20px;">
+            <li><strong>Accessibilité :</strong> Faciliter l'accès aux meilleures œuvres sans barrières.</li>
+            <li><strong>Performance :</strong> Interface sombre et rapide.</li>
+            <li><strong>Communauté :</strong> Un point de ralliement pour tous les passionnés.</li>
+        </ul>
+        <h4>L'Auteur du Projet</h4>
+        <div class="about-card" style="border-left:3px solid var(--primary);">
+            <p style="color:#fff;font-weight:bold;margin-bottom:5px;">David Laurens KOKOURA</p>
+            <p style="font-style:italic;font-size:12px;">alias DAVIESLAY 💥 OTAKU</p>
+            <p>Développeur passionné depuis <strong>Abidjan, Côte d'Ivoire 🇨🇮</strong>.</p>
+        </div>
+        <div style="background:rgba(249,115,22,0.1);padding:15px;border-radius:8px;border:1px dashed var(--primary);margin-top:20px;">
+            <p style="margin:0;font-weight:bold;color:var(--primary);">INFOS TECHNIQUES</p>
+            <p style="margin:5px 0 0;font-size:11px;">Version : 1.0 (Bêta)</p>
+        </div>
+    </div>
+</div>
+<div id="settingsView" class="view">
+    <h3 class="section-title">Paramètres</h3>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:10px;">
+        <div style="background:var(--card);padding:15px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
+            <span>Notifications</span><input type="checkbox" checked>
+        </div>
+        <div style="background:var(--card);padding:15px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
+            <span>Lecture automatique</span><input type="checkbox" checked>
+        </div>
+        <div style="background:var(--card);padding:15px;border-radius:8px;">
+            <p style="margin:0 0 8px;font-size:13px;">Langue vidéo préférée</p>
+            <div style="display:flex;gap:8px;">
+                <div onclick="setDefaultLang('vostfr')" id="defVOSTFR" style="flex:1;padding:8px;text-align:center;border-radius:6px;background:var(--primary);color:white;font-size:12px;font-weight:700;cursor:pointer;">VOSTFR</div>
+                <div onclick="setDefaultLang('vf')" id="defVF" style="flex:1;padding:8px;text-align:center;border-radius:6px;background:#1e293b;color:#94a3b8;font-size:12px;font-weight:700;cursor:pointer;">VF</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="playerView" class="view">
+    <div class="vid-container">
+        <div class="vid-loading" id="vidLoading">
+            <div class="vid-spinner"></div>
+            <span id="vidLoadingTxt">Recherche du stream...</span>
+        </div>
+        <iframe id="vidFrame" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" style="display:none;"></iframe>
+    </div>
+    <div style="padding:12px 15px 0;">
+        <h2 id="vidTitle" style="margin:0;font-size:18px;"></h2>
+    </div>
+    <div class="lang-tabs">
+        <div class="lang-tab active" id="langVOSTFR" onclick="switchLang('vostfr')">🎌 VOSTFR</div>
+        <div class="lang-tab" id="langVF" onclick="switchLang('vf')">🇫🇷 VF</div>
+    </div>
+    <div class="stream-status" id="streamStatus"></div>
+    <p style="color:var(--primary);font-size:12px;margin:0 15px 5px;">ÉPISODES</p>
+    <div id="epList" class="ep-grid"></div>
+    <div style="padding:0 15px;">
+        <button class="ep-btn" style="width:100%;margin-top:15px;background:#334155;" onclick="loadHome()">RETOUR</button>
+    </div>
+</div>
+<footer>
+    <div class="tab" id="ftHome" onclick="loadHome()"><span>🏠</span>ACCUEIL</div>
+    <div class="tab" id="ftDiscover" onclick="loadDiscover()"><span>🔭</span>DÉCOUVRIR</div>
+    <div class="tab" id="ftBiblio" onclick="loadBibliotheque()"><span>📚</span>MANGA</div>
+    <div class="tab" id="ftSettings" onclick="loadSettings()"><span>⚙️</span>RÉGLAGES</div>
+</footer>
+<script>
+var searchTimer;
+var TMDB_KEY='4f5f43495afcc67e9553f6c684a82f84';
+var TMDB='https://api.themoviedb.org/3';
+var MDEX='https://api.mangadex.org';
+var MDEX_IMG='https://uploads.mangadex.org';
+var PROXY='https://corsproxy.io/?url=';
+var currentTmdbId=null,currentEp=1,currentEpCount=12,currentLang=localStorage.getItem('otaku_lang')||'vostfr',currentAnimeTitle='';
+var biblioOffset=0,biblioGenreId=null,biblioSort='followedCount',biblioQuery='',biblioLoaded=false;
+var currentChapters=[],currentChapterIndex=0,currentMangaId=null;
+var readHistory=JSON.parse(localStorage.getItem('otaku_history')||'{}');
+var readChapters=JSON.parse(localStorage.getItem('otaku_read_chaps')||'{}');
+var GENRES_MANGA=[
+    {label:'Tous',id:null},{label:'Action',id:'391b0423-d847-456f-aff0-8b0cfc03066b'},
+    {label:'Romance',id:'423e2eae-a7a2-4a8b-ac03-a8351462d71d'},{label:'Comédie',id:'4d32cc48-9f00-4cca-9b5a-a839f0764984'},
+    {label:'Fantasy',id:'cdc58593-87dd-415e-bbc0-2ec27bf404cc'},{label:'Horreur',id:'cdad7e68-1419-41dd-bdce-27753074a640'},
+    {label:'Aventure',id:'87cc87cd-a395-47af-b27a-93258283bbc6'},{label:'Drame',id:'b9af3a63-f058-46de-a9a0-e0c13906197a'},
+    {label:'Sport',id:'69964a64-2f90-4d33-beeb-f3ed2875eb4c'},{label:'Sci-Fi',id:'256c8bd9-4904-4360-bf4f-508a76d67183'},
+    {label:'Isekai',id:'ace04997-f6bd-436e-b261-779182193d3d'}
+];
+function mdFetch(url){return fetch(PROXY+encodeURIComponent(url)).then(function(r){return r.json();});}
+function handleAvatarChange(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){document.getElementById('avatarImg').src=ev.target.result;document.getElementById('avatarImg').style.display='block';document.getElementById('avatarLetter').style.display='none';localStorage.setItem('otaku_avatar',ev.target.result);};r.readAsDataURL(f);}
+function loadSavedAvatar(){var s=localStorage.getItem('otaku_avatar');if(s){document.getElementById('avatarImg').src=s;document.getElementById('avatarImg').style.display='block';document.getElementById('avatarLetter').style.display='none';}}
+function showView(id){document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});document.getElementById('readerView').style.display='none';var t=document.getElementById(id);if(t)t.classList.add('active');window.scrollTo(0,0);toggleMenu(false);document.getElementById('searchSuggestions').style.display='none';['ftHome','ftDiscover','ftBiblio','ftSettings'].forEach(function(x){var el=document.getElementById(x);if(el)el.classList.remove('active-tab');});var map={homeView:'ftHome',discoverView:'ftDiscover',bibliothequeView:'ftBiblio',settingsView:'ftSettings'};if(map[id]){var el=document.getElementById(map[id]);if(el)el.classList.add('active-tab');}}
+function toggleMenu(f){var m=document.getElementById('sideMenu'),o=document.getElementById('menuOverlay');if(f===false){m.classList.remove('open');o.style.display='none';}else{m.classList.toggle('open');o.style.display=m.classList.contains('open')?'block':'none';}}
+function loadCommunity(){showView('communityView');}
+function loadAbout(){showView('aboutView');}
+function loadSettings(){showView('settingsView');document.getElementById('defVOSTFR').style.background=currentLang==='vostfr'?'var(--primary)':'#1e293b';document.getElementById('defVOSTFR').style.color=currentLang==='vostfr'?'white':'#94a3b8';document.getElementById('defVF').style.background=currentLang==='vf'?'var(--primary)':'#1e293b';document.getElementById('defVF').style.color=currentLang==='vf'?'white':'#94a3b8';}
+function setDefaultLang(l){currentLang=l;localStorage.setItem('otaku_lang',l);loadSettings();}
+var searchInput=document.getElementById('searchInput');
+var suggestionsBox=document.getElementById('searchSuggestions');
+searchInput.addEventListener('input',function(){clearTimeout(searchTimer);var q=searchInput.value.trim();if(q.length<3){suggestionsBox.style.display='none';return;}searchTimer=setTimeout(function(){fetch('https://api.jikan.moe/v4/anime?q='+encodeURIComponent(q)+'&limit=6').then(function(r){return r.json();}).then(function(d){if(d.data&&d.data.length>0){suggestionsBox.style.display='block';document.getElementById('suggestionsList').innerHTML=d.data.map(function(a){return '<div class="suggestion-item" onclick="playAnime(\''+a.title.replace(/'/g,"\\'")+'\','+a.mal_id+')"><img src="'+a.images.jpg.small_image_url+'" style="width:40px;height:55px;border-radius:4px;object-fit:cover;"><div style="overflow:hidden"><div style="font-size:12px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+a.title+'</div><div style="font-size:10px;color:#94a3b8;">★ '+(a.score||'N/A')+'</div></div></div>';}).join('');}}).catch(function(){});},500);});
+document.addEventListener('click',function(e){if(!searchInput.contains(e.target))suggestionsBox.style.display='none';});
+function loadHome(){showView('homeView');fetch('https://api.jikan.moe/v4/seasons/now?limit=10').then(function(r){return r.json();}).then(function(d){document.getElementById('recentScroll').innerHTML=d.data.map(function(a){return '<div style="flex-shrink:0;cursor:pointer;" onclick="playAnime(\''+a.title.replace(/'/g,"\\'")+'\','+a.mal_id+')"><img src="'+a.images.jpg.image_url+'" style="width:100px;height:140px;border-radius:8px;object-fit:cover;display:block;"></div>';}).join('');}).catch(function(){});fetch('https://api.jikan.moe/v4/top/anime?limit=12&type=tv').then(function(r){return r.json();}).then(function(d){renderGrid(d.data,'popGrid');}).catch(function(){});}
+function loadDiscover(){document.getElementById('discoverTitle').innerText='Top de la Saison';showView('discoverView');fetch('https://api.jikan.moe/v4/seasons/now?limit=24').then(function(r){return r.json();}).then(function(d){renderGrid(d.data,'discoverGrid');}).catch(function(){});}
+async function loadCalendar(){showView('calendarView');var days=['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];var labels={monday:'Lundi',tuesday:'Mardi',wednesday:'Mercredi',thursday:'Jeudi',friday:'Vendredi',saturday:'Samedi',sunday:'Dimanche'};document.getElementById('calendarContent').innerHTML=days.map(function(d){return '<h4 style="color:var(--primary);margin-bottom:10px;text-transform:uppercase;">'+labels[d]+'</h4><div id="cal-'+d+'" style="display:flex;gap:10px;overflow-x:auto;margin-bottom:20px;color:#94a3b8;font-size:12px;">Chargement...</div>';}).join('');for(var i=0;i<days.length;i++){await new Promise(function(r){setTimeout(r,i*500);});(function(day){fetch('https://api.jikan.moe/v4/schedules?filter='+day+'&limit=5').then(function(r){return r.json();}).then(function(d){var el=document.getElementById('cal-'+day);if(!el)return;el.innerHTML=d.data&&d.data.length>0?d.data.map(function(a){return '<img src="'+a.images.jpg.small_image_url+'" onclick="playAnime(\''+a.title.replace(/'/g,"\\'")+'\','+a.mal_id+')" style="width:70px;height:100px;border-radius:5px;object-fit:cover;cursor:pointer;">';}).join(''):'<span>Pas de sortie</span>';}).catch(function(){var el=document.getElementById('cal-'+day);if(el)el.innerHTML='<span>Indisponible</span>';});})(days[i]);}}
+function renderGrid(data,target){document.getElementById(target).innerHTML=data.map(function(a){return '<div class="manga-card" onclick="playAnime(\''+a.title.replace(/'/g,"\\'")+'\','+a.mal_id+')"><img src="'+a.images.jpg.large_image_url+'" loading="lazy"><p>'+a.title+'</p></div>';}).join('');}
+function setStatus(msg,type){var el=document.getElementById('streamStatus');el.textContent=msg;el.className='stream-status'+(type?' '+type:'');}
+async function playAnime(title,malId){currentTmdbId=null;currentEp=1;currentAnimeTitle=title;document.getElementById('vidTitle').innerText=title;document.getElementById('vidFrame').style.display='none';document.getElementById('vidLoading').style.display='flex';document.getElementById('vidLoadingTxt').textContent='Recherche du stream...';document.getElementById('epList').innerHTML='';setStatus('');showView('playerView');searchInput.value='';suggestionsBox.style.display='none';document.getElementById('langVOSTFR').classList.toggle('active',currentLang==='vostfr');document.getElementById('langVF').classList.toggle('active',currentLang==='vf');try{var r=await fetch('https://api.jikan.moe/v4/anime/'+malId);var d=await r.json();currentEpCount=d.data.episodes||12;}catch(e){currentEpCount=12;}try{document.getElementById('vidLoadingTxt').textContent='Identification TMDB...';var r2=await fetch(TMDB+'/search/tv?api_key='+TMDB_KEY+'&query='+encodeURIComponent(title));var d2=await r2.json();if(d2.results&&d2.results.length>0){currentTmdbId=d2.results[0].id;setStatus('✅ '+(d2.results[0].name||title),'ok');}else{setStatus('⚠️ Stream direct activé','warn');}}catch(e){setStatus('⚠️ Stream direct activé','warn');}buildEpButtons(currentEpCount);loadStream(1);}
+function buildEpButtons(count){var list=document.getElementById('epList');list.innerHTML='';var max=Math.min(count,500);for(var i=1;i<=max;i++){var b=document.createElement('div');b.className='ep-btn'+(i===1?' active':'');b.innerText=i;(function(ep){b.onclick=function(){document.querySelectorAll('.ep-btn').forEach(function(x){x.classList.remove('active');});b.classList.add('active');currentEp=ep;loadStream(ep);};})(i);list.appendChild(b);}}
+function loadStream(ep){currentEp=ep;var frame=document.getElementById('vidFrame');document.getElementById('vidLoading').style.display='none';var url;if(currentLang==='vf'){url=currentTmdbId?'https://vidsrc.to/embed/tv/'+currentTmdbId+'/1/'+ep:'https://vidsrc.to/embed/tv/'+encodeURIComponent(currentAnimeTitle)+'/1/'+ep;setStatus('🇫🇷 VF — Épisode '+ep,'ok');}else{url=currentTmdbId?'https://vidsrc.cc/v2/embed/tv/'+currentTmdbId+'/1/'+ep+'?autoPlay=1':'https://vidsrc.cc/v2/embed/tv/'+encodeURIComponent(currentAnimeTitle)+'/1/'+ep+'?autoPlay=1';setStatus('🎌 VOSTFR — Épisode '+ep,'ok');}frame.src=url;frame.style.display='block';}
+function switchLang(lang){currentLang=lang;localStorage.setItem('otaku_lang',lang);document.getElementById('langVOSTFR').classList.toggle('active',lang==='vostfr');document.getElementById('langVF').classList.toggle('active',lang==='vf');loadStream(currentEp);}
+function loadBibliotheque(){showView('bibliothequeView');buildBiblioGenres();if(!biblioLoaded)fetchBiblio(true);switchBiblioTab('biblio');}
+function switchBiblioTab(tab){var b=tab==='biblio';document.getElementById('panelBiblio').style.display=b?'block':'none';document.getElementById('panelHistorique').style.display=b?'none':'block';document.getElementById('tabBiblio').style.background=b?'var(--primary)':'#1e293b';document.getElementById('tabBiblio').style.color=b?'white':'#94a3b8';document.getElementById('tabHistorique').style.background=b?'#1e293b':'var(--primary)';document.getElementById('tabHistorique').style.color=b?'#94a3b8':'white';if(!b)renderHistorique();}
+function buildBiblioGenres(){document.getElementById('biblioGenres').innerHTML=GENRES_MANGA.map(function(g){return '<div class="filter-chip '+(g.id===biblioGenreId?'active':'')+'" onclick="setBiblioGenre('+(g.id?'\''+g.id+'\'':'null')+')">'+g.label+'</div>';}).join('');}
+function setBiblioGenre(id){biblioGenreId=id||null;buildBiblioGenres();fetchBiblio(true);}
+function setSortBiblio(sort){biblioSort=sort;['pop','new','az'].forEach(function(s){var el=document.getElementById('sort-'+s);if(el)el.classList.remove('active');});var map={followedCount:'pop',latestUploadedChapter:'new',title:'az'};var el=document.getElementById('sort-'+map[sort]);if(el)el.classList.add('active');fetchBiblio(true);}
+function searchBiblio(){biblioQuery=document.getElementById('biblioSearch').value.trim();fetchBiblio(true);}
+async function fetchBiblio(reset){if(reset){biblioOffset=0;document.getElementById('biblioGrid').innerHTML='';}var grid=document.getElementById('biblioGrid');if(reset)grid.innerHTML='<div class="loading-txt" style="grid-column:1/-1;">Chargement...</div>';var url=MDEX+'/manga?limit=24&offset='+biblioOffset+'&order['+biblioSort+']=desc&includes[]=cover_art&contentRating[]=safe&contentRating[]=suggestive';if(biblioQuery)url+='&title='+encodeURIComponent(biblioQuery);if(biblioGenreId)url+='&includedTags[]='+biblioGenreId;try{var json=await mdFetch(url);if(!json.data||!json.data.length){if(reset)grid.innerHTML='<div class="loading-txt" style="grid-column:1/-1;">Aucun résultat.</div>';document.getElementById('biblioMoreBtn').style.display='none';return;}if(reset)grid.innerHTML='';var favIds=getFavIds();grid.innerHTML+=json.data.map(function(m){var title=m.attributes.title.fr||m.attributes.title.en||Object.values(m.attributes.title)[0]||'Sans titre';var coverRel=m.relationships.find(function(r){return r.type==='cover_art';});var coverUrl=coverRel&&coverRel.attributes&&coverRel.attributes.fileName?MDEX_IMG+'/covers/'+m.id+'/'+coverRel.attributes.fileName+'.256.jpg':'';var isFav=favIds.indexOf(m.id)>-1;return '<div class="manga-dex-card" onclick="openMangaDetail(\''+m.id+'\')"><img src="'+coverUrl+'" loading="lazy" onerror="this.style.background=\'#1e293b\'"><button class="fav-btn" onclick="event.stopPropagation();toggleFav(\''+m.id+'\',\''+title.replace(/'/g,"\\'")+'\',\''+coverUrl+'\')" id="fav-'+m.id+'">'+(isFav?'❤️':'🤍')+'</button><p>'+title+'</p></div>';}).join('');biblioOffset+=24;biblioLoaded=true;document.getElementById('biblioMoreBtn').style.display=json.data.length===24?'block':'none';}catch(e){if(reset)grid.innerHTML='<div class="loading-txt" style="grid-column:1/-1;">Erreur.</div>';}}
+function loadMoreBiblio(){fetchBiblio(false);}
+function getFavIds(){return JSON.parse(localStorage.getItem('otaku_favs_data')||'[]').map(function(f){return f.id;});}
+function toggleFav(id,title,cover){var favs=JSON.parse(localStorage.getItem('otaku_favs_data')||'[]');var ids=favs.map(function(f){return f.id;});if(ids.indexOf(id)>-1){favs=favs.filter(function(f){return f.id!==id;});var btn=document.getElementById('fav-'+id);if(btn)btn.textContent='🤍';}else{favs.push({id:id,title:title,cover:cover});var btn=document.getElementById('fav-'+id);if(btn)btn.textContent='❤️';}localStorage.setItem('otaku_favs_data',JSON.stringify(favs));}
+function saveHistory(mangaId,title,cover,chapNum){readHistory[mangaId]={title:title,cover:cover,chapNum:chapNum,date:Date.now()};localStorage.setItem('otaku_history',JSON.stringify(readHistory));}
+function renderHistorique(){var list=document.getElementById('historiqueList'),empty=document.getElementById('historiqueEmpty');var entries=Object.entries(readHistory).sort(function(a,b){return b[1].date-a[1].date;});if(!entries.length){list.innerHTML='';empty.style.display='block';return;}empty.style.display='none';list.innerHTML=entries.map(function(e){var id=e[0],info=e[1];return '<div class="history-item" onclick="openMangaDetail(\''+id+'\')"><img src="'+info.cover+'" onerror="this.style.background=\'#1e293b\'" alt=""><div style="flex:1;overflow:hidden;"><div class="history-title">'+info.title+'</div><div class="history-chap">Dernier lu : Chapitre '+info.chapNum+'</div></div></div>';}).join('');}
+async function openMangaDetail(mangaId){currentMangaId=mangaId;document.getElementById('retourDetailBtn').onclick=function(){showView('bibliothequeView');};showView('mangaDetailView');document.getElementById('mangaDetailContent').innerHTML='<div class="loading-txt">Chargement...</div>';document.getElementById('chapterList').innerHTML='';try{var mJson=await mdFetch(MDEX+'/manga/'+mangaId+'?includes[]=cover_art');var m=mJson.data;var title=m.attributes.title.fr||m.attributes.title.en||Object.values(m.attributes.title)[0]||'Sans titre';var desc=m.attributes.description.fr||m.attributes.description.en||'Pas de description.';var status=m.attributes.status;var coverRel=m.relationships.find(function(r){return r.type==='cover_art';});var coverUrl=coverRel&&coverRel.attributes&&coverRel.attributes.fileName?MDEX_IMG+'/covers/'+m.id+'/'+coverRel.attributes.fileName+'.256.jpg':'';var statusClass=status==='ongoing'?'status-ongoing':'status-completed';var statusLabel=status==='ongoing'?'🟢 En cours':status==='completed'?'✅ Terminé':'';document.getElementById('mangaDetailContent').innerHTML='<div class="manga-detail-header"><img class="manga-detail-cover" src="'+coverUrl+'" onerror="this.style.background=\'#1e293b\'"><div><div class="manga-detail-title">'+title+'</div>'+(statusLabel?'<span class="manga-status-badge '+statusClass+'">'+statusLabel+'</span>':'')+'<div class="manga-detail-desc" style="margin-top:6px;">'+desc+'</div></div></div>';var cJson=await mdFetch(MDEX+'/manga/'+mangaId+'/feed?translatedLanguage[]=fr&order[chapter]=desc&limit=100');var chapters=cJson.data;if(!chapters||!chapters.length){document.getElementById('chapterList').innerHTML='<div class="loading-txt">Pas de chapitres FR disponibles.</div>';return;}currentChapters=chapters;document.getElementById('chapterList').innerHTML=chapters.map(function(ch,idx){var num=ch.attributes.chapter||'?';var date=ch.attributes.publishAt?new Date(ch.attributes.publishAt).toLocaleDateString('fr-FR'):'';var isRead=readChapters[mangaId+'_'+num];return '<div class="chapter-item '+(isRead?'read':'')+'"><div><div class="chapter-num">Chapitre '+num+(isRead?' ✓':'')+'</div><div class="chapter-date">'+date+'</div></div><button class="chapter-read-btn" onclick="readChap('+idx+',\''+mangaId+'\',\''+title.replace(/'/g,"\\'")+'\',\''+coverUrl+'\',\''+num+'\')">LIRE</button></div>';}).join('');}catch(e){document.getElementById('mangaDetailContent').innerHTML='<div class="loading-txt">Erreur.</div>';}}
+function readChap(index,mangaId,title,cover,chapNum){readChapter(index,mangaId,title,cover,chapNum);}
+async function readChapter(index,mangaId,title,cover,chapNum){currentChapterIndex=index;var chapter=currentChapters[index];var num=chapter.attributes.chapter||chapNum||'?';document.getElementById('readerTitle').innerText=title+' — Ch. '+num;document.getElementById('chapterPages').innerHTML='<div class="loading-txt" style="color:white;">Chargement...</div>';document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});document.getElementById('readerView').style.display='block';window.scrollTo(0,0);saveHistory(mangaId||currentMangaId,title,cover,num);readChapters[(mangaId||currentMangaId)+'_'+num]=true;localStorage.setItem('otaku_read_chaps',JSON.stringify(readChapters));try{var json=await mdFetch(MDEX+'/at-home/server/'+chapter.id);var pages=json.chapter.data.map(function(f){return json.baseUrl+'/data/'+json.chapter.hash+'/'+f;});document.getElementById('chapterPages').innerHTML=pages.map(function(p){return '<img src="'+p+'" loading="lazy" onerror="this.style.display=\'none\'">';}).join('');}catch(e){document.getElementById('chapterPages').innerHTML='<div class="loading-txt" style="color:#94a3b8;">Erreur.</div>';}}
+function navigateChapter(dir){var n=currentChapterIndex-dir;if(n>=0&&n<currentChapters.length){var ch=currentChapters[n];var num=ch.attributes.chapter||'?';var t=document.getElementById('readerTitle').innerText.split(' — ')[0];readChapter(n,currentMangaId,t,'',num);}}
+function closeReader(){document.getElementById('readerView').style.display='none';showView('mangaDetailView');}
+window.addEventListener('DOMContentLoaded',function(){var bs=document.getElementById('biblioSearch');if(bs)bs.addEventListener('keydown',function(e){if(e.key==='Enter')searchBiblio();});});
+window.onload=function(){loadHome();loadSavedAvatar();};
+</script>
+</body>
+</html>
