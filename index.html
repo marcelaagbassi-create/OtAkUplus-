@@ -1,0 +1,2317 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>OtAkU+</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#f97316">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="OtAkU+">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<script>if('serviceWorker'in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js');});</script>
+<style>
+:root{--bg:#020617;--card:#0f172a;--card2:#141e33;--primary:#f97316;--text:#f8fafc;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;margin:0;padding-bottom:140px;overflow-x:hidden;}
+
+/* AUTH SCREEN */
+#authScreen{position:fixed;inset:0;background:var(--bg);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-y:auto;}
+#authScreen.hidden{display:none;}
+.auth-logo{font-size:42px;font-weight:900;color:var(--primary);letter-spacing:-2px;margin-bottom:6px;text-align:center;}
+.auth-sub{font-size:12px;color:#94a3b8;margin-bottom:28px;text-align:center;}
+.auth-tabs{display:flex;background:#1e293b;border-radius:12px;padding:3px;margin-bottom:22px;width:100%;max-width:320px;}
+.auth-tab{flex:1;padding:9px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;border-radius:10px;transition:all 0.2s;}
+.auth-tab.active{background:var(--primary);color:white;}
+.auth-tab:not(.active){color:#94a3b8;}
+.auth-form{width:100%;max-width:320px;display:flex;flex-direction:column;gap:11px;}
+.auth-input{background:#1e293b;border:2px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px;color:white;font-family:'Inter',sans-serif;font-size:13px;outline:none;width:100%;}
+.auth-input:focus{border-color:var(--primary);}
+.auth-btn{background:var(--primary);border:none;border-radius:10px;padding:13px;color:white;font-family:'Inter',sans-serif;font-weight:900;font-size:14px;cursor:pointer;width:100%;transition:all 0.2s;}
+.auth-btn:hover{filter:brightness(1.1);}
+.auth-err{font-size:11px;color:#ef4444;text-align:center;min-height:16px;}
+
+/* PROFIL SELECTOR */
+#profileSelector{position:fixed;inset:0;background:var(--bg);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow:hidden;}
+#profileSelector.open{display:flex;}
+.ps-bg{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);gap:3px;opacity:0.15;filter:blur(2px);transform:scale(1.05);}
+.ps-bg img{width:100%;height:100%;object-fit:cover;}
+.ps-bg-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(2,6,23,0.7),rgba(2,6,23,0.85));}
+.ps-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:100%;}
+.ps-title{font-size:20px;font-weight:900;margin-bottom:6px;}
+.ps-sub{font-size:12px;color:#94a3b8;margin-bottom:28px;}
+.ps-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%;max-width:340px;margin-bottom:20px;}
+.ps-card{background:var(--card);border-radius:14px;padding:18px 10px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;}
+.ps-card:hover,.ps-card:focus{border-color:var(--primary);transform:scale(1.04);}
+.ps-card.add-card{border:2px dashed rgba(255,255,255,0.15);color:#64748b;}
+.ps-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;border:2px solid rgba(255,255,255,0.1);overflow:hidden;position:relative;}
+.ps-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.ps-name{font-size:12px;font-weight:700;text-align:center;}
+.ps-del{position:absolute;top:6px;right:6px;background:rgba(239,68,68,0.85);border:none;border-radius:50%;width:18px;height:18px;color:white;font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center;}
+.ps-card:hover .ps-del{display:flex;}
+
+/* GALERIE AVATARS MANGA */
+#avatarGalleryModal{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10002;display:none;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:60px;}
+#avatarGalleryModal.open{display:flex;}
+.ag-header{width:100%;max-width:480px;display:flex;align-items:center;justify-content:space-between;padding:0 16px 14px;}
+.ag-title{font-size:16px;font-weight:900;color:var(--primary);}
+.ag-close{background:#334155;border:none;color:white;width:32px;height:32px;border-radius:50%;font-size:14px;cursor:pointer;}
+.ag-search{width:calc(100% - 32px);max-width:448px;background:#1e293b;border:2px solid rgba(255,255,255,0.1);border-radius:10px;padding:9px 14px;color:white;font-family:'Inter',sans-serif;font-size:13px;outline:none;margin-bottom:12px;}
+.ag-search:focus{border-color:var(--primary);}
+.ag-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%;max-width:480px;padding:0 16px;overflow-y:auto;max-height:calc(100vh - 180px);padding-bottom:20px;}
+.ag-card{background:var(--card);border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;}
+.ag-card:hover,.ag-card:focus{border-color:var(--primary);transform:scale(1.05);}
+.ag-card.selected{border-color:var(--primary);box-shadow:0 0 12px rgba(249,115,22,0.5);}
+.ag-card img{width:100%;aspect-ratio:1/1;object-fit:cover;object-position:top;}
+.ag-card p{font-size:8px;padding:3px 4px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;text-align:center;}
+.ag-load{text-align:center;color:#94a3b8;padding:20px;font-size:12px;grid-column:1/-1;}
+.ag-confirm{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--primary);border:none;color:white;padding:13px 36px;border-radius:12px;font-family:'Inter',sans-serif;font-weight:900;font-size:14px;cursor:pointer;box-shadow:0 4px 20px rgba(249,115,22,0.4);display:none;z-index:10003;}
+.ag-confirm.show{display:block;}
+
+/* AGENDA MANGA */
+.cal-day-header{display:flex;align-items:center;gap:10px;padding:10px 14px 8px;margin-top:6px;}
+.cal-day-label{font-size:13px;font-weight:900;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;}
+.cal-day-badge{font-size:9px;background:rgba(249,115,22,0.15);color:var(--primary);border:1px solid rgba(249,115,22,0.3);padding:2px 8px;border-radius:20px;font-weight:700;}
+.cal-day-badge.today{background:var(--primary);color:white;border-color:var(--primary);}
+.cal-scroll{display:flex;gap:8px;overflow-x:auto;padding:0 14px 14px;}
+.cal-scroll::-webkit-scrollbar{display:none;}
+.cal-anime-card{flex-shrink:0;width:80px;cursor:pointer;border-radius:9px;overflow:hidden;border:2px solid transparent;transition:all 0.2s;background:var(--card);}
+.cal-anime-card:hover,.cal-anime-card:focus{border-color:var(--primary);transform:scale(1.05);}
+.cal-anime-card img{width:100%;height:112px;object-fit:cover;display:block;}
+.cal-anime-info{padding:4px 5px;}
+.cal-anime-title{font-size:8px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-anime-ep{font-size:7px;color:var(--primary);font-weight:700;margin-top:1px;}
+.cal-anime-time{font-size:7px;color:#64748b;margin-top:1px;}
+.cal-empty{font-size:11px;color:#64748b;padding:14px;font-style:italic;}
+.cal-loading{display:flex;gap:8px;padding:0 14px 14px;}
+.cal-skeleton{width:80px;height:130px;background:linear-gradient(90deg,#1e293b 25%,#2d3f55 50%,#1e293b 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:9px;flex-shrink:0;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.cal-week-nav{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--card2);margin-bottom:4px;}
+.cal-week-btn{background:#1e293b;border:none;color:white;padding:6px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.cal-week-btn:hover{border:1px solid var(--primary);color:var(--primary);}
+.cal-week-label{font-size:12px;font-weight:700;color:#94a3b8;}
+
+/* MODE VEILLE */
+#sleepScreen{position:fixed;inset:0;z-index:9998;display:none;background:#000;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;}
+#sleepScreen.active{display:flex;}
+.sleep-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:opacity 1.5s ease,background-image 0s;}
+.sleep-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.6) 60%,rgba(0,0,0,0.92) 100%);}
+.sleep-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px;}
+.sleep-time{font-size:72px;font-weight:900;letter-spacing:-4px;line-height:1;text-shadow:0 4px 24px rgba(0,0,0,0.8);}
+.sleep-date{font-size:14px;color:rgba(255,255,255,0.7);letter-spacing:1px;text-transform:uppercase;margin-top:-6px;}
+.sleep-title{font-size:13px;font-weight:700;color:var(--primary);margin-top:16px;text-align:center;max-width:260px;text-shadow:0 2px 8px rgba(0,0,0,0.8);}
+.sleep-genres{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
+.sleep-genre{padding:4px 10px;border-radius:20px;background:rgba(249,115,22,0.2);border:1px solid rgba(249,115,22,0.4);font-size:10px;font-weight:700;color:var(--primary);}
+.sleep-hint{position:absolute;bottom:100px;font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:0.5px;}
+.sleep-recs{position:absolute;bottom:130px;display:flex;gap:10px;padding:0 16px;}
+.sleep-rec-card{width:60px;border-radius:8px;overflow:hidden;opacity:0.7;transition:opacity 0.3s;}
+.sleep-rec-card img{width:100%;aspect-ratio:2/3;object-fit:cover;}
+
+/* MODAL NOUVEAU PROFIL */
+#newProfileModal{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:10001;display:none;align-items:center;justify-content:center;}
+#newProfileModal.open{display:flex;}
+.npm-box{background:#0f172a;border:2px solid var(--primary);border-radius:16px;padding:22px;width:88%;max-width:320px;}
+.npm-title{font-size:14px;font-weight:900;color:var(--primary);margin-bottom:14px;}
+.npm-avatars{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.npm-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;background:#1e293b;}
+.npm-av:hover,.npm-av.sel{border-color:var(--primary);transform:scale(1.1);}
+
+/* CURSEUR TV */
+#tv-cursor{
+    position:fixed;
+    width:28px;height:28px;
+    border-radius:50%;
+    border:3px solid var(--primary);
+    background:rgba(249,115,22,0.25);
+    pointer-events:none;
+    z-index:9999;
+    transition:left 0.12s cubic-bezier(.16,1,.3,1),top 0.12s cubic-bezier(.16,1,.3,1),transform 0.15s,opacity 0.3s;
+    box-shadow:0 0 14px rgba(249,115,22,0.6),0 0 4px rgba(249,115,22,0.9);
+    transform:translate(-50%,-50%);
+    opacity:0;
+}
+#tv-cursor.visible{opacity:1;}
+#tv-cursor.click{transform:translate(-50%,-50%) scale(0.7);background:rgba(249,115,22,0.6);}
+
+img{background:#0f172a;}
+.manga-card img,.manga-dex-card img,.fav-card img,.history-item img{
+    background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);
+    min-height:40px;
+}
+
+/* FOCUS TV */
+.focusable:focus,button:focus,.manga-card:focus,.ep-btn:focus,.menu-link:focus,.filter-chip:focus,.sort-btn:focus,.history-item:focus,.fav-card:focus,.manga-dex-card:focus,.selector-btn:focus,.chapter-read-btn:focus,.reader-btn:focus,.load-more-btn:focus,.suggestion-item:focus{outline:4px solid var(--primary);outline-offset:2px;box-shadow:0 0 0 4px rgba(249,115,22,0.3);transform:scale(1.05);}
+.manga-card:focus,.manga-dex-card:focus,.fav-card:focus{transform:scale(1.08);}
+:focus{outline:none;}
+
+/* NAV */
+nav{background:rgba(2,6,23,0.92);backdrop-filter:blur(14px);padding:11px 16px;display:flex;justify-content:space-between;align-items:center;position:fixed;top:0;width:100%;z-index:1000;border-bottom:1px solid rgba(249,115,22,0.15);}
+.nav-left{display:flex;align-items:center;gap:14px;}
+.menu-btn{display:flex;flex-direction:column;gap:5px;cursor:pointer;width:22px;padding:4px;}
+.menu-btn span{width:100%;height:2px;background:var(--text);border-radius:2px;}
+.logo-txt{font-size:21px;font-weight:900;color:var(--primary);letter-spacing:-1px;cursor:pointer;}
+.search-box{background:rgba(30,41,59,0.6);border-radius:22px;padding:7px 14px;width:44%;border:1px solid rgba(255,255,255,0.1);}
+.search-box input{background:none;border:none;color:white;width:100%;outline:none;font-size:13px;font-family:'Inter',sans-serif;}
+#searchSuggestions{display:none;position:fixed;top:62px;right:14px;width:68%;max-width:320px;max-height:400px;background:rgba(10,17,40,0.99);backdrop-filter:blur(20px);z-index:2001;border-radius:14px;border:2px solid var(--primary);overflow-y:auto;box-shadow:0 12px 30px rgba(0,0,0,0.6);}
+.suggestion-item{display:flex;align-items:center;gap:12px;padding:11px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;}
+.suggestion-item:hover,.suggestion-item:focus{background:rgba(249,115,22,0.12);}
+
+/* SIDE MENU */
+.side-menu{position:fixed;top:0;left:-300px;width:280px;height:100%;background:#08102a;z-index:2000;transition:0.35s cubic-bezier(.16,1,.3,1);padding:26px 18px;border-right:2px solid rgba(249,115,22,0.15);overflow-y:auto;}
+.side-menu.open{left:0;}
+.profile-section{display:flex;align-items:center;gap:12px;margin-bottom:26px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.profile-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(45deg,var(--primary),#fbbf24);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;cursor:pointer;position:relative;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,0.15);}
+.profile-avatar img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;}
+.avatar-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;font-size:16px;}
+.profile-avatar:active .avatar-overlay{opacity:1;}
+.profile-name{font-size:14px;font-weight:900;}
+.profile-sub{font-size:10px;color:#94a3b8;margin-top:1px;}
+.name-edit-btn{font-size:10px;color:var(--primary);cursor:pointer;margin-top:3px;text-decoration:underline;}
+.menu-link{padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.05);color:var(--text);display:flex;align-items:center;gap:10px;font-weight:700;cursor:pointer;font-size:13px;transition:color 0.15s,padding-left 0.15s;}
+.menu-link:hover,.menu-link:focus{color:var(--primary);padding-left:6px;}
+.menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:1999;display:none;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:3000;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:#0f172a;border:2px solid var(--primary);border-radius:16px;padding:22px;width:84%;max-width:310px;}
+.modal-title{font-size:14px;font-weight:900;margin-bottom:14px;color:var(--primary);}
+.modal-input{width:100%;background:#1e293b;border:2px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 13px;color:white;font-family:'Inter',sans-serif;font-size:13px;outline:none;margin-bottom:12px;}
+.modal-input:focus{border-color:var(--primary);}
+.modal-btns{display:flex;gap:8px;}
+.modal-btn{flex:1;padding:10px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;border:none;font-family:'Inter',sans-serif;}
+.modal-btn.confirm{background:var(--primary);color:white;}
+.modal-btn.cancel{background:#334155;color:#94a3b8;}
+
+/* VIEWS */
+.view{display:none;padding:62px 0 20px;min-height:100vh;}
+.active{display:block;}
+.section-title{font-size:13px;font-weight:900;border-left:3px solid var(--primary);padding-left:9px;margin:12px 14px;text-transform:uppercase;}
+
+.hero-progress{position:absolute;bottom:0;left:0;width:100%;height:3px;background:rgba(255,255,255,0.1);z-index:4;}
+.hero-progress-bar{height:100%;background:var(--primary);width:0%;transition:none;}
+.hero-progress-bar.animate{transition:width 90s linear;}
+
+/* CERCLE PROFIL BANNIÈRE */
+.hero-profile-btn{position:absolute;top:14px;right:14px;z-index:5;width:38px;height:38px;border-radius:50%;background:linear-gradient(45deg,var(--primary),#fbbf24);border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;cursor:pointer;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.5);transition:transform 0.2s;}
+.hero-profile-btn:hover{transform:scale(1.1);}
+.hero-profile-btn img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+
+/* NAV LOUPE + AIDE */
+.search-box{background:rgba(30,41,59,0.6);border-radius:22px;padding:7px 14px;width:44%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:7px;}
+.search-box input{background:none;border:none;color:white;width:100%;outline:none;font-size:13px;font-family:'Inter',sans-serif;}
+.search-icon{color:#64748b;flex-shrink:0;width:14px;height:14px;}
+.help-btn{width:30px;height:30px;border-radius:50%;background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;font-weight:900;color:#94a3b8;flex-shrink:0;transition:all 0.2s;}
+.help-btn:hover{border-color:var(--primary);color:var(--primary);}
+.help-popup{position:fixed;top:58px;right:10px;background:rgba(10,17,40,0.99);border:2px solid var(--primary);border-radius:12px;padding:14px;width:220px;z-index:2002;display:none;font-size:11px;color:#94a3b8;line-height:1.7;box-shadow:0 8px 24px rgba(0,0,0,0.6);}
+.help-popup.open{display:block;}
+.help-popup b{color:var(--primary);}
+
+/* CARD OVERLAY */
+.manga-card{position:relative;}
+.card-badge{
+    position:absolute;top:5px;left:5px;
+    background:rgba(0,0,0,0.28);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    color:rgba(249,115,22,0.95);
+    font-size:6px;font-weight:900;
+    padding:2px 6px;border-radius:4px;
+    letter-spacing:1px;z-index:3;
+    border:1px solid rgba(249,115,22,0.25);
+    text-transform:uppercase;
+    font-family:'Inter',sans-serif;
+}
+.card-heart{
+    position:absolute;top:4px;right:4px;
+    background:rgba(0,0,0,0.25);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:50%;
+    width:22px;height:22px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;z-index:5;
+    transition:all 0.2s;
+    padding:0;
+}
+.card-heart:hover{background:rgba(239,68,68,0.3);border-color:rgba(239,68,68,0.45);transform:scale(1.18);}
+.card-heart svg{width:11px;height:11px;transition:all 0.2s;}
+.card-heart.liked svg{fill:#ef4444;stroke:#ef4444;stroke-width:1;}
+.card-heart:not(.liked) svg{fill:rgba(255,255,255,0.15);stroke:rgba(255,255,255,0.75);stroke-width:1.8;}
+/* HERO DOTS */
+.hero-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:3;}
+.hero-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.35);cursor:pointer;transition:all 0.3s;border:none;padding:0;}
+.hero-dot.active{background:var(--primary);width:20px;border-radius:4px;}
+.hero-img-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.8s ease;}
+
+/* HERO BANNER */
+.hero-banner{position:relative;width:100%;height:42vh;overflow:hidden;margin-bottom:0;}
+.hero-video-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.hero-iframe{position:absolute;inset:0;width:100%;height:100%;border:none;pointer-events:none;}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(2,6,23,0.1) 0%,rgba(2,6,23,0.5) 60%,rgba(2,6,23,1) 100%);}
+.hero-content{position:absolute;bottom:14px;left:14px;right:14px;}
+.hero-badge{font-size:9px;font-weight:900;color:var(--primary);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;}
+.hero-title{font-size:18px;font-weight:900;line-height:1.1;margin-bottom:6px;text-shadow:0 2px 8px rgba(0,0,0,0.8);}
+.hero-btns{display:flex;gap:8px;margin-top:8px;}
+.hero-btn{padding:7px 16px;border-radius:20px;font-size:11px;font-weight:900;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all 0.2s;}
+.hero-btn.play{background:var(--primary);color:white;}
+.hero-btn.resume{background:rgba(255,255,255,0.15);color:white;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);}
+.hero-btn:hover,.hero-btn:focus{transform:scale(1.05);outline:none;}
+
+/* GRID 4 cols */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:0 10px 14px;}
+.manga-card{background:var(--card);border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.2s;}
+.manga-card img{width:100%;aspect-ratio:2/3;object-fit:cover;}
+.manga-card p{font-size:8px;padding:3px 5px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.manga-card:hover{border-color:var(--primary);transform:scale(1.03);}
+
+/* PLAYER */
+.vid-container{background:#000;width:100%;aspect-ratio:16/9;position:relative;}
+/* SPLASH SCREEN */
+#splashScreen{position:fixed;inset:0;background:#020617;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.6s ease;}
+#splashScreen.fade{opacity:0;pointer-events:none;}
+.splash-logo{font-size:52px;font-weight:900;color:var(--primary);letter-spacing:-2px;animation:splashPop 0.6s cubic-bezier(.16,1,.3,1);}
+.splash-tagline{font-size:11px;color:#334155;letter-spacing:2px;text-transform:uppercase;margin-top:10px;}
+.splash-bottom{position:absolute;bottom:48px;left:0;right:0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.splash-by-txt{font-size:11px;color:#334155;letter-spacing:2px;text-transform:uppercase;}
+.splash-by-name{font-size:13px;font-weight:900;color:#475569;letter-spacing:3px;text-transform:uppercase;}
+@keyframes splashPop{0%{transform:scale(0.6);opacity:0;}100%{transform:scale(1);opacity:1;}}
+
+/* SPINNER OtAkU+ */
+.vid-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;color:#94a3b8;font-size:12px;gap:14px;}
+.otaku-spinner{position:relative;width:60px;height:60px;}
+.otaku-spinner-ring{position:absolute;inset:0;border-radius:50%;border:3px solid transparent;border-top-color:var(--primary);animation:spin 0.9s linear infinite;}
+.otaku-spinner-ring2{position:absolute;inset:6px;border-radius:50%;border:2px solid transparent;border-top-color:rgba(249,115,22,0.4);animation:spin 1.4s linear infinite reverse;}
+.otaku-spinner-logo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--primary);}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* PLAYER ACTIONS */
+.player-actions{display:flex;gap:8px;padding:10px 14px;}
+.player-action-btn{display:flex;align-items:center;gap:6px;padding:11px 20px;border-radius:6px;font-family:'Inter',sans-serif;font-size:12px;font-weight:900;cursor:pointer;border:none;transition:all 0.2s;flex:1;justify-content:center;}
+.player-action-btn.primary{background:white;color:#020617;}
+.player-action-btn.primary:hover{background:#e2e8f0;}
+.player-action-btn.secondary{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.2);}
+.player-action-btn.secondary:hover{background:rgba(255,255,255,0.25);}
+.player-meta{font-size:10px;color:rgba(255,255,255,0.6);margin:3px 0;display:flex;gap:8px;flex-wrap:wrap;}
+.player-meta span{background:rgba(255,255,255,0.1);padding:1px 6px;border-radius:3px;}
+
+/* ÉPISODES STYLE NETFLIX */
+.ep-netflix-list{display:flex;flex-direction:column;gap:0;padding:0 14px;}
+.ep-netflix-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;align-items:flex-start;transition:background 0.15s;}
+.ep-netflix-item:hover{background:rgba(255,255,255,0.03);}
+.ep-netflix-item.active-ep .ep-thumb-wrap{border-color:var(--primary);}
+.ep-thumb-wrap{position:relative;flex-shrink:0;width:100px;height:58px;border-radius:6px;overflow:hidden;border:2px solid transparent;}
+.ep-thumb-wrap img{width:100%;height:100%;object-fit:cover;}
+.ep-thumb-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);}
+.ep-thumb-play svg{width:22px;height:22px;fill:white;opacity:0.85;}
+.ep-info{flex:1;min-width:0;}
+.ep-info-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.ep-num{font-size:12px;font-weight:900;}
+.ep-duration{font-size:10px;color:#64748b;}
+.ep-desc{font-size:10px;color:#94a3b8;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.ep-dl-btn{background:none;border:none;color:#64748b;cursor:pointer;padding:4px;border-radius:50%;transition:all 0.2s;flex-shrink:0;}
+.ep-dl-btn:hover{color:var(--primary);background:rgba(249,115,22,0.1);}
+
+/* PLAYER REDESIGNÉ */
+.player-banner{width:100%;height:180px;position:relative;overflow:hidden;background:#000;}
+.player-banner img{width:100%;height:100%;object-fit:cover;opacity:0.5;}
+.player-banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(2,6,23,0.2),rgba(2,6,23,0.9));}
+.player-banner-info{position:absolute;bottom:12px;left:14px;right:14px;}
+.player-anime-title{font-size:20px;font-weight:900;text-shadow:0 2px 8px rgba(0,0,0,0.8);}
+.player-season-label{font-size:11px;color:var(--primary);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.vid-container{background:#000;width:100%;aspect-ratio:16/9;position:relative;}
+.vid-container iframe{width:100%;height:100%;border:none;display:block;}
+.synopsis-box{margin:8px 14px;background:var(--card2);border-radius:10px;padding:10px 12px;border-left:3px solid var(--primary);}
+.synopsis-title{font-size:10px;font-weight:900;color:var(--primary);margin-bottom:5px;text-transform:uppercase;}
+.synopsis-text{font-size:10px;color:#94a3b8;line-height:1.65;}
+
+/* SELECTORS — sans doublons VOSTFR/VF */
+.player-selectors{display:flex;gap:8px;padding:9px 14px 4px;flex-wrap:wrap;}
+.selector-wrap{position:relative;flex:1;min-width:100px;}
+.selector-btn{width:100%;padding:8px 11px;background:#1e293b;border:2px solid rgba(255,255,255,0.1);border-radius:9px;color:var(--text);font-family:'Inter',sans-serif;font-size:11px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all 0.2s;}
+.selector-btn:hover,.selector-btn:focus{border-color:var(--primary);}
+.selector-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;width:100%;background:rgba(8,16,42,0.99);border:2px solid var(--primary);border-radius:10px;z-index:600;max-height:200px;overflow-y:auto;box-shadow:0 12px 28px rgba(0,0,0,0.7);}
+.selector-dropdown.open{display:block;}
+.dropdown-item{padding:10px 13px;cursor:pointer;font-size:11px;font-weight:700;border-bottom:1px solid rgba(255,255,255,0.04);transition:background 0.12s;}
+.dropdown-item:last-child{border-bottom:none;}
+.dropdown-item:hover,.dropdown-item.sel-active{background:rgba(249,115,22,0.18);color:var(--primary);}
+
+.stream-status{padding:3px 14px 5px;font-size:10px;color:#94a3b8;min-height:18px;}
+.stream-status.ok{color:#22c55e;}.stream-status.err{color:#ef4444;}.stream-status.warn{color:#f59e0b;}
+.ep-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;padding:8px 14px;}
+.ep-btn{background:#1e293b;color:white;padding:10px;border-radius:6px;text-align:center;font-size:11px;cursor:pointer;border:2px solid transparent;transition:all 0.15s;font-weight:700;}
+.ep-btn:hover{border-color:var(--primary);}
+.ep-btn.active{background:var(--primary);}
+
+/* BIBLIO */
+.biblio-bar{display:flex;gap:8px;padding:0 14px 10px;}
+.biblio-bar input{flex:1;background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:9px;padding:8px 12px;color:white;font-family:'Inter',sans-serif;font-size:12px;outline:none;}
+.biblio-bar input:focus{border-color:var(--primary);}
+.biblio-bar button{background:var(--primary);border:none;border-radius:9px;padding:8px 14px;color:white;font-weight:700;font-size:12px;cursor:pointer;}
+.filter-row{display:flex;gap:5px;overflow-x:auto;padding:0 14px 9px;}
+.filter-row::-webkit-scrollbar{display:none;}
+.filter-chip{flex-shrink:0;padding:4px 10px;border-radius:20px;background:rgba(30,41,59,0.8);border:1px solid rgba(255,255,255,0.1);font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;}
+.filter-chip.active{background:var(--primary);border-color:var(--primary);}
+.filter-chip:hover{border-color:var(--primary);}
+.sort-row{display:flex;gap:6px;padding:0 14px 10px;align-items:center;}
+.sort-btn{padding:4px 11px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.1);background:#1e293b;color:#94a3b8;transition:all 0.15s;}
+.sort-btn.active{background:#334155;color:white;}
+.sort-btn:hover{border-color:var(--primary);}
+.manga-dex-card{background:var(--card);border-radius:8px;overflow:hidden;cursor:pointer;position:relative;border:2px solid transparent;transition:all 0.2s;}
+.manga-dex-card img{width:100%;aspect-ratio:2/3;object-fit:cover;background:linear-gradient(135deg,#0a1128 0%,#1e293b 100%);min-height:80px;}
+.manga-dex-card p{font-size:8px;padding:3px 5px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.manga-dex-card:hover{border-color:var(--primary);transform:scale(1.03);}
+.manga-dex-card .card-badge{position:absolute;top:5px;left:5px;background:rgba(0,0,0,0.28);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:rgba(249,115,22,0.95);font-size:6px;font-weight:900;padding:2px 6px;border-radius:4px;letter-spacing:1px;z-index:3;border:1px solid rgba(249,115,22,0.25);text-transform:uppercase;font-family:'Inter',sans-serif;}
+.fav-btn{position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.65);border:none;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;}
+
+/* FAV / HIST */
+.fav-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:0 10px 14px;}
+.fav-card{background:var(--card);border-radius:8px;overflow:hidden;cursor:pointer;position:relative;border:2px solid transparent;transition:all 0.2s;}
+.fav-card img{width:100%;aspect-ratio:2/3;object-fit:cover;}
+.fav-card p{font-size:8px;padding:3px 5px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fav-card:hover{border-color:var(--primary);transform:scale(1.03);}
+.fav-del-btn{position:absolute;top:3px;right:3px;background:rgba(239,68,68,0.85);border:none;border-radius:50%;width:20px;height:20px;color:white;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.history-item{display:flex;gap:11px;align-items:center;background:var(--card);border-radius:10px;padding:10px;margin:0 14px 9px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;}
+.history-item:hover{border-color:var(--primary);}
+.history-item img{width:46px;height:65px;border-radius:6px;object-fit:cover;flex-shrink:0;}
+.history-title{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.history-chap{font-size:10px;color:#94a3b8;margin-top:2px;}
+
+/* MANGA DETAIL */
+.manga-detail-header{display:flex;gap:12px;padding:14px;}
+.manga-detail-cover{width:96px;height:142px;border-radius:8px;object-fit:cover;flex-shrink:0;border:2px solid var(--primary);}
+.manga-detail-title{font-size:14px;font-weight:900;margin-bottom:5px;}
+.manga-detail-desc{font-size:10px;color:#94a3b8;line-height:1.6;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;}
+.manga-status-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;margin-top:4px;}
+.status-ongoing{background:rgba(34,197,94,0.15);color:#22c55e;}
+.status-completed{background:rgba(99,102,241,0.15);color:#818cf8;}
+.chapter-list{padding:11px;display:flex;flex-direction:column;gap:6px;}
+.chapter-item{background:var(--card);border-radius:8px;padding:11px 13px;display:flex;justify-content:space-between;align-items:center;border:2px solid transparent;transition:border-color 0.2s;}
+.chapter-item:hover{border-color:var(--primary);}
+.chapter-item.read{opacity:0.5;}
+.chapter-num{font-size:12px;font-weight:700;}
+.chapter-date{font-size:10px;color:#94a3b8;}
+.chapter-read-btn{background:var(--primary);border:none;color:white;padding:5px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;}
+
+/* READER */
+#readerView{display:none;padding:54px 0 20px;min-height:100vh;background:#000;}
+.reader-nav{position:fixed;top:54px;width:100%;background:rgba(2,6,23,0.97);padding:7px 14px;display:flex;align-items:center;justify-content:space-between;z-index:999;border-bottom:1px solid rgba(249,115,22,0.15);}
+.reader-title{font-size:11px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:55%;}
+.reader-controls{display:flex;gap:7px;}
+.reader-btn{background:#1e293b;border:none;color:white;padding:6px 13px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.reader-btn.primary{background:var(--primary);}
+.reader-btn:hover{border:2px solid var(--primary);}
+.chapter-pages{padding-top:44px;}
+.chapter-pages img{width:100%;display:block;}
+
+/* ABOUT / SETTINGS */
+.about-content{padding:14px;color:#94a3b8;font-size:13px;line-height:1.65;}
+.about-content h4{color:var(--primary);margin:18px 0 8px;text-transform:uppercase;font-size:12px;}
+.about-card{background:var(--card);padding:14px;border-radius:12px;margin-bottom:18px;border:1px solid rgba(255,255,255,0.05);}
+
+/* ===== FOOTER PILL FLOTTANT ===== */
+footer{
+    position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
+    width:calc(100% - 28px);max-width:480px;
+    height:64px;
+    background:rgba(10,16,36,0.55);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border-radius:32px;
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:0 8px 32px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.06);
+    display:flex;
+    z-index:1000;
+    opacity:0;
+    transition:opacity 0.3s,transform 0.3s;
+    transform:translateX(-50%) translateY(10px);
+    padding:0 6px;
+}
+footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:3px;padding:6px 2px;transition:all 0.2s;border-radius:28px;}
+.tab:hover,.tab:focus{background:rgba(249,115,22,0.1);outline:none;}
+.tab.active-tab .tab-icon{color:var(--primary);}
+.tab.active-tab .tab-label{color:var(--primary);}
+.tab-icon{width:20px;height:20px;color:#64748b;transition:color 0.2s;}
+.tab-label{font-size:7px;font-weight:700;color:#64748b;transition:color 0.2s;letter-spacing:0.3px;text-transform:uppercase;}
+
+.loading-txt{text-align:center;color:#94a3b8;padding:24px;font-size:13px;}
+.load-more-btn{display:block;margin:8px auto 18px;padding:10px 28px;background:#1e293b;border:2px solid rgba(255,255,255,0.1);color:var(--text);border-radius:9px;font-family:'Inter',sans-serif;font-weight:700;font-size:11px;cursor:pointer;transition:all 0.2s;}
+.load-more-btn:hover{border-color:var(--primary);}
+
+/* TOAST */
+.toast{position:fixed;top:76px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.98);border:2px solid var(--primary);border-radius:12px;padding:10px 18px;font-size:12px;font-weight:700;z-index:5000;white-space:nowrap;transition:opacity 0.4s;pointer-events:none;}
+.toast.hidden{opacity:0;}
+</style>
+</head>
+<body>
+
+<div class="toast hidden" id="toast"></div>
+<div id="tv-cursor"></div>
+
+<!-- SPLASH SCREEN -->
+<div id="splashScreen">
+    <div class="splash-logo">OtAkU+</div>
+    <div class="splash-tagline">Streaming Manga & Anime</div>
+    <div class="splash-bottom">
+        <div class="splash-by-txt">BY</div>
+        <div class="splash-by-name">DAVIESLAY 💥</div>
+    </div>
+</div>
+
+<!-- MODE VEILLE -->
+<div id="sleepScreen" onclick="wakeUp()" ontouchstart="wakeUp()">
+    <div class="sleep-bg" id="sleepBg"></div>
+    <div class="sleep-content">
+        <div class="sleep-time" id="sleepTime">00:00</div>
+        <div class="sleep-date" id="sleepDate"></div>
+        <div class="sleep-title" id="sleepTitle">OtAkU+</div>
+        <div class="sleep-genres" id="sleepGenres"></div>
+    </div>
+    <div class="sleep-recs" id="sleepRecs"></div>
+    <div class="sleep-hint">Appuie pour continuer</div>
+</div>
+
+<!-- GALERIE AVATARS MANGA -->
+<div id="avatarGalleryModal">
+    <div class="ag-header">
+        <div class="ag-title">🎭 Choisis ton avatar manga</div>
+        <button class="ag-close focusable" tabindex="0" onclick="closeAvatarGallery()">✕</button>
+    </div>
+    <input class="ag-search focusable" id="agSearch" tabindex="0" type="text" placeholder="🔍 Rechercher un personnage...">
+    <div class="ag-grid" id="agGrid"><div class="ag-load">Chargement des personnages...</div></div>
+    <button class="ag-confirm focusable" id="agConfirm" tabindex="0" onclick="confirmAvatar()">✅ CHOISIR CET AVATAR</button>
+</div>
+
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+    <div class="auth-logo">OtAkU<span>+</span></div>
+    <div class="auth-sub">🔥 Streaming Manga & Anime — Gratuit</div>
+    <div class="auth-tabs">
+        <div class="auth-tab active focusable" tabindex="0" id="tabLogin" onclick="switchAuth('login')">CONNEXION</div>
+        <div class="auth-tab focusable" tabindex="0" id="tabRegister" onclick="switchAuth('register')">INSCRIPTION</div>
+    </div>
+    <div class="auth-form" id="loginForm">
+        <input class="auth-input focusable" id="loginEmail" type="email" placeholder="Email" tabindex="0">
+        <input class="auth-input focusable" id="loginPass" type="password" placeholder="Mot de passe" tabindex="0">
+        <div class="auth-err" id="loginErr"></div>
+        <button class="auth-btn focusable" tabindex="0" onclick="doLogin()">SE CONNECTER</button>
+        <div style="text-align:center;font-size:11px;color:#94a3b8;margin-top:4px;">Pas encore de compte ? <span style="color:var(--primary);cursor:pointer;" onclick="switchAuth('register')">S'inscrire</span></div>
+    </div>
+    <div class="auth-form" id="registerForm" style="display:none;">
+        <input class="auth-input focusable" id="regName" type="text" placeholder="Ton nom" tabindex="0">
+        <input class="auth-input focusable" id="regEmail" type="email" placeholder="Email" tabindex="0">
+        <input class="auth-input focusable" id="regPass" type="password" placeholder="Mot de passe (min. 6 car.)" tabindex="0">
+        <div class="auth-err" id="regErr"></div>
+        <button class="auth-btn focusable" tabindex="0" onclick="doRegister()">CRÉER MON COMPTE</button>
+        <div style="text-align:center;font-size:11px;color:#94a3b8;margin-top:4px;">Déjà un compte ? <span style="color:var(--primary);cursor:pointer;" onclick="switchAuth('login')">Se connecter</span></div>
+    </div>
+</div>
+
+<!-- PROFILE SELECTOR -->
+<div id="profileSelector">
+    <!-- Fond manga animé -->
+    <div class="ps-bg" id="psBg"></div>
+    <div class="ps-bg-overlay"></div>
+    <div class="ps-content">
+        <div class="ps-title">Qui regarde ? 👀</div>
+        <div class="ps-sub">Choisis ton profil</div>
+        <div class="ps-grid" id="psGrid"></div>
+        <button class="auth-btn focusable" tabindex="0" style="max-width:200px;font-size:12px;background:#334155;" onclick="logoutAuth()">← CHANGER DE COMPTE</button>
+    </div>
+</div>
+
+<!-- MODAL NOUVEAU PROFIL -->
+<div id="newProfileModal">
+    <div class="npm-box">
+        <div class="npm-title">➕ Nouveau profil</div>
+        <input class="auth-input focusable" id="npmName" type="text" placeholder="Nom du profil" maxlength="20" tabindex="0" style="margin-bottom:12px;">
+        <div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">Choisis un avatar :</div>
+        <div class="npm-avatars" id="npmAvatars"></div>
+        <button class="auth-btn focusable" tabindex="0" onclick="openAvatarGallery('newprofile')" style="background:#1e293b;font-size:12px;padding:10px;margin-bottom:10px;">🎭 GALERIE PERSONNAGES MANGA</button>
+        <div class="modal-btns">
+            <button class="modal-btn cancel focusable" tabindex="0" onclick="closeNewProfile()">Annuler</button>
+            <button class="modal-btn confirm focusable" tabindex="0" onclick="saveNewProfile()">Créer</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL NOM -->
+<div class="modal-overlay" id="nameModal">
+    <div class="modal-box">
+        <div class="modal-title">✏️ Modifier le nom</div>
+        <input class="modal-input" id="nameInput" type="text" placeholder="Ton nom..." maxlength="30">
+        <div class="modal-btns">
+            <button class="modal-btn cancel" onclick="closeNameModal()">Annuler</button>
+            <button class="modal-btn confirm" onclick="saveName()">Sauvegarder</button>
+        </div>
+    </div>
+</div>
+
+<input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="handleAvatarChange(event)">
+<div id="menuOverlay" class="menu-overlay" onclick="toggleMenu()"></div>
+
+<div id="sideMenu" class="side-menu">
+    <div class="profile-section">
+        <div class="profile-avatar focusable" tabindex="0" onclick="openAvatarGallery('main')">
+            <span id="avatarLetter">D</span>
+            <img id="avatarImg" src="" alt="" style="display:none;">
+            <div class="avatar-overlay">📷</div>
+        </div>
+        <div>
+            <div class="profile-name" id="profileNameDisplay">Davieslay 💥</div>
+            <div class="profile-sub">Créateur OtAkU+</div>
+            <div class="name-edit-btn focusable" tabindex="0" onclick="openNameModal()">✏️ Modifier le nom</div>
+        </div>
+    </div>
+    <div class="menu-link focusable" tabindex="0" onclick="loadHome()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>ACCUEIL
+    </div>
+    <div class="menu-link focusable" tabindex="0" onclick="loadDiscover()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>DÉCOUVRIR
+    </div>
+    <div class="menu-link focusable" tabindex="0" onclick="loadCalendar()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>CALENDRIER
+    </div>
+    <div class="menu-link focusable" tabindex="0" onclick="loadBibliotheque()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>BIBLIOTHÈQUE
+    </div>
+    <div class="menu-link focusable" tabindex="0" onclick="loadFavoris()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>FAVORIS
+    </div>
+    <div class="menu-link focusable" tabindex="0" onclick="loadHistorique()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>HISTORIQUE
+    </div>
+    <div class="menu-link focusable" tabindex="0" onclick="loadDownloads()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>TÉLÉCHARGEMENTS
+    </div>
+    <div class="menu-link focusable" tabindex="0" onclick="loadCommunity()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>COMMUNAUTÉ
+    </div>
+    <div class="menu-link focusable" tabindex="0" onclick="loadAbout()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>À PROPOS
+    </div>
+    <div class="menu-link focusable" tabindex="0" style="color:#64748b;margin-top:20px;" onclick="loadSettings()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>PARAMÈTRES
+    </div>
+    <div class="menu-link focusable" tabindex="0" style="color:#ef4444;" onclick="toggleMenu(false)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>FERMER
+    </div>
+</div>
+
+<nav>
+    <div class="nav-left">
+        <div class="menu-btn focusable" tabindex="0" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+        <div class="logo-txt" onclick="loadHome()">OtAkU<span>+</span></div>
+    </div>
+    <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input type="text" id="searchInput" placeholder="Recherche rapide..." autocomplete="off">
+    </div>
+    <div class="help-btn focusable" tabindex="0" onclick="toggleHelp()" title="Aide">?</div>
+</nav>
+<div class="help-popup" id="helpPopup">
+    <b>🔍 Recherche</b> — Tape le nom d'un anime<br>
+    <b>▶ Regarder</b> — Clique sur une carte<br>
+    <b>❤️ Favoris</b> — Icône cœur sur les mangas<br>
+    <b>📺 TV</b> — Navigation avec D-pad<br>
+    <b>👤 Profil</b> — Clique sur ton avatar<br>
+    <b>🌙 Veille</b> — Auto après 3 min d'inactivité
+</div>
+<div id="searchSuggestions"><div id="suggestionsList"></div></div>
+
+<!-- HOME avec HERO BANNER -->
+<div id="homeView" class="view active">
+    <!-- HERO BANNER bande annonce / reprise -->
+    <div class="hero-banner" id="heroBanner">
+        <img class="hero-img-bg" id="heroBgImg" src="" alt="">
+        <iframe class="hero-iframe" id="heroFrame" src="" allow="autoplay;encrypted-media" allowfullscreen></iframe>
+        <div class="hero-overlay"></div>
+        <!-- Cercle profil bannière -->
+        <div class="hero-profile-btn focusable" tabindex="0" id="heroProfBtn" onclick="showProfileSelector()" title="Mon profil">
+            <span id="heroProfLetter">D</span>
+            <img id="heroProfImg" src="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge" id="heroBadge">🔥 EN CE MOMENT</div>
+            <div class="hero-title" id="heroTitle">Chargement...</div>
+            <div class="hero-btns">
+                <button class="hero-btn play focusable" tabindex="0" id="heroPlayBtn" onclick="heroPlay()">▶ REGARDER</button>
+                <button class="hero-btn resume focusable" tabindex="0" id="heroResumeBtn" style="display:none;" onclick="heroResume()">↩ REPRENDRE</button>
+            </div>
+        </div>
+        <div class="hero-dots" id="heroDots"></div>
+        <div class="hero-progress"><div class="hero-progress-bar" id="heroProgressBar"></div></div>
+    </div>
+
+    <h3 class="section-title" style="margin-top:10px;">Nouvelles sorties</h3>
+    <div id="recentScroll" style="display:flex;gap:8px;overflow-x:auto;padding:0 10px 12px;"></div>
+    <h3 class="section-title">Top Populaires</h3>
+    <div class="grid" id="popGrid"></div>
+    <h3 class="section-title">🆕 Derniers épisodes ajoutés</h3>
+    <div id="latestEpScroll" style="display:flex;gap:8px;overflow-x:auto;padding:0 10px 12px;"></div>
+    <h3 class="section-title">💎 Pépites</h3>
+    <div class="grid" id="pepiGrid"></div>
+    <h3 class="section-title">📖 Derniers scans ajoutés</h3>
+    <div id="lastScansScroll" style="display:flex;gap:8px;overflow-x:auto;padding:0 10px 12px;"></div>
+    <h3 class="section-title">🏆 Les Classiques</h3>
+    <div class="grid" id="classicsGrid"></div>
+</div>
+
+<!-- DISCOVER -->
+<div id="discoverView" class="view">
+    <h3 class="section-title" id="discoverTitle">Découvrir</h3>
+    <div class="grid" id="discoverGrid"></div>
+</div>
+
+<!-- CALENDAR -->
+<div id="calendarView" class="view">
+    <h3 class="section-title">Agenda des sorties</h3>
+    <div id="calendarContent" style="padding:14px;"></div>
+</div>
+
+<!-- BIBLIO -->
+<div id="bibliothequeView" class="view">
+    <h3 class="section-title">📚 Bibliothèque</h3>
+    <div style="display:flex;padding:0 14px 11px;">
+        <div id="tabBiblio" onclick="sBT('biblio')" class="focusable" tabindex="0" style="flex:1;padding:8px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;background:var(--primary);color:white;border-radius:8px 0 0 8px;">CATALOGUE</div>
+        <div id="tabHistTab" onclick="sBT('historique')" class="focusable" tabindex="0" style="flex:1;padding:8px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;background:#1e293b;color:#94a3b8;border-radius:0 8px 8px 0;">EN COURS</div>
+    </div>
+    <div id="panelBiblio">
+        <div class="biblio-bar">
+            <input type="text" id="biblioSearch" placeholder="Rechercher..." autocomplete="off">
+            <button class="focusable" tabindex="0" onclick="searchBiblio()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
+        </div>
+        <div class="filter-row" id="biblioGenres"></div>
+        <div class="sort-row">
+            <span style="font-size:10px;color:#94a3b8;">TRIER :</span>
+            <div class="sort-btn active focusable" id="sort-pop" tabindex="0" onclick="setSortBiblio('followedCount')">Popularité</div>
+            <div class="sort-btn focusable" id="sort-new" tabindex="0" onclick="setSortBiblio('latestUploadedChapter')">Récents</div>
+            <div class="sort-btn focusable" id="sort-az" tabindex="0" onclick="setSortBiblio('title')">A-Z</div>
+        </div>
+        <div class="grid" id="biblioGrid"></div>
+        <button class="load-more-btn focusable" id="biblioMoreBtn" tabindex="0" onclick="loadMoreBiblio()" style="display:none;">CHARGER PLUS</button>
+    </div>
+    <div id="panelHistorique" style="display:none;">
+        <div id="historiqueList"></div>
+        <div id="historiqueEmpty" style="display:none;" class="loading-txt">Aucun titre en cours.</div>
+    </div>
+</div>
+
+<!-- FAVORIS -->
+<div id="favorisView" class="view">
+    <h3 class="section-title">❤️ Mes Favoris</h3>
+    <div id="favGrid" class="fav-grid"></div>
+    <div id="favEmpty" style="display:none;" class="loading-txt">Aucun favori pour l'instant.</div>
+</div>
+
+<!-- HISTORIQUE -->
+<div id="historiqueView" class="view">
+    <h3 class="section-title">🕘 Historique</h3>
+    <div id="histListMain"></div>
+    <div id="histEmpty" style="display:none;" class="loading-txt">Aucun historique.</div>
+</div>
+
+<!-- MANGA DETAIL -->
+<div id="mangaDetailView" class="view">
+    <div id="mangaDetailContent"></div>
+    <h3 class="section-title">Chapitres</h3>
+    <div id="chapterList" class="chapter-list"></div>
+    <div style="padding:0 14px 10px;">
+        <button class="ep-btn focusable" style="width:100%;background:#334155;padding:13px;" tabindex="0" id="retourDetailBtn">← RETOUR</button>
+    </div>
+</div>
+
+<!-- READER -->
+<div id="readerView">
+    <div class="reader-nav">
+        <div class="reader-title" id="readerTitle">Lecture</div>
+        <div class="reader-controls">
+            <button class="reader-btn focusable" tabindex="0" onclick="navigateChapter(-1)">◀ PRÉC.</button>
+            <button class="reader-btn primary focusable" tabindex="0" onclick="navigateChapter(1)">SUIV. ▶</button>
+            <button class="reader-btn focusable" tabindex="0" onclick="closeReader()">✕</button>
+        </div>
+    </div>
+    <div class="chapter-pages" id="chapterPages"></div>
+</div>
+
+<!-- COMMUNITY -->
+<div id="communityView" class="view">
+    <h3 class="section-title">Communauté</h3>
+    <div style="padding:18px;display:flex;flex-direction:column;gap:14px;">
+        <p style="font-size:13px;color:#94a3b8;">Rejoignez la communauté OtAkU+ !</p>
+        <a href="https://discord.gg/w3Tst5te8" target="_blank" style="text-decoration:none;"><div class="ep-btn focusable" tabindex="0" style="background:#5865F2;font-weight:bold;padding:14px;">REJOINDRE LE DISCORD</div></a>
+        <div class="ep-btn" style="background:#E1306C;font-weight:bold;padding:14px;">SUIVRE SUR INSTAGRAM</div>
+        <div class="ep-btn" style="background:#1e293b;color:#94a3b8;padding:12px;font-size:12px;">davidlaurens090@gmail.com</div>
+    </div>
+</div>
+
+<!-- ABOUT -->
+<div id="aboutView" class="view">
+    <h3 class="section-title">À Propos</h3>
+    <div class="about-content">
+        <div class="about-card"><h2 style="color:#fff;font-size:17px;margin:0 0 8px 0;">Bienvenue dans l'univers OtAkU+ !</h2><p>Plateforme ultra-fluide, gratuite, optimisée pour mobile et Smart TV.</p></div>
+        <h4>L'Auteur</h4>
+        <div class="about-card" style="border-left:3px solid var(--primary);">
+            <p style="color:#fff;font-weight:bold;margin-bottom:4px;">David Laurens KOKOURA</p>
+            <p style="font-style:italic;font-size:11px;">alias DAVIESLAY 💥 OTAKU</p>
+            <p>Développeur depuis <strong>Abidjan, Côte d'Ivoire 🇨🇮</strong></p>
+        </div>
+        <div style="background:rgba(249,115,22,0.08);padding:13px;border-radius:8px;border:1px dashed var(--primary);margin-top:16px;"><p style="margin:0;font-weight:bold;color:var(--primary);">Version 1.2 — VIDAA Ready</p></div>
+    </div>
+</div>
+
+<!-- AIDE -->
+<div id="aideView" class="view">
+    <h3 class="section-title">❓ Centre d'Aide</h3>
+    <div class="about-content">
+        <div class="about-card" style="border-left:3px solid var(--primary);">
+            <h4 style="color:var(--primary);margin:0 0 10px;font-size:13px;">🔍 RECHERCHE</h4>
+            <p>Tape le nom d'un anime ou manga dans la barre de recherche en haut. Les suggestions apparaissent automatiquement après 3 caractères.</p>
+        </div>
+        <div class="about-card" style="border-left:3px solid #6366f1;">
+            <h4 style="color:#6366f1;margin:0 0 10px;font-size:13px;">▶ REGARDER UN ANIME</h4>
+            <p>Clique sur une carte depuis l'accueil ou la découverte. Choisis ta saison, ta langue (VOSTFR/VF) et lance l'épisode souhaité.</p>
+        </div>
+        <div class="about-card" style="border-left:3px solid #22c55e;">
+            <h4 style="color:#22c55e;margin:0 0 10px;font-size:13px;">📖 LIRE UN MANGA</h4>
+            <p>Va dans l'onglet Manga de la bibliothèque. Clique sur un titre pour voir ses chapitres disponibles en français, puis clique sur LIRE.</p>
+        </div>
+        <div class="about-card" style="border-left:3px solid #ef4444;">
+            <h4 style="color:#ef4444;margin:0 0 10px;font-size:13px;">❤️ FAVORIS</h4>
+            <p>Clique sur l'icône cœur sur n'importe quelle carte pour l'ajouter à tes favoris. Retrouve-les dans l'onglet Favoris.</p>
+        </div>
+        <div class="about-card" style="border-left:3px solid #f59e0b;">
+            <h4 style="color:#f59e0b;margin:0 0 10px;font-size:13px;">⬇️ TÉLÉCHARGEMENTS</h4>
+            <p>Sur la page d'un épisode, clique sur l'icône téléchargement à droite de l'épisode. Les épisodes téléchargés sont accessibles dans le menu Téléchargements.</p>
+        </div>
+        <div class="about-card" style="border-left:3px solid #94a3b8;">
+            <h4 style="color:#94a3b8;margin:0 0 10px;font-size:13px;">📺 MODE TV (D-PAD)</h4>
+            <p>Utilise les touches directionnelles de ta télécommande pour naviguer. Le curseur orange indique l'élément sélectionné. Appuie sur Entrée pour valider.</p>
+        </div>
+        <div class="about-card" style="border-left:3px solid #8b5cf6;">
+            <h4 style="color:#8b5cf6;margin:0 0 10px;font-size:13px;">👥 MULTI-PROFILS</h4>
+            <p>Jusqu'à 4 profils par compte. Chaque profil a son propre historique et ses favoris. Change de profil depuis l'avatar en haut de la bannière.</p>
+        </div>
+        <div class="about-card" style="border-left:3px solid #06b6d4;">
+            <h4 style="color:#06b6d4;margin:0 0 10px;font-size:13px;">🌙 MODE VEILLE</h4>
+            <p>L'écran de veille s'active automatiquement après 3 minutes d'inactivité. Il affiche les covers des top animes avec l'heure locale. Touche l'écran pour reprendre.</p>
+        </div>
+        <div style="background:rgba(249,115,22,0.08);padding:13px;border-radius:8px;border:1px dashed var(--primary);margin-top:4px;text-align:center;">
+            <p style="margin:0;font-size:12px;color:#94a3b8;">Un problème ? Contacte-nous</p>
+            <p style="margin:6px 0 0;font-weight:700;color:var(--primary);">davidlaurens090@gmail.com</p>
+        </div>
+    </div>
+</div>
+
+<!-- TÉLÉCHARGEMENTS -->
+<div id="downloadsView" class="view">
+    <h3 class="section-title">⬇️ Téléchargements</h3>
+    <div id="downloadsList" style="padding:14px;display:flex;flex-direction:column;gap:10px;"></div>
+    <div id="downloadsEmpty" class="loading-txt" style="display:none;">Aucun téléchargement pour l'instant.<br><span style="font-size:11px;color:#475569;">Clique sur ⬇️ sur un épisode pour le sauvegarder.</span></div>
+</div>
+<div id="settingsView" class="view">
+    <h3 class="section-title">Paramètres</h3>
+    <div style="padding:16px;display:flex;flex-direction:column;gap:11px;">
+        <div style="background:var(--card);padding:14px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
+            <div><div style="font-size:13px;font-weight:700;">Notifications Push</div><div style="font-size:10px;color:#94a3b8;margin-top:2px;">Alertes nouvelles sorties</div></div>
+            <button id="notifBtn" onclick="toggleNotifications()" style="background:var(--primary);border:none;color:white;padding:7px 14px;border-radius:8px;font-weight:700;font-size:11px;cursor:pointer;">ACTIVER</button>
+        </div>
+        <div style="background:var(--card);padding:13px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;">Lecture automatique</span><input type="checkbox" checked></div>
+        <div style="background:var(--card);padding:13px;border-radius:10px;">
+            <p style="margin:0 0 9px;font-size:13px;font-weight:700;">Langue vidéo préférée</p>
+            <div style="display:flex;gap:8px;">
+                <div onclick="setDefaultLang('vostfr')" id="defVOSTFR" class="focusable" tabindex="0" style="flex:1;padding:9px;text-align:center;border-radius:8px;background:var(--primary);color:white;font-size:12px;font-weight:700;cursor:pointer;">VOSTFR</div>
+                <div onclick="setDefaultLang('vf')" id="defVF" class="focusable" tabindex="0" style="flex:1;padding:9px;text-align:center;border-radius:8px;background:#1e293b;color:#94a3b8;font-size:12px;font-weight:700;cursor:pointer;">VF</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PLAYER -->
+<div id="playerView" class="view">
+    <!-- Bannière style Netflix -->
+    <div class="player-banner" id="playerBanner">
+        <img id="playerBannerImg" src="" alt="" onerror="this.style.display='none'">
+        <div class="player-banner-overlay"></div>
+        <div class="player-banner-info">
+            <div class="player-anime-title" id="vidTitle"></div>
+            <div class="player-meta" id="playerMeta"></div>
+            <div class="player-season-label" id="playerSeasonLabel">SAISON 1</div>
+        </div>
+    </div>
+
+    <!-- Boutons action style Netflix -->
+    <div class="player-actions">
+        <button class="player-action-btn primary focusable" tabindex="0" onclick="lS(cEp,cSn)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            LECTURE
+        </button>
+        <button class="player-action-btn secondary focusable" tabindex="0" onclick="downloadEp()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            TÉLÉCHARGER
+        </button>
+    </div>
+
+    <!-- Synopsis -->
+    <div class="synopsis-box" id="synopsisBox" style="display:none;">
+        <div class="synopsis-title">Synopsis</div>
+        <div class="synopsis-text" id="synopsisText"></div>
+    </div>
+
+    <!-- Sélecteurs saison + langue -->
+    <div class="player-selectors">
+        <div class="selector-wrap">
+            <div class="selector-btn focusable" tabindex="0" onclick="toggleDropdown('seasonDrop')">
+                <span id="seasonLabel">Saison 1</span><span>▾</span>
+            </div>
+            <div class="selector-dropdown" id="seasonDrop"></div>
+        </div>
+        <div class="selector-wrap">
+            <div class="selector-btn focusable" tabindex="0" onclick="toggleDropdown('audioDrop')">
+                <span id="audioLabel">🎌 VOSTFR</span><span>▾</span>
+            </div>
+            <div class="selector-dropdown" id="audioDrop">
+                <div class="dropdown-item focusable" tabindex="0" onclick="selectAudio('vostfr')">🎌 VOSTFR</div>
+                <div class="dropdown-item focusable" tabindex="0" onclick="selectAudio('vf')">🇫🇷 VF</div>
+                <div class="dropdown-item focusable" tabindex="0" onclick="selectAudio('vo')">🇯🇵 VO Japonais</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stream-status" id="streamStatus"></div>
+
+    <!-- Lecteur vidéo -->
+    <div class="vid-container" id="vidContainer">
+        <div class="vid-loading" id="vidLoading">
+            <div class="otaku-spinner">
+                <div class="otaku-spinner-ring"></div>
+                <div class="otaku-spinner-ring2"></div>
+                <div class="otaku-spinner-logo">O+</div>
+            </div>
+            <span id="vidLoadingTxt">Recherche...</span>
+        </div>
+        <iframe id="vidFrame" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="display:none;" referrerpolicy="no-referrer"></iframe>
+    </div>
+
+    <!-- Épisodes style Netflix -->
+    <div style="padding:14px 14px 4px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:13px;font-weight:900;color:white;">Épisodes</div>
+        <div style="font-size:11px;color:#94a3b8;" id="epCountLabel"></div>
+    </div>
+    <div id="epList" class="ep-netflix-list"></div>
+    <div style="padding:0 14px 10px;">
+        <button class="ep-btn focusable" tabindex="0" style="width:100%;margin-top:9px;background:#334155;padding:13px;font-size:12px;" onclick="loadHome()">← RETOUR ACCUEIL</button>
+    </div>
+</div>
+
+<!-- FOOTER PILL FLOTTANT avec icônes SVG custom -->
+<footer id="mainFooter">
+    <div class="tab active-tab focusable" id="ftHome" tabindex="0" onclick="loadHome()">
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span class="tab-label">Accueil</span>
+    </div>
+    <div class="tab focusable" id="ftDiscover" tabindex="0" onclick="loadDiscover()">
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        <span class="tab-label">Découvrir</span>
+    </div>
+    <div class="tab focusable" id="ftBiblio" tabindex="0" onclick="loadBibliotheque()">
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+        <span class="tab-label">Manga</span>
+    </div>
+    <div class="tab focusable" id="ftFavoris" tabindex="0" onclick="loadFavoris()">
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <span class="tab-label">Favoris</span>
+    </div>
+    <div class="tab focusable" id="ftHist" tabindex="0" onclick="loadHistorique()">
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+        <span class="tab-label">Historique</span>
+    </div>
+    <div class="tab focusable" id="ftSettings" tabindex="0" onclick="loadSettings()">
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        <span class="tab-label">Réglages</span>
+    </div>
+</footer>
+
+<script>
+var sT;var TK='4f5f43495afcc67e9553f6c684a82f84';var TB='https://api.themoviedb.org/3';
+var MX='https://api.mangadex.org';var MI='https://uploads.mangadex.org';
+var PX='https://corsproxy.io/?url=';
+var PH='data:image/svg+xml;base64,'+btoa('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450"><rect width="300" height="450" fill="#0f172a"/><rect x="0" y="0" width="300" height="3" fill="#f97316"/><text x="150" y="210" font-family="Arial" font-weight="bold" font-size="28" fill="#f97316" text-anchor="middle">OtAkU+</text><text x="150" y="245" font-family="Arial" font-size="12" fill="#334155" text-anchor="middle">Chargement...</text></svg>');
+var YT_KEY='AIzaSyD-PLACEHOLDER';
+
+// État global
+var cTId=null,cEp=1,cSn=1,cEpN=12,cLang=localStorage.getItem('otaku_lang')||'vostfr',cTitle='',cMalId=0;
+var bOff=0,bGId=null,bSort='followedCount',bQ='',bLoaded=false;
+var cChaps=[],cChIdx=0,cMId=null;
+var rHist=JSON.parse(localStorage.getItem('otaku_history')||'{}');
+var rChaps=JSON.parse(localStorage.getItem('otaku_read_chaps')||'{}');
+var heroData={title:'',malId:0,tmdbId:null};
+
+var GM=[
+    {l:'Tous',id:null},{l:'Action',id:'391b0423-d847-456f-aff0-8b0cfc03066b'},
+    {l:'Romance',id:'423e2eae-a7a2-4a8b-ac03-a8351462d71d'},{l:'Comédie',id:'4d32cc48-9f00-4cca-9b5a-a839f0764984'},
+    {l:'Fantasy',id:'cdc58593-87dd-415e-bbc0-2ec27bf404cc'},{l:'Horreur',id:'cdad7e68-1419-41dd-bdce-27753074a640'},
+    {l:'Aventure',id:'87cc87cd-a395-47af-b27a-93258283bbc6'},{l:'Drame',id:'b9af3a63-f058-46de-a9a0-e0c13906197a'},
+    {l:'Sport',id:'69964a64-2f90-4d33-beeb-f3ed2875eb4c'},{l:'Sci-Fi',id:'256c8bd9-4904-4360-bf4f-508a76d67183'},
+    {l:'Isekai',id:'ace04997-f6bd-436e-b261-779182193d3d'}
+];
+
+function mF(u){return fetch(PX+encodeURIComponent(u)).then(function(r){return r.json();});}
+
+// ── FOOTER APPARAÎT AU SCROLL / SURVOL BAS ──
+(function(){
+    var ft=document.getElementById('mainFooter');
+    var hideTimer;
+    function showFt(){ft.classList.add('visible');clearTimeout(hideTimer);hideTimer=setTimeout(function(){ft.classList.remove('visible');},4000);}
+    document.addEventListener('scroll',function(){showFt();},true);
+    document.addEventListener('touchstart',function(e){if(e.touches[0].clientY>window.innerHeight-100)showFt();});
+    document.addEventListener('mousemove',function(e){if(e.clientY>window.innerHeight-80)showFt();});
+    ft.addEventListener('mouseenter',function(){clearTimeout(hideTimer);ft.classList.add('visible');});
+    ft.addEventListener('mouseleave',function(){hideTimer=setTimeout(function(){ft.classList.remove('visible');},2000);});
+    // Afficher au démarrage 3s
+    setTimeout(function(){ft.classList.add('visible');setTimeout(function(){ft.classList.remove('visible');},3000);},500);
+})();
+
+// ── TOAST ──
+function showToast(msg,dur){var t=document.getElementById('toast');t.textContent=msg;t.classList.remove('hidden');setTimeout(function(){t.classList.add('hidden');},dur||3000);}
+
+// ── PROFIL ──
+function loadProfile(){
+    var n=localStorage.getItem('otaku_name')||'Davieslay 💥';
+    document.getElementById('profileNameDisplay').textContent=n;
+    var s=localStorage.getItem('otaku_avatar');
+    if(s){document.getElementById('avatarImg').src=s;document.getElementById('avatarImg').style.display='block';document.getElementById('avatarLetter').style.display='none';}
+}
+function openNameModal(){document.getElementById('nameInput').value=localStorage.getItem('otaku_name')||'';document.getElementById('nameModal').classList.add('open');setTimeout(function(){document.getElementById('nameInput').focus();},100);}
+function closeNameModal(){document.getElementById('nameModal').classList.remove('open');}
+function saveName(){var n=document.getElementById('nameInput').value.trim();if(n){localStorage.setItem('otaku_name',n);document.getElementById('profileNameDisplay').textContent=n;showToast('✅ Nom mis à jour !');}closeNameModal();}
+function handleAvatarChange(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){document.getElementById('avatarImg').src=ev.target.result;document.getElementById('avatarImg').style.display='block';document.getElementById('avatarLetter').style.display='none';localStorage.setItem('otaku_avatar',ev.target.result);showToast('✅ Photo mise à jour !');};r.readAsDataURL(f);}
+
+// ── NOTIFICATIONS ──
+function toggleNotifications(){
+    if(!('Notification'in window)){showToast('❌ Non supporté');return;}
+    if(Notification.permission==='granted'){showToast('✅ Notifications déjà actives');return;}
+    Notification.requestPermission().then(function(p){
+        if(p==='granted'){showToast('✅ Notifications activées !');document.getElementById('notifBtn').textContent='ACTIVÉES ✓';document.getElementById('notifBtn').style.background='#22c55e';localStorage.setItem('otaku_notif','1');new Notification('OtAkU+ 🔥',{body:'Tu seras notifié des nouvelles sorties !',icon:'icon-192.png'});}
+        else showToast('❌ Notifications refusées');
+    });
+}
+function checkNotifStatus(){if(localStorage.getItem('otaku_notif')==='1'&&Notification.permission==='granted'){document.getElementById('notifBtn').textContent='ACTIVÉES ✓';document.getElementById('notifBtn').style.background='#22c55e';}}
+
+// ── VUES ──
+function sV(id){
+    // Stopper le player iframe quand on quitte la vue player (évite consommation mémoire)
+    if(id!=='playerView'){
+        var fr=document.getElementById('vidFrame');
+        if(fr&&fr.src){fr.src='';}
+    }
+    document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+    document.getElementById('readerView').style.display='none';
+    var t=document.getElementById(id);if(t)t.classList.add('active');
+    window.scrollTo({top:0,behavior:'instant'});
+    toggleMenu(false);
+    document.getElementById('searchSuggestions').style.display='none';
+    cAD();
+    ['ftHome','ftDiscover','ftBiblio','ftFavoris','ftHist','ftSettings'].forEach(function(x){
+        var el=document.getElementById(x);if(el)el.classList.remove('active-tab');
+    });
+    var mp={homeView:'ftHome',discoverView:'ftDiscover',bibliothequeView:'ftBiblio',favorisView:'ftFavoris',historiqueView:'ftHist',settingsView:'ftSettings'};
+    if(mp[id]){var el=document.getElementById(mp[id]);if(el)el.classList.add('active-tab');}
+    var ft=document.getElementById('mainFooter');
+    ft.classList.add('visible');
+    setTimeout(function(){ft.classList.remove('visible');},3000);
+}
+function toggleMenu(f){var m=document.getElementById('sideMenu'),o=document.getElementById('menuOverlay');if(f===false){m.classList.remove('open');o.style.display='none';}else{m.classList.toggle('open');o.style.display=m.classList.contains('open')?'block':'none';}}
+function loadCommunity(){sV('communityView');}function loadAbout(){sV('aboutView');}
+function loadSettings(){sV('settingsView');uLU();checkNotifStatus();}
+function setDefaultLang(l){cLang=l;localStorage.setItem('otaku_lang',l);uLU();showToast('Langue : '+(l==='vf'?'🇫🇷 VF':'🎌 VOSTFR'));}
+function uLU(){document.getElementById('defVOSTFR').style.background=cLang==='vostfr'?'var(--primary)':'#1e293b';document.getElementById('defVOSTFR').style.color=cLang==='vostfr'?'white':'#94a3b8';document.getElementById('defVF').style.background=cLang==='vf'?'var(--primary)':'#1e293b';document.getElementById('defVF').style.color=cLang==='vf'?'white':'#94a3b8';}
+
+// ── DROPDOWNS ──
+function tDD(id){var d=document.getElementById(id);var w=d.classList.contains('open');cAD();if(!w)d.classList.add('open');}
+function cAD(){document.querySelectorAll('.selector-dropdown').forEach(function(d){d.classList.remove('open');});}
+function toggleDropdown(id){tDD(id);}
+document.addEventListener('click',function(e){if(!e.target.closest('.selector-wrap'))cAD();});
+function selectAudio(t){cLang=t;var lb={vostfr:'🎌 VOSTFR',vf:'🇫🇷 VF',vo:'🇯🇵 VO'};document.getElementById('audioLabel').textContent=lb[t]||'🎌 VOSTFR';cAD();lS(cEp,cSn);}
+
+// ── RECHERCHE ──
+var sI=document.getElementById('searchInput');var sB=document.getElementById('searchSuggestions');
+sI.addEventListener('input',function(){clearTimeout(sT);var q=sI.value.trim();if(q.length<3){sB.style.display='none';return;}sT=setTimeout(function(){fetch('https://api.jikan.moe/v4/anime?q='+encodeURIComponent(q)+'&limit=6').then(function(r){return r.json();}).then(function(d){if(d.data&&d.data.length>0){sB.style.display='block';document.getElementById('suggestionsList').innerHTML=d.data.map(function(a){return '<div class="suggestion-item focusable" tabindex="0" onclick="pA(\''+a.title.replace(/'/g,"\\'")+'\','+a.mal_id+')"><img src="'+a.images.jpg.small_image_url+'" style="width:38px;height:54px;border-radius:5px;object-fit:cover;" onerror="this.src=\''+PH+'\'"><div style="overflow:hidden"><div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+a.title+'</div><div style="font-size:10px;color:#94a3b8;">★ '+(a.score||'N/A')+'</div></div></div>';}).join('');}}).catch(function(){});},500);});
+document.addEventListener('click',function(e){if(!sI.contains(e.target)&&!sB.contains(e.target))sB.style.display='none';});
+
+// ── HERO BANNER DYNAMIQUE ──
+var heroList=[];var heroIdx=0;var heroTimer=null;var heroPaused=false;
+var heroListenersAdded=false; // éviter doublons de listeners
+
+var HERO_TARGETS=[
+    {title:'One Piece',mal_id:21},
+    {title:'Solo Leveling',mal_id:58426},
+    {title:'Hunter x Hunter (2011)',mal_id:11061},
+    {title:'Jujutsu Kaisen',mal_id:40748},
+    {title:'Hell\'s Paradise: Jigokuraku',mal_id:51535},
+    {title:'Fire Force',mal_id:38671},
+    {title:'Demon Slayer',mal_id:38000},
+    {title:'Black Clover',mal_id:33338}
+];
+
+function loadHero(topData){
+    // Fusionner : top anime en premier (Frieren etc.) + targets ciblés
+    var seen={};var merged=[];
+    // D'abord les top anime reçus (max 4)
+    if(topData&&topData.length){
+        topData.slice(0,4).forEach(function(a){
+            if(!seen[a.mal_id]){seen[a.mal_id]=true;merged.push(a);}
+        });
+    }
+    // Ensuite les targets ciblés non déjà présents
+    HERO_TARGETS.forEach(function(t){
+        if(!seen[t.mal_id]){
+            seen[t.mal_id]=true;
+            // Chercher dans topData ou créer objet minimal
+            var found=topData&&topData.find(function(a){return a.mal_id===t.mal_id;});
+            merged.push(found||{mal_id:t.mal_id,title:t.title,images:{jpg:{large_image_url:'',image_url:''}}});
+        }
+    });
+    heroList=merged.slice(0,8);
+    heroIdx=0;
+    // Enrichir images manquantes en arrière-plan
+    heroList.forEach(function(a,i){
+        if(!a.images||!a.images.jpg||!a.images.jpg.large_image_url){
+            fetch('https://api.jikan.moe/v4/anime/'+a.mal_id)
+                .then(function(r){return r.json();})
+                .then(function(d){if(d.data){heroList[i]=d.data;if(i===heroIdx)showHeroSlide(heroIdx);}})
+                .catch(function(){});
+        }
+    });
+    renderHeroDots();
+    showHeroSlide(0);
+    // Reset timer proprement
+    clearInterval(heroTimer);
+    startHeroAuto();
+    // Listeners une seule fois
+    if(!heroListenersAdded){
+        heroListenersAdded=true;
+        var banner=document.getElementById('heroBanner');
+        banner.addEventListener('mouseenter',function(){heroPaused=true;});
+        banner.addEventListener('mouseleave',function(){heroPaused=false;});
+        banner.addEventListener('touchstart',function(){heroPaused=true;setTimeout(function(){heroPaused=false;},4000);},{passive:true});
+    }
+    // Bouton reprise
+    try{
+        var lw=JSON.parse(localStorage.getItem('otaku_last_watch')||'{}');
+        if(lw.title){
+            var rb=document.getElementById('heroResumeBtn');
+            rb.style.display='block';
+            rb.setAttribute('data-title',lw.title);
+            rb.setAttribute('data-id',lw.malId||0);
+            rb.setAttribute('data-ep',lw.ep||1);
+        }
+    }catch(e){}
+}
+
+function renderHeroDots(){
+    var dots=document.getElementById('heroDots');
+    dots.innerHTML=heroList.map(function(a,i){
+        return '<button class="hero-dot'+(i===0?' active':'')+'" onclick="goHeroSlide('+i+')"></button>';
+    }).join('');
+}
+
+function goHeroSlide(idx){
+    heroIdx=idx;
+    showHeroSlide(idx);
+    // Reset timer
+    clearInterval(heroTimer);
+    startHeroAuto();
+}
+
+async function showHeroSlide(idx){
+    var a=heroList[idx];
+    if(!a||!a.title)return;
+    heroData.title=a.title;
+    heroData.malId=a.mal_id;
+
+    // Mettre à jour le contenu
+    document.getElementById('heroTitle').textContent=a.title;
+    document.getElementById('heroBadge').textContent='🔥 EN CE MOMENT';
+
+    // Image de fond immédiate (haute qualité Jikan)
+    var bgImg=document.getElementById('heroBgImg');
+    if(a.images&&a.images.jpg){
+        bgImg.src=a.images.jpg.large_image_url||a.images.jpg.image_url||'';
+    }
+
+    // Dots
+    document.querySelectorAll('.hero-dot').forEach(function(d,i){
+        d.classList.toggle('active',i===idx);
+    });
+
+    // Barre progression
+    var bar=document.getElementById('heroProgressBar');
+    if(bar){bar.classList.remove('animate');bar.style.width='0%';setTimeout(function(){bar.classList.add('animate');bar.style.width='100%';},100);}
+
+    // Trailer YouTube via Jikan (pas TMDB/Netflix)
+    document.getElementById('heroFrame').src='';
+    try{
+        var r=await fetch('https://api.jikan.moe/v4/anime/'+a.mal_id+'/videos');
+        var d=await r.json();
+        if(d.data&&d.data.promo&&d.data.promo.length>0&&heroIdx===idx){
+            var promo=d.data.promo[0];
+            if(promo.trailer&&promo.trailer.youtube_id){
+                var ytId=promo.trailer.youtube_id;
+                document.getElementById('heroFrame').src=
+                    'https://www.youtube.com/embed/'+ytId+
+                    '?autoplay=1&mute=0&loop=1&playlist='+ytId+
+                    '&controls=0&showinfo=0&modestbranding=1&rel=0';
+                document.getElementById('heroBadge').textContent='🎬 BANDE ANNONCE';
+            }
+        }
+    }catch(e){}
+}
+
+function startHeroAuto(){
+    heroTimer=setInterval(function(){
+        if(heroPaused)return;
+        heroIdx=(heroIdx+1)%heroList.length;
+        showHeroSlide(heroIdx);
+    },90000);
+}
+
+function heroPlay(){if(heroData.malId)pA(heroData.title,heroData.malId);}
+function heroResume(){var btn=document.getElementById('heroResumeBtn');var t=btn.getAttribute('data-title');var id=btn.getAttribute('data-id');if(t&&id)pA(t,parseInt(id)||0);}
+
+// ── HOME ──
+function loadHome(){
+    sV('homeView');
+    fetch('https://api.jikan.moe/v4/top/anime?limit=12&type=tv').then(function(r){return r.json();}).then(function(d){
+        if(d.data&&d.data.length)loadHero(d.data);
+        rG(d.data,'popGrid');
+    }).catch(function(){});
+
+    fetch('https://api.jikan.moe/v4/seasons/now?limit=12').then(function(r){return r.json();}).then(function(d){
+        document.getElementById('recentScroll').innerHTML=d.data.map(function(a){
+            return '<div class="focusable" style="flex-shrink:0;cursor:pointer;border:2px solid transparent;border-radius:8px;transition:all 0.2s;" tabindex="0" onclick="pA(\''+a.title.replace(/'/g,"\\'")+'\','+a.mal_id+')" onmouseenter="this.style.borderColor=\'var(--primary)\'" onmouseleave="this.style.borderColor=\'transparent\'">'+'<img src="'+a.images.jpg.image_url+'" style="width:85px;height:124px;border-radius:6px;object-fit:cover;display:block;" onerror="this.src=\''+PH+'\'"></div>';
+        }).join('');
+    }).catch(function(){});
+
+    fetch('https://api.jikan.moe/v4/seasons/now?limit=20').then(function(r){return r.json();}).then(function(d){
+        var sorted=d.data.slice().sort(function(a,b){
+            var da=a.aired&&a.aired.from?new Date(a.aired.from):new Date(0);
+            var db=b.aired&&b.aired.from?new Date(b.aired.from):new Date(0);
+            return db-da;
+        });
+        document.getElementById('latestEpScroll').innerHTML=sorted.map(function(a){
+            var ep=a.episodes?'Ep. '+a.episodes:'En cours';
+            return '<div class="focusable" style="flex-shrink:0;cursor:pointer;width:90px;" tabindex="0" onclick="pA(\''+a.title.replace(/'/g,"\\'")+'\','+a.mal_id+')">'+
+                '<div style="position:relative;">'+
+                    '<img src="'+a.images.jpg.image_url+'" style="width:90px;height:130px;border-radius:8px;object-fit:cover;display:block;border:2px solid transparent;transition:all 0.2s;" onerror="this.src=\''+PH+'\'" onmouseenter="this.style.borderColor=\'var(--primary)\'" onmouseleave="this.style.borderColor=\'transparent\'">'+
+                    '<div style="position:absolute;bottom:4px;left:4px;background:var(--primary);color:white;font-size:7px;font-weight:900;padding:2px 5px;border-radius:4px;">'+ep+'</div>'+
+                '</div>'+
+                '<div style="font-size:8px;padding:3px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700;">'+a.title+'</div>'+
+            '</div>';
+        }).join('');
+    }).catch(function(){});
+
+    // 💎 Pépites — gems avec bon score, moins connus
+    fetch('https://api.jikan.moe/v4/anime?min_score=7.5&max_score=8.5&order_by=members&sort=asc&limit=12&type=tv&sfw=true').then(function(r){return r.json();}).then(function(d){
+        if(d.data&&d.data.length){
+            var filtered=d.data.filter(function(a){return a.members&&a.members<500000;});
+            rG(filtered.length>=4?filtered:d.data,'pepiGrid');
+        }
+    }).catch(function(){
+        // Fallback sur top anime page 2
+        fetch('https://api.jikan.moe/v4/top/anime?limit=12&type=tv&page=2').then(function(r){return r.json();}).then(function(d){
+            if(d.data&&d.data.length)rG(d.data,'pepiGrid');
+        }).catch(function(){});
+    });
+
+    // 📖 Derniers scans — manga récents MangaDex
+    fetch(PX+encodeURIComponent(MX+'/manga?limit=10&order[latestUploadedChapter]=desc&includes[]=cover_art&contentRating[]=safe&contentRating[]=suggestive')).then(function(r){return r.json();}).then(function(d){
+        if(!d.data)return;
+        document.getElementById('lastScansScroll').innerHTML=d.data.map(function(m){
+            var tt=m.attributes.title.fr||m.attributes.title.en||Object.values(m.attributes.title)[0]||'?';
+            var cr=m.relationships.find(function(r){return r.type==='cover_art';});
+            var cu=cr&&cr.attributes&&cr.attributes.fileName?MI+'/covers/'+m.id+'/'+cr.attributes.fileName+'.256.jpg':PH;
+            return '<div class="focusable" style="flex-shrink:0;cursor:pointer;width:90px;" tabindex="0" onclick="oMD(\''+m.id+'\')">'+
+                '<div style="position:relative;">'+
+                    '<img src="'+cu+'" style="width:90px;height:130px;border-radius:8px;object-fit:cover;display:block;border:2px solid transparent;transition:all 0.2s;" onerror="this.src=\''+PH+'\'" onmouseenter="this.style.borderColor=\'var(--primary)\'" onmouseleave="this.style.borderColor=\'transparent\'">'+
+                    '<div style="position:absolute;bottom:4px;left:4px;background:#6366f1;color:white;font-size:7px;font-weight:900;padding:2px 5px;border-radius:4px;">SCAN</div>'+
+                '</div>'+
+                '<div style="font-size:8px;padding:3px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700;">'+tt+'</div>'+
+            '</div>';
+        }).join('');
+    }).catch(function(){});
+
+    // 🏆 Classiques — animes avant 2010 avec haut score
+    fetch('https://api.jikan.moe/v4/top/anime?limit=25&type=tv').then(function(r){return r.json();}).then(function(d){
+        var classics=d.data.filter(function(a){
+            var year=a.aired&&a.aired.from?new Date(a.aired.from).getFullYear():9999;
+            return year<=2010;
+        });
+        if(classics.length<4){
+            // Fallback : chercher directement les classiques
+            fetch('https://api.jikan.moe/v4/anime?max_score=10&min_score=8&order_by=score&sort=desc&limit=12&type=tv&start_date=1990-01-01&end_date=2010-12-31').then(function(r){return r.json();}).then(function(d2){
+                if(d2.data&&d2.data.length)rG(d2.data,'classicsGrid');
+            }).catch(function(){});
+        } else {
+            rG(classics.slice(0,12),'classicsGrid');
+        }
+    }).catch(function(){});
+}
+
+function loadDiscover(){document.getElementById('discoverTitle').innerText='Top de la Saison';sV('discoverView');fetch('https://api.jikan.moe/v4/seasons/now?limit=24').then(function(r){return r.json();}).then(function(d){rG(d.data,'discoverGrid');}).catch(function(){});}
+
+var calWeekOffset=0;
+
+async function loadCalendar(){
+    sV('calendarView');
+    renderCalendar();
+}
+
+async function renderCalendar(){
+    var content=document.getElementById('calendarContent');
+    var days=['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+    var labFR={monday:'Lundi',tuesday:'Mardi',wednesday:'Mercredi',thursday:'Jeudi',friday:'Vendredi',saturday:'Samedi',sunday:'Dimanche'};
+    var today=new Date();
+    var todayDay=days[today.getDay()===0?6:today.getDay()-1];
+
+    // Nav semaine
+    content.innerHTML='<div class="cal-week-nav">'+
+        '<button class="cal-week-btn focusable" tabindex="0" onclick="calWeekOffset--;renderCalendar()">◀ Semaine préc.</button>'+
+        '<span class="cal-week-label">'+(calWeekOffset===0?'Cette semaine':calWeekOffset>0?'+'+calWeekOffset+' sem.':calWeekOffset+' sem.')+'</span>'+
+        '<button class="cal-week-btn focusable" tabindex="0" onclick="calWeekOffset++;renderCalendar()">Semaine suiv. ▶</button>'+
+    '</div>';
+
+    // Squelettes de chargement
+    days.forEach(function(day){
+        var isToday=calWeekOffset===0&&day===todayDay;
+        content.innerHTML+=
+            '<div class="cal-day-header">'+
+                '<div class="cal-day-label">'+labFR[day]+'</div>'+
+                (isToday?'<div class="cal-day-badge today">AUJOURD\'HUI</div>':'<div class="cal-day-badge">'+labFR[day].substring(0,3)+'</div>')+
+            '</div>'+
+            '<div class="cal-loading" id="cal-skel-'+day+'">'+
+                '<div class="cal-skeleton"></div>'+
+                '<div class="cal-skeleton"></div>'+
+                '<div class="cal-skeleton"></div>'+
+            '</div>'+
+            '<div class="cal-scroll" id="cal-'+day+'" style="display:none;"></div>';
+    });
+
+    // Charger chaque jour
+    for(var i=0;i<days.length;i++){
+        await new Promise(function(r){setTimeout(r,i*300);});
+        (function(day){
+            fetch('https://api.jikan.moe/v4/schedules?filter='+day+'&limit=10')
+            .then(function(r){return r.json();})
+            .then(function(d){
+                var skel=document.getElementById('cal-skel-'+day);
+                var scroll=document.getElementById('cal-'+day);
+                if(!skel||!scroll)return;
+                skel.style.display='none';
+                scroll.style.display='flex';
+                if(!d.data||!d.data.length){
+                    scroll.innerHTML='<div class="cal-empty">Pas de sortie ce jour.</div>';
+                    return;
+                }
+                scroll.innerHTML=d.data.map(function(a){
+                    var ep=a.episodes?'Ep. '+a.episodes:'?? ép.';
+                    var score=a.score?'★ '+a.score:'';
+                    var time=a.broadcast&&a.broadcast.time?a.broadcast.time+' JST':'';
+                    return '<div class="cal-anime-card focusable" tabindex="0" onclick="pA(\''+a.title.replace(/'/g,"\\'")+'\','+a.mal_id+')" onkeydown="if(event.key===\'Enter\')pA(\''+a.title.replace(/'/g,"\\'")+'\','+a.mal_id+')">'+
+                        '<img src="'+a.images.jpg.image_url+'" loading="lazy" onerror="this.src=\''+PH+'\'">'+
+                        '<div class="cal-anime-info">'+
+                            '<div class="cal-anime-title">'+a.title+'</div>'+
+                            '<div class="cal-anime-ep">'+ep+'</div>'+
+                            (time?'<div class="cal-anime-time">'+time+'</div>':'')+
+                            (score?'<div class="cal-anime-time">'+score+'</div>':'')+
+                        '</div></div>';
+                }).join('');
+            })
+            .catch(function(){
+                var skel=document.getElementById('cal-skel-'+day);
+                var scroll=document.getElementById('cal-'+day);
+                if(skel)skel.style.display='none';
+                if(scroll){scroll.style.display='flex';scroll.innerHTML='<div class="cal-empty">Indisponible.</div>';}
+            });
+        })(days[i]);
+    }
+}
+
+var HEART_SVG='<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
+
+function rG(data,target){
+    document.getElementById(target).innerHTML=data.map(function(a){
+        var isFav=gFavAnime(a.mal_id);
+        var cover=a.images.jpg.large_image_url||a.images.jpg.image_url;
+        return '<div class="manga-card focusable" tabindex="0" data-malid="'+a.mal_id+'" '+
+            'onclick="pA(\''+a.title.replace(/'/g,"\\'")+'\','+a.mal_id+')" '+
+            'onkeydown="if(event.key===\'Enter\')pA(\''+a.title.replace(/'/g,"\\'")+'\','+a.mal_id+')">'+
+            '<img src="'+cover+'" loading="lazy" onerror="this.src=\''+PH+'\'">'+
+            '<div class="card-badge">OtAkU+</div>'+
+            '<button class="card-heart'+(isFav?' liked':'')+'" id="fav-anime-'+a.mal_id+'" onclick="event.stopPropagation();tFavAnime('+a.mal_id+',\''+a.title.replace(/'/g,"\\'")+'\',\''+cover+'\')">'+
+                HEART_SVG+
+            '</button>'+
+            '<p>'+a.title+'</p>'+
+        '</div>';
+    }).join('');
+}
+
+function gFavAnime(id){
+    var favs=JSON.parse(localStorage.getItem('otaku_favs_anime')||'[]');
+    return favs.some(function(f){return f.id==id;});
+}
+
+function tFavAnime(id,title,cover){
+    var favs=JSON.parse(localStorage.getItem('otaku_favs_anime')||'[]');
+    var exists=favs.some(function(f){return f.id==id;});
+    if(exists){
+        favs=favs.filter(function(f){return f.id!=id;});
+        var btn=document.getElementById('fav-anime-'+id);
+        if(btn)btn.classList.remove('liked');
+        showToast('Retiré des favoris');
+    }else{
+        favs.push({id:id,title:title,cover:cover,date:Date.now()});
+        var btn=document.getElementById('fav-anime-'+id);
+        if(btn)btn.classList.add('liked');
+        showToast('Ajouté aux favoris !');
+    }
+    localStorage.setItem('otaku_favs_anime',JSON.stringify(favs));
+}
+
+// ── PLAYER ──
+function sSt(msg,type){var el=document.getElementById('streamStatus');el.textContent=msg;el.className='stream-status'+(type?' '+type:'');}
+
+async function pA(title,malId){
+    cTId=null;cEp=1;cSn=1;cTitle=title;cMalId=malId;
+    document.getElementById('vidTitle').innerText=title;
+    document.getElementById('playerSeasonLabel').textContent='SAISON 1';
+    document.getElementById('vidFrame').style.display='none';
+    document.getElementById('vidLoading').style.display='flex';
+    document.getElementById('vidLoadingTxt').textContent='Recherche...';
+    document.getElementById('epList').innerHTML='';
+    document.getElementById('synopsisBox').style.display='none';
+    document.getElementById('seasonDrop').innerHTML='';
+    document.getElementById('seasonLabel').textContent='Saison 1';
+    document.getElementById('audioLabel').textContent=cLang==='vf'?'🇫🇷 VF':'🎌 VOSTFR';
+    sSt('');sV('playerView');sI.value='';sB.style.display='none';
+    localStorage.setItem('otaku_last_watch',JSON.stringify({title:title,malId:malId,ep:1}));
+
+    // Image bannière depuis Jikan
+    try{
+        var rj=await fetch('https://api.jikan.moe/v4/anime/'+malId);
+        var dj=await rj.json();
+        cEpN=dj.data.episodes||12;
+        var bannerImg=dj.data.images&&dj.data.images.jpg?
+            dj.data.images.jpg.large_image_url||dj.data.images.jpg.image_url:'';
+        if(bannerImg){
+            document.getElementById('playerBannerImg').src=bannerImg;
+            document.getElementById('playerBannerImg').style.display='block';
+        }
+        // Meta infos
+        var year=dj.data.aired&&dj.data.aired.from?new Date(dj.data.aired.from).getFullYear():'';
+        var score=dj.data.score?'★ '+dj.data.score:'';
+        var rating=dj.data.rating?dj.data.rating.split(' ')[0]:'';
+        var metaEl=document.getElementById('playerMeta');
+        if(metaEl){
+            metaEl.innerHTML=
+                (year?'<span>'+year+'</span>':'')+
+                (score?'<span>'+score+'</span>':'')+
+                (rating?'<span>'+rating+'</span>':'');
+        }
+    }catch(e){cEpN=12;}
+
+    // TMDB : synopsis FR + saisons
+    try{
+        document.getElementById('vidLoadingTxt').textContent='Identification...';
+        var r2=await fetch(TB+'/search/tv?api_key='+TK+'&query='+encodeURIComponent(title)+'&language=fr-FR');
+        var d2=await r2.json();
+        if(d2.results&&d2.results.length>0){
+            cTId=d2.results[0].id;
+            sSt('✅ '+(d2.results[0].name||title),'ok');
+            // Bannière TMDB (meilleure qualité)
+            if(d2.results[0].backdrop_path){
+                document.getElementById('playerBannerImg').src='https://image.tmdb.org/t/p/w780'+d2.results[0].backdrop_path;
+            }
+            var synFR=d2.results[0].overview||'';
+            if(synFR){document.getElementById('synopsisText').textContent=synFR;document.getElementById('synopsisBox').style.display='block';}
+            var r3=await fetch(TB+'/tv/'+cTId+'?api_key='+TK+'&language=fr-FR');
+            var d3=await r3.json();
+            var sns=(d3.seasons||[]).filter(function(s){return s.season_number>0;});
+            if(sns.length>0){
+                var sDrop=document.getElementById('seasonDrop');
+                sDrop.innerHTML=sns.map(function(s,i){
+                    return '<div class="dropdown-item focusable'+(i===0?' sel-active':'')+'" tabindex="0" onclick="selSn('+s.season_number+','+s.episode_count+')" onkeydown="if(event.key===\'Enter\')selSn('+s.season_number+','+s.episode_count+')">Saison '+s.season_number+' &mdash; '+s.episode_count+' ép.</div>';
+                }).join('');
+                cEpN=sns[0].episode_count||cEpN;
+            }
+        }else{sSt('⚠️ Stream direct','warn');}
+    }catch(e){sSt('⚠️ Stream direct','warn');}
+    bEP(cEpN);lS(1,1);
+}
+function playAnime(t,id){pA(t,id);}
+
+function selSn(num,epCount){
+    cSn=num;
+    document.getElementById('seasonLabel').textContent='Saison '+num;
+    document.getElementById('playerSeasonLabel').textContent='SAISON '+num;
+    cAD();
+    cEpN=epCount||12;bEP(cEpN);lS(1,num);
+    var lw=JSON.parse(localStorage.getItem('otaku_last_watch')||'{}');lw.ep=1;localStorage.setItem('otaku_last_watch',JSON.stringify(lw));
+}
+
+function bEP(count){
+    var list=document.getElementById('epList');
+    list.innerHTML='';
+    var max=Math.min(count,500);
+    var lbl=document.getElementById('epCountLabel');
+    if(lbl)lbl.textContent=max+' épisode'+(max>1?'s':'');
+    for(var i=1;i<=max;i++){
+        (function(ep){
+            var item=document.createElement('div');
+            item.className='ep-netflix-item focusable'+(ep===1?' active-ep':'');
+            item.tabIndex=0;
+            // Miniature depuis TMDB si disponible
+            var thumbSrc=cTId?
+                'https://image.tmdb.org/t/p/w300/'+cTId+'_s'+cSn+'_e'+ep+'.jpg':
+                '';
+            item.innerHTML=
+                '<div class="ep-thumb-wrap">'+
+                    '<img src="'+PH+'" id="epthumb-'+ep+'" onerror="this.src=\''+PH+'\'">'+
+                    '<div class="ep-thumb-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>'+
+                '</div>'+
+                '<div class="ep-info">'+
+                    '<div class="ep-info-top">'+
+                        '<div class="ep-num">Épisode '+ep+'</div>'+
+                        '<div class="ep-duration" id="epdur-'+ep+'">~24 min</div>'+
+                    '</div>'+
+                    '<div class="ep-desc" id="epdesc-'+ep+'">Cliquez pour lancer l\'épisode '+ep+'.</div>'+
+                '</div>'+
+                '<button class="ep-dl-btn focusable" tabindex="0" title="Télécharger" onclick="event.stopPropagation();downloadEpN('+ep+')">'+
+                    '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>'+
+                '</button>';
+            item.onclick=function(){
+                document.querySelectorAll('.ep-netflix-item').forEach(function(x){x.classList.remove('active-ep');});
+                item.classList.add('active-ep');
+                cEp=ep;lS(ep,cSn);
+                var lw=JSON.parse(localStorage.getItem('otaku_last_watch')||'{}');
+                lw.ep=ep;localStorage.setItem('otaku_last_watch',JSON.stringify(lw));
+                // Scroll vers le lecteur
+                document.getElementById('vidContainer').scrollIntoView({behavior:'smooth'});
+            };
+            item.onkeydown=function(e){if(e.key==='Enter')item.onclick();};
+            list.appendChild(item);
+        })(i);
+    }
+    // Charger les miniatures TMDB si disponible
+    if(cTId)loadEpThumbs(max);
+}
+
+async function loadEpThumbs(max){
+    try{
+        var r=await fetch(TB+'/tv/'+cTId+'/season/'+cSn+'?api_key='+TK+'&language=fr-FR');
+        var d=await r.json();
+        if(!d.episodes)return;
+        d.episodes.slice(0,max).forEach(function(ep,i){
+            var num=ep.episode_number;
+            var thumb=document.getElementById('epthumb-'+num);
+            if(thumb&&ep.still_path){
+                thumb.src='https://image.tmdb.org/t/p/w300'+ep.still_path;
+            }
+            var desc=document.getElementById('epdesc-'+num);
+            if(desc&&ep.overview)desc.textContent=ep.overview;
+            var dur=document.getElementById('epdur-'+num);
+            if(dur&&ep.runtime)dur.textContent=ep.runtime+' min';
+        });
+    }catch(e){}
+}
+
+function downloadEpN(ep){
+    var s=cSn||1;
+    var url=cTId?
+        'https://vidsrc.cc/v2/embed/tv/'+cTId+'/'+s+'/'+ep+'?download=1':
+        'https://vidsrc.cc/v2/embed/tv/'+encodeURIComponent(cTitle)+'/'+s+'/'+ep+'?download=1';
+    window.open(url,'_blank');
+    // Sauvegarder dans les téléchargements
+    var dls=JSON.parse(localStorage.getItem('otaku_downloads')||'[]');
+    var exists=dls.some(function(d){return d.malId==cMalId&&d.ep==ep&&d.sn==s;});
+    if(!exists){
+        var cover=document.getElementById('playerBannerImg')?document.getElementById('playerBannerImg').src:'';
+        dls.unshift({title:cTitle,malId:cMalId,ep:ep,sn:s,cover:cover,date:Date.now()});
+        if(dls.length>50)dls=dls.slice(0,50);
+        localStorage.setItem('otaku_downloads',JSON.stringify(dls));
+    }
+    showToast('⬇️ Épisode '+ep+' sauvegardé !');
+}
+
+function downloadEp(){downloadEpN(cEp);}
+
+function lS(ep,sn){
+    cEp=ep;if(sn)cSn=sn;
+    var fr=document.getElementById('vidFrame');
+    document.getElementById('vidLoading').style.display='flex';
+    fr.style.display='none';
+    var u,s=cSn||1;
+    if(cLang==='vf'){
+        u=cTId?'https://vidsrc.to/embed/tv/'+cTId+'/'+s+'/'+ep:'https://vidsrc.to/embed/tv/'+encodeURIComponent(cTitle)+'/'+s+'/'+ep;
+        sSt('🇫🇷 VF — S'+s+' É'+ep,'ok');
+    }else{
+        u=cTId?'https://vidsrc.cc/v2/embed/tv/'+cTId+'/'+s+'/'+ep+'?autoPlay=1':'https://vidsrc.cc/v2/embed/tv/'+encodeURIComponent(cTitle)+'/'+s+'/'+ep+'?autoPlay=1';
+        sSt('🎌 VOSTFR — S'+s+' É'+ep,'ok');
+    }
+    fr.onload=function(){document.getElementById('vidLoading').style.display='none';fr.style.display='block';};
+    fr.src=u;
+}
+
+// ── BIBLIO ──
+function loadBibliotheque(){sV('bibliothequeView');bBG();if(!bLoaded)fB(true);sBT('biblio');}
+function sBT(tab){var b=tab==='biblio';document.getElementById('panelBiblio').style.display=b?'block':'none';document.getElementById('panelHistorique').style.display=b?'none':'block';document.getElementById('tabBiblio').style.background=b?'var(--primary)':'#1e293b';document.getElementById('tabBiblio').style.color=b?'white':'#94a3b8';document.getElementById('tabHistTab').style.background=b?'#1e293b':'var(--primary)';document.getElementById('tabHistTab').style.color=b?'#94a3b8':'white';if(!b)rHP('historiqueList','historiqueEmpty');}
+function switchBiblioTab(t){sBT(t);}
+function bBG(){document.getElementById('biblioGenres').innerHTML=GM.map(function(g){return '<div class="filter-chip focusable'+(g.id===bGId?' active':'')+'" tabindex="0" onclick="sBG('+(g.id?'\''+g.id+'\'':'null')+')" onkeydown="if(event.key===\'Enter\')sBG('+(g.id?'\''+g.id+'\'':'null')+')">'+g.l+'</div>';}).join('');}
+function sBG(id){bGId=id||null;bBG();fB(true);}
+function setBiblioGenre(id){sBG(id);}
+function setSortBiblio(sort){bSort=sort;['pop','new','az'].forEach(function(s){var el=document.getElementById('sort-'+s);if(el)el.classList.remove('active');});var mp={followedCount:'pop',latestUploadedChapter:'new',title:'az'};var el=document.getElementById('sort-'+mp[sort]);if(el)el.classList.add('active');fB(true);}
+function searchBiblio(){bQ=document.getElementById('biblioSearch').value.trim();fB(true);}
+
+async function fB(reset){
+    if(reset){bOff=0;document.getElementById('biblioGrid').innerHTML='';}
+    var grid=document.getElementById('biblioGrid');
+    if(reset)grid.innerHTML='<div class="loading-txt" style="grid-column:1/-1;">Chargement...</div>';
+    var u=MX+'/manga?limit=24&offset='+bOff+'&order['+bSort+']=desc&includes[]=cover_art&contentRating[]=safe&contentRating[]=suggestive';
+    if(bQ)u+='&title='+encodeURIComponent(bQ);if(bGId)u+='&includedTags[]='+bGId;
+    try{
+        var j=await mF(u);
+        if(!j.data||!j.data.length){if(reset)grid.innerHTML='<div class="loading-txt" style="grid-column:1/-1;">Aucun résultat.</div>';document.getElementById('biblioMoreBtn').style.display='none';return;}
+        if(reset)grid.innerHTML='';
+        var fIds=gFI();
+        grid.innerHTML+=j.data.map(function(m){
+            var tt=m.attributes.title.fr||m.attributes.title.en||Object.values(m.attributes.title)[0]||'?';
+            var cr=m.relationships.find(function(r){return r.type==='cover_art';});
+            var cu=cr&&cr.attributes&&cr.attributes.fileName?MI+'/covers/'+m.id+'/'+cr.attributes.fileName+'.256.jpg':PH;
+            var iF=fIds.indexOf(m.id)>-1;
+            return '<div class="manga-dex-card focusable" tabindex="0" onclick="oMD(\''+m.id+'\')" onkeydown="if(event.key===\'Enter\')oMD(\''+m.id+'\')">'+
+                '<img src="'+cu+'" loading="lazy" onerror="this.src=\''+PH+'\';this.style.background=\'linear-gradient(135deg,#0a1128,#1e293b)\'">'+
+                '<div class="card-badge">OtAkU+</div>'+
+                '<button class="card-heart'+(iF?' liked':'')+'" onclick="event.stopPropagation();tFav(\''+m.id+'\',\''+tt.replace(/'/g,"\\'")+'\',\''+cu+'\')" id="fav-'+m.id+'">'+HEART_SVG+'</button>'+
+                '<p>'+tt+'</p></div>';
+        }).join('');
+        bOff+=24;bLoaded=true;
+        document.getElementById('biblioMoreBtn').style.display=j.data.length===24?'block':'none';
+    }catch(e){if(reset)grid.innerHTML='<div class="loading-txt" style="grid-column:1/-1;">Erreur de chargement.</div>';}
+}
+function loadMoreBiblio(){fB(false);}
+
+// ── FAVORIS ──
+function gFI(){return JSON.parse(localStorage.getItem('otaku_favs_data')||'[]').map(function(f){return f.id;});}
+function tFav(id,title,cover){var favs=JSON.parse(localStorage.getItem('otaku_favs_data')||'[]');var ids=favs.map(function(f){return f.id;});if(ids.indexOf(id)>-1){favs=favs.filter(function(f){return f.id!==id;});var b=document.getElementById('fav-'+id);if(b)b.textContent='🤍';showToast('Retiré des favoris');}else{favs.push({id:id,title:title,cover:cover});var b=document.getElementById('fav-'+id);if(b)b.textContent='❤️';showToast('❤️ Ajouté aux favoris !');}localStorage.setItem('otaku_favs_data',JSON.stringify(favs));}
+function loadFavoris(){
+    sV('favorisView');
+    var favsManga=JSON.parse(localStorage.getItem('otaku_favs_data')||'[]');
+    var favsAnime=JSON.parse(localStorage.getItem('otaku_favs_anime')||'[]');
+    var grid=document.getElementById('favGrid');
+    var empty=document.getElementById('favEmpty');
+    var all=[];
+    // Anime favoris
+    favsAnime.forEach(function(f){all.push({id:f.id,title:f.title,cover:f.cover,type:'anime'});});
+    // Manga favoris
+    favsManga.forEach(function(f){all.push({id:f.id,title:f.title,cover:f.cover,type:'manga'});});
+    if(!all.length){grid.innerHTML='';empty.style.display='block';return;}
+    empty.style.display='none';
+    grid.innerHTML=all.map(function(f){
+        var isManga=f.type==='manga';
+        return '<div class="fav-card focusable" tabindex="0" '+
+            'onclick="'+(isManga?'oMD(\''+f.id+'\')':'pA(\''+f.title.replace(/'/g,"\\'")+'\','+f.id+')')+'" '+
+            'onkeydown="if(event.key===\'Enter\')'+(isManga?'oMD(\''+f.id+'\')':'pA(\''+f.title.replace(/'/g,"\\'")+'\','+f.id+')')+'"'+
+            '>'+
+            '<img src="'+f.cover+'" onerror="this.src=\''+PH+'\'" loading="lazy">'+
+            '<div class="card-badge">'+(isManga?'MANGA':'ANIME')+'</div>'+
+            '<button class="fav-del-btn" onclick="event.stopPropagation();'+(isManga?'rFav(\''+f.id+'\')':'rFavAnime('+f.id+')')+'">✕</button>'+
+            '<p>'+f.title+'</p>'+
+        '</div>';
+    }).join('');
+}
+
+function rFavAnime(id){
+    var favs=JSON.parse(localStorage.getItem('otaku_favs_anime')||'[]').filter(function(f){return f.id!=id;});
+    localStorage.setItem('otaku_favs_anime',JSON.stringify(favs));
+    var btn=document.getElementById('fav-anime-'+id);
+    if(btn)btn.classList.remove('liked');
+    loadFavoris();
+    showToast('Retiré des favoris');
+}
+function rFav(id){var favs=JSON.parse(localStorage.getItem('otaku_favs_data')||'[]').filter(function(f){return f.id!==id;});localStorage.setItem('otaku_favs_data',JSON.stringify(favs));loadFavoris();showToast('Retiré des favoris');}
+
+// ── HISTORIQUE ──
+function sHist(mid,title,cover,ch){rHist[mid]={title:title,cover:cover,chapNum:ch,date:Date.now()};localStorage.setItem('otaku_history',JSON.stringify(rHist));}
+function rHP(lId,eId){var list=document.getElementById(lId),empty=document.getElementById(eId);var ent=Object.entries(rHist).sort(function(a,b){return b[1].date-a[1].date;});if(!ent.length){list.innerHTML='';empty.style.display='block';return;}empty.style.display='none';list.innerHTML=ent.map(function(e){var id=e[0],info=e[1];return '<div class="history-item focusable" tabindex="0" onclick="oMD(\''+id+'\')" onkeydown="if(event.key===\'Enter\')oMD(\''+id+'\')"><img src="'+info.cover+'" onerror="this.src=\''+PH+'\'" alt=""><div style="flex:1;overflow:hidden;"><div class="history-title">'+info.title+'</div><div class="history-chap">Dernier lu : Ch. '+info.chapNum+'</div></div></div>';}).join('');}
+function loadHistorique(){sV('historiqueView');rHP('histListMain','histEmpty');}
+
+// ── MANGA DETAIL ──
+async function oMD(mangaId){
+    cMId=mangaId;document.getElementById('retourDetailBtn').onclick=function(){sV('bibliothequeView');};sV('mangaDetailView');
+    document.getElementById('mangaDetailContent').innerHTML='<div class="loading-txt">Chargement...</div>';document.getElementById('chapterList').innerHTML='';
+    try{
+        var mJ=await mF(MX+'/manga/'+mangaId+'?includes[]=cover_art');var m=mJ.data;
+        var tt=m.attributes.title.fr||m.attributes.title.en||Object.values(m.attributes.title)[0]||'?';
+        var dc=m.attributes.description.fr||m.attributes.description.en||'Pas de description.';
+        var st=m.attributes.status;
+        var cr=m.relationships.find(function(r){return r.type==='cover_art';});
+        var cu=cr&&cr.attributes&&cr.attributes.fileName?MI+'/covers/'+m.id+'/'+cr.attributes.fileName+'.256.jpg':PH;
+        var sC=st==='ongoing'?'status-ongoing':'status-completed';
+        var sL=st==='ongoing'?'🟢 En cours':st==='completed'?'✅ Terminé':'';
+        document.getElementById('mangaDetailContent').innerHTML=
+            '<div class="manga-detail-header"><img class="manga-detail-cover" src="'+cu+'" onerror="this.src=\''+PH+'\'">'+
+            '<div><div class="manga-detail-title">'+tt+'</div>'+(sL?'<span class="manga-status-badge '+sC+'">'+sL+'</span>':'')+
+            '<div class="manga-detail-desc" style="margin-top:5px;">'+dc+'</div></div></div>';
+        var cJ=await mF(MX+'/manga/'+mangaId+'/feed?translatedLanguage[]=fr&order[chapter]=desc&limit=100');
+        var chapters=cJ.data;
+        if(!chapters||!chapters.length){document.getElementById('chapterList').innerHTML='<div class="loading-txt">Pas de chapitres disponibles.</div>';return;}
+        cChaps=chapters;
+        document.getElementById('chapterList').innerHTML=chapters.map(function(ch,idx){
+            var num=ch.attributes.chapter||'?';var date=ch.attributes.publishAt?new Date(ch.attributes.publishAt).toLocaleDateString('fr-FR'):'';var isR=rChaps[mangaId+'_'+num];
+            return '<div class="chapter-item'+(isR?' read':'')+'" tabindex="0">'+
+                '<div><div class="chapter-num">Chapitre '+num+(isR?' ✓':'')+'</div><div class="chapter-date">'+date+'</div></div>'+
+                '<button class="chapter-read-btn focusable" tabindex="0" onclick="rCB('+idx+',\''+mangaId+'\',\''+tt.replace(/'/g,"\\'")+'\',\''+cu+'\',\''+num+'\')">LIRE</button></div>';
+        }).join('');
+    }catch(e){document.getElementById('mangaDetailContent').innerHTML='<div class="loading-txt">Erreur.</div>';}
+}
+function openMangaDetail(id){oMD(id);}
+function rCB(i,mid,t,c,n){rCh(i,mid,t,c,n);}
+async function rCh(index,mid,title,cover,chapNum){
+    cChIdx=index;var ch=cChaps[index];var num=ch.attributes.chapter||chapNum||'?';
+    document.getElementById('readerTitle').innerText=title+' — Ch. '+num;
+    document.getElementById('chapterPages').innerHTML='<div class="loading-txt" style="color:white;padding:40px;">Chargement...</div>';
+    document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+    document.getElementById('readerView').style.display='block';window.scrollTo(0,0);
+    sHist(mid||cMId,title,cover,num);
+    rChaps[(mid||cMId)+'_'+num]=true;localStorage.setItem('otaku_read_chaps',JSON.stringify(rChaps));
+    try{
+        var j=await mF(MX+'/at-home/server/'+ch.id);
+        var pages=j.chapter.data.map(function(f){return j.baseUrl+'/data/'+j.chapter.hash+'/'+f;});
+        document.getElementById('chapterPages').innerHTML=pages.map(function(p){return '<img src="'+p+'" loading="lazy" onerror="this.src=\''+PH+'\'">';}).join('');
+    }catch(e){document.getElementById('chapterPages').innerHTML='<div class="loading-txt" style="color:#94a3b8;">Erreur.</div>';}
+}
+function navigateChapter(dir){var n=cChIdx-dir;if(n>=0&&n<cChaps.length){var ch=cChaps[n];var num=ch.attributes.chapter||'?';var t=document.getElementById('readerTitle').innerText.split(' — ')[0];rCh(n,cMId,t,'',num);}}
+function closeReader(){document.getElementById('readerView').style.display='none';sV('mangaDetailView');}
+
+// ── MODE VEILLE ──
+(function(){
+    var IDLE_DELAY=3*60*1000;
+    var idleTimer=null;
+    var sleepActive=false;
+    var sleepBgTimer=null;
+    var sleepClockTimer=null;
+    var sleepAnimes=[];
+    var sleepIdx=0;
+    var sleepDataLoaded=false; // cache — ne charger qu'une fois
+
+    var GENRES=['Action','Romance','Aventure','Fantasy','Comédie','Horreur','Sci-Fi','Isekai','Sport','Drame'];
+
+    function resetIdle(){
+        if(sleepActive)return;
+        clearTimeout(idleTimer);
+        idleTimer=setTimeout(activateSleep,IDLE_DELAY);
+    }
+
+    ['mousemove','mousedown','keydown','touchstart','scroll','click'].forEach(function(ev){
+        document.addEventListener(ev,resetIdle,{passive:true,capture:true});
+    });
+
+    function activateSleep(){
+        var auth=document.getElementById('authScreen');
+        var ps=document.getElementById('profileSelector');
+        if(auth&&!auth.classList.contains('hidden'))return;
+        if(ps&&ps.classList.contains('open'))return;
+        sleepActive=true;
+        document.getElementById('sleepScreen').classList.add('active');
+        // Stopper le player pour économiser ressources
+        var fr=document.getElementById('vidFrame');
+        if(fr&&fr.src)fr.src='';
+        loadSleepData().then(function(){
+            startSleepBg();
+            startSleepClock();
+        });
+    }
+
+    function loadSleepData(){
+        if(sleepDataLoaded&&sleepAnimes.length)return Promise.resolve();
+        return fetch('https://api.jikan.moe/v4/top/anime?limit=20&type=tv')
+            .then(function(r){return r.json();})
+            .then(function(d){
+                if(d.data&&d.data.length){
+                    sleepAnimes=d.data;
+                    sleepDataLoaded=true;
+                    var recs=document.getElementById('sleepRecs');
+                    if(recs)recs.innerHTML=d.data.slice(0,5).map(function(a){
+                        return '<div class="sleep-rec-card"><img src="'+a.images.jpg.image_url+'" loading="lazy"></div>';
+                    }).join('');
+                }
+            }).catch(function(){});
+    }
+
+    function startSleepBg(){
+        if(!sleepAnimes.length)return;
+        showSleepBg();
+        clearInterval(sleepBgTimer);
+        sleepBgTimer=setInterval(function(){
+            sleepIdx=(sleepIdx+1)%sleepAnimes.length;
+            showSleepBg();
+        },6000);
+    }
+
+    function showSleepBg(){
+        if(!sleepAnimes.length)return;
+        var a=sleepAnimes[sleepIdx];
+        var bg=document.getElementById('sleepBg');
+        if(bg)bg.style.backgroundImage='url('+(a.images.jpg.large_image_url||a.images.jpg.image_url)+')';
+        var st=document.getElementById('sleepTitle');
+        if(st)st.textContent=a.title||'OtAkU+';
+        var sg=document.getElementById('sleepGenres');
+        if(sg){
+            var picked=GENRES.slice().sort(function(){return Math.random()-0.5;}).slice(0,3);
+            sg.innerHTML=picked.map(function(g){return '<span class="sleep-genre">'+g+'</span>';}).join('');
+        }
+    }
+
+    function startSleepClock(){
+        updateSleepClock();
+        clearInterval(sleepClockTimer);
+        sleepClockTimer=setInterval(updateSleepClock,1000);
+    }
+
+    function updateSleepClock(){
+        var now=new Date();
+        var el=document.getElementById('sleepTime');
+        if(el)el.textContent=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+        var de=document.getElementById('sleepDate');
+        if(de){
+            var days=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+            var months=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+            de.textContent=days[now.getDay()]+' '+now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
+        }
+    }
+
+    window.wakeUp=function(){
+        if(!sleepActive)return;
+        sleepActive=false;
+        document.getElementById('sleepScreen').classList.remove('active');
+        clearInterval(sleepBgTimer);
+        clearInterval(sleepClockTimer);
+        sleepBgTimer=null;sleepClockTimer=null;
+        sleepIdx=0;
+        resetIdle();
+    };
+
+    resetIdle();
+})();
+
+function toggleHelp(){
+    sV('aideView');toggleMenu(false);
+}
+
+function loadDownloads(){
+    sV('downloadsView');
+    var dls=JSON.parse(localStorage.getItem('otaku_downloads')||'[]');
+    var list=document.getElementById('downloadsList');
+    var empty=document.getElementById('downloadsEmpty');
+    if(!dls.length){list.innerHTML='';empty.style.display='block';return;}
+    empty.style.display='none';
+    list.innerHTML=dls.map(function(d,i){
+        return '<div style="background:var(--card);border-radius:10px;padding:12px;display:flex;gap:12px;align-items:center;border:1px solid rgba(255,255,255,0.06);">'+
+            '<div style="width:48px;height:68px;border-radius:6px;background:#1e293b;flex-shrink:0;overflow:hidden;">'+
+                '<img src="'+d.cover+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">'+
+            '</div>'+
+            '<div style="flex:1;min-width:0;">'+
+                '<div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+d.title+'</div>'+
+                '<div style="font-size:10px;color:var(--primary);margin-top:2px;">S'+d.sn+' — Épisode '+d.ep+'</div>'+
+                '<div style="font-size:10px;color:#64748b;margin-top:2px;">'+new Date(d.date).toLocaleDateString('fr-FR')+'</div>'+
+            '</div>'+
+            '<div style="display:flex;flex-direction:column;gap:6px;">'+
+                '<button onclick="playDownload(\''+d.title+'\','+d.malId+','+d.ep+','+d.sn+')" style="background:var(--primary);border:none;color:white;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">▶</button>'+
+                '<button onclick="removeDownload('+i+')" style="background:#334155;border:none;color:#94a3b8;padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;">✕</button>'+
+            '</div>'+
+        '</div>';
+    }).join('');
+}
+
+function playDownload(title,malId,ep,sn){pA(title,malId).then(function(){lS(ep,sn);});}
+
+function removeDownload(idx){
+    var dls=JSON.parse(localStorage.getItem('otaku_downloads')||'[]');
+    dls.splice(idx,1);
+    localStorage.setItem('otaku_downloads',JSON.stringify(dls));
+    loadDownloads();
+    showToast('Téléchargement supprimé');
+}
+
+function updateHeroProfil(){
+    var av=localStorage.getItem('otaku_avatar');
+    var letter=document.getElementById('heroProfLetter');
+    var img=document.getElementById('heroProfImg');
+    if(av){img.src=av;img.style.display='block';if(letter)letter.style.display='none';}
+    else{
+        var name=currentProfile?currentProfile.name:(localStorage.getItem('otaku_name')||'D');
+        var av2=currentProfile&&currentProfile.avatarImg;
+        if(av2){img.src=av2;img.style.display='block';if(letter)letter.style.display='none';}
+        else{if(letter)letter.textContent=(currentProfile&&currentProfile.avatar)||name[0].toUpperCase();if(img)img.style.display='none';}
+    }
+}
+
+// ── GALERIE AVATARS MANGA ──
+var agPage=1;var agQuery='';var agSelected=null;var agTarget='main';var agLoading=false;
+var agSearchTimer;
+
+function openAvatarGallery(target){
+    agTarget=target||'main';
+    agPage=1;agQuery='';agSelected=null;
+    document.getElementById('agSearch').value='';
+    document.getElementById('agConfirm').classList.remove('show');
+    document.getElementById('avatarGalleryModal').classList.add('open');
+    fetchAvatars(true);
+}
+
+function closeAvatarGallery(){
+    document.getElementById('avatarGalleryModal').classList.remove('open');
+    agSelected=null;
+}
+
+async function fetchAvatars(reset){
+    if(agLoading)return;
+    agLoading=true;
+    var grid=document.getElementById('agGrid');
+    if(reset){grid.innerHTML='<div class="ag-load">🔍 Chargement...</div>';agPage=1;}
+    try{
+        var url='https://api.jikan.moe/v4/characters?page='+agPage+'&limit=24&order_by=favorites&sort=desc';
+        if(agQuery)url='https://api.jikan.moe/v4/characters?q='+encodeURIComponent(agQuery)+'&limit=24';
+        var r=await fetch(url);var d=await r.json();
+        if(!d.data||!d.data.length){if(reset)grid.innerHTML='<div class="ag-load">Aucun résultat.</div>';agLoading=false;return;}
+        var cards=d.data.filter(function(c){return c.images&&c.images.jpg&&c.images.jpg.image_url&&!c.images.jpg.image_url.includes('questionmark');}).map(function(c){
+            var img=c.images.jpg.image_url;
+            var name=c.name||'';
+            return '<div class="ag-card focusable" tabindex="0" onclick="selectAgCard(this,\''+img.replace(/'/g,"\\'")+'\')" onkeydown="if(event.key===\'Enter\')selectAgCard(this,\''+img.replace(/'/g,"\\'")+'\')">'+
+                '<img src="'+img+'" loading="lazy" onerror="this.parentElement.style.display=\'none\'">'+
+                '<p>'+name+'</p></div>';
+        }).join('');
+        if(reset)grid.innerHTML=cards;else grid.innerHTML+=cards;
+        // Bouton charger plus
+        if(!agQuery){
+            var more=document.createElement('div');
+            more.className='ag-load';more.style.cursor='pointer';more.style.color='var(--primary)';more.style.fontWeight='700';
+            more.textContent='▼ Charger plus';
+            more.onclick=function(){agPage++;grid.removeChild(more);fetchAvatars(false);};
+            grid.appendChild(more);
+        }
+    }catch(e){grid.innerHTML='<div class="ag-load">Erreur de chargement.</div>';}
+    agLoading=false;
+}
+
+function selectAgCard(el,imgUrl){
+    document.querySelectorAll('.ag-card').forEach(function(c){c.classList.remove('selected');});
+    el.classList.add('selected');
+    agSelected=imgUrl;
+    document.getElementById('agConfirm').classList.add('show');
+}
+
+function confirmAvatar(){
+    if(!agSelected)return;
+    if(agTarget==='main'){
+        // Mettre à jour avatar principal
+        document.getElementById('avatarImg').src=agSelected;
+        document.getElementById('avatarImg').style.display='block';
+        document.getElementById('avatarLetter').style.display='none';
+        localStorage.setItem('otaku_avatar',agSelected);
+        if(currentProfile)currentProfile.avatarImg=agSelected;
+        showToast('✅ Avatar mis à jour !');
+    } else if(agTarget==='newprofile'){
+        // Mettre à jour l'avatar sélectionné dans le nouveau profil
+        selAvatar='IMG:'+agSelected;
+        // Afficher un aperçu
+        document.getElementById('npmAvatars').innerHTML='<img src="'+agSelected+'" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--primary);">'+
+            '<span style="font-size:11px;color:#22c55e;align-self:center;">✅ Avatar sélectionné</span>';
+        showToast('🎭 Avatar choisi !');
+    }
+    closeAvatarGallery();
+}
+
+// Recherche dans la galerie
+document.addEventListener('DOMContentLoaded',function(){
+    var agS=document.getElementById('agSearch');
+    if(agS)agS.addEventListener('input',function(){
+        clearTimeout(agSearchTimer);
+        agQuery=agS.value.trim();
+        agSearchTimer=setTimeout(function(){fetchAvatars(true);},500);
+    });
+});
+
+// ── SPLASH SCREEN ──
+function showSplash(){
+    var s=document.getElementById('splashScreen');
+    if(!s)return;
+    s.style.display='flex';
+    setTimeout(function(){
+        s.classList.add('fade');
+        setTimeout(function(){s.style.display='none';},600);
+    },2200);
+}
+
+// ── AUTH & MULTI-PROFILS ──
+var AVATARS=['🦊','🐉','⚔️','🌸','🔥','💫','🎭','👾','🌙','⚡','🦋','🐺','🎯','💎','🌊','🏔️'];
+var currentUser=null;
+var currentProfile=null;
+var selAvatar=AVATARS[0];
+
+function switchAuth(tab){
+    var isLogin=tab==='login';
+    var lf=document.getElementById('loginForm');
+    var rf=document.getElementById('registerForm');
+    var tl=document.getElementById('tabLogin');
+    var tr=document.getElementById('tabRegister');
+    lf.style.display=isLogin?'flex':'none';
+    rf.style.display=isLogin?'none':'flex';
+    if(isLogin){lf.style.flexDirection='column';}
+    else{rf.style.flexDirection='column';}
+    tl.classList.toggle('active',isLogin);
+    tr.classList.toggle('active',!isLogin);
+    document.getElementById('loginErr').textContent='';
+    document.getElementById('regErr').textContent='';
+}
+
+function doLogin(){
+    var email=document.getElementById('loginEmail').value.trim();
+    var pass=document.getElementById('loginPass').value;
+    var err=document.getElementById('loginErr');
+    if(!email||!pass){err.textContent='Remplis tous les champs.';return;}
+    var users=JSON.parse(localStorage.getItem('otaku_users')||'[]');
+    var user=users.find(function(u){return u.email===email&&u.pass===btoa(pass);});
+    if(!user){err.textContent='Email ou mot de passe incorrect.';return;}
+    err.textContent='';
+    currentUser=user;
+    localStorage.setItem('otaku_current_user',JSON.stringify(user));
+    document.getElementById('authScreen').classList.add('hidden');
+    showProfileSelector();
+}
+
+function doRegister(){
+    var name=document.getElementById('regName').value.trim();
+    var email=document.getElementById('regEmail').value.trim();
+    var pass=document.getElementById('regPass').value;
+    var err=document.getElementById('regErr');
+    if(!name||!email||!pass){err.textContent='Remplis tous les champs.';return;}
+    if(pass.length<6){err.textContent='Mot de passe trop court (min. 6 car.).';return;}
+    var users=JSON.parse(localStorage.getItem('otaku_users')||'[]');
+    if(users.find(function(u){return u.email===email;})){err.textContent='Email déjà utilisé.';return;}
+    var newUser={id:Date.now(),name:name,email:email,pass:btoa(pass),profiles:[{id:1,name:name,avatar:AVATARS[0],color:'#f97316'}]};
+    users.push(newUser);
+    localStorage.setItem('otaku_users',JSON.stringify(users));
+    err.textContent='';
+    currentUser=newUser;
+    localStorage.setItem('otaku_current_user',JSON.stringify(newUser));
+    document.getElementById('authScreen').classList.add('hidden');
+    showToast('✅ Compte créé ! Bienvenue '+name+' 🔥');
+    showProfileSelector();
+}
+
+function logoutAuth(){
+    localStorage.removeItem('otaku_current_user');
+    currentUser=null;currentProfile=null;
+    document.getElementById('profileSelector').classList.remove('open');
+    document.getElementById('authScreen').classList.remove('hidden');
+}
+
+function showProfileSelector(){
+    var ps=document.getElementById('profileSelector');
+    ps.classList.add('open');
+    renderProfiles();
+    // Charger fond manga aléatoire
+    var mangaIds=[21,11061,40748,38000,33338,38671,51535,58426,1535,16498];
+    var shuffled=mangaIds.sort(function(){return Math.random()-0.5;}).slice(0,12);
+    var bg=document.getElementById('psBg');
+    if(bg){
+        bg.innerHTML='';
+        shuffled.forEach(function(id){
+            var img=document.createElement('img');
+            img.src='https://cdn.myanimelist.net/images/anime/'+id+'/'+id+'l.jpg';
+            fetch('https://api.jikan.moe/v4/anime/'+id).then(function(r){return r.json();}).then(function(d){
+                if(d.data&&d.data.images)img.src=d.data.images.jpg.large_image_url||d.data.images.jpg.image_url;
+            }).catch(function(){});
+            bg.appendChild(img);
+        });
+    }
+}
+
+function renderProfiles(){
+    if(!currentUser)return;
+    var profiles=currentUser.profiles||[];
+    var grid=document.getElementById('psGrid');
+    grid.innerHTML=profiles.map(function(p,i){
+        var avHTML=p.avatarImg?
+            '<img src="'+p.avatarImg+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">':
+            p.avatar;
+        return '<div class="ps-card focusable" tabindex="0" onclick="selectProfile('+i+')" style="position:relative;">'+
+            '<div class="ps-avatar" style="background:'+(p.color||'#1e293b')+';">'+avHTML+'</div>'+
+            '<div class="ps-name">'+p.name+'</div>'+
+            (profiles.length>1?'<button class="ps-del" onclick="event.stopPropagation();deleteProfile('+i+')">✕</button>':'')+
+        '</div>';
+    }).join('');
+    if(profiles.length<4){
+        grid.innerHTML+='<div class="ps-card add-card focusable" tabindex="0" onclick="openNewProfile()">'+
+            '<div class="ps-avatar" style="background:#1e293b;font-size:28px;">＋</div>'+
+            '<div class="ps-name" style="color:#64748b;">Ajouter</div>'+
+        '</div>';
+    }
+}
+
+function selectProfile(idx){
+    currentProfile=currentUser.profiles[idx];
+    document.getElementById('profileSelector').classList.remove('open');
+    document.getElementById('profileNameDisplay').textContent=currentProfile.name+' '+currentProfile.avatar;
+    document.getElementById('avatarLetter').textContent=currentProfile.avatar;
+    showToast('👋 Bonjour '+currentProfile.name+' !');
+    updateHeroProfil();
+    loadHome();
+}
+
+function deleteProfile(idx){
+    if(!confirm('Supprimer ce profil ?'))return;
+    currentUser.profiles.splice(idx,1);
+    updateUserStorage();
+    renderProfiles();
+}
+
+function openNewProfile(){
+    selAvatar=AVATARS[0];
+    document.getElementById('npmName').value='';
+    document.getElementById('npmAvatars').innerHTML=AVATARS.map(function(av,i){
+        return '<div class="npm-av focusable'+(i===0?' sel':'')+'" tabindex="0" onclick="selAv(this,\''+av+'\')">'+av+'</div>';
+    }).join('');
+    document.getElementById('newProfileModal').classList.add('open');
+}
+
+function closeNewProfile(){document.getElementById('newProfileModal').classList.remove('open');}
+
+function selAv(el,av){
+    selAvatar=av;
+    document.querySelectorAll('.npm-av').forEach(function(e){e.classList.remove('sel');});
+    el.classList.add('sel');
+}
+
+function saveNewProfile(){
+    var name=document.getElementById('npmName').value.trim();
+    if(!name){showToast('❌ Entre un nom !');return;}
+    var colors=['#f97316','#6366f1','#22c55e','#ec4899'];
+    var idx=currentUser.profiles.length;
+    var isImg=selAvatar&&selAvatar.startsWith('IMG:');
+    var profile={id:Date.now(),name:name,color:colors[idx%colors.length]};
+    if(isImg){profile.avatarImg=selAvatar.replace('IMG:','');profile.avatar='🎭';}
+    else{profile.avatar=selAvatar||AVATARS[0];}
+    currentUser.profiles.push(profile);
+    updateUserStorage();
+    closeNewProfile();
+    renderProfiles();
+    showToast('✅ Profil "'+name+'" créé !');
+}
+
+function updateUserStorage(){
+    var users=JSON.parse(localStorage.getItem('otaku_users')||'[]');
+    var i=users.findIndex(function(u){return u.id===currentUser.id;});
+    if(i>-1)users[i]=currentUser;
+    localStorage.setItem('otaku_users',JSON.stringify(users));
+    localStorage.setItem('otaku_current_user',JSON.stringify(currentUser));
+}
+
+function checkAuth(){
+    showSplash();
+    setTimeout(function(){
+        var saved=localStorage.getItem('otaku_current_user');
+        if(saved){
+            try{
+                currentUser=JSON.parse(saved);
+                document.getElementById('authScreen').classList.add('hidden');
+                showProfileSelector();
+            }catch(e){document.getElementById('authScreen').classList.remove('hidden');}
+        }else{
+            document.getElementById('authScreen').classList.remove('hidden');
+        }
+    },2400);
+}
+
+// Ajouter option déconnexion dans le menu
+document.addEventListener('DOMContentLoaded',function(){
+    // Entrée clavier sur les champs auth
+    ['loginPass','regPass'].forEach(function(id){
+        var el=document.getElementById(id);
+        if(el)el.addEventListener('keydown',function(e){if(e.key==='Enter'){id==='loginPass'?doLogin():doRegister();}});
+    });
+    var bs=document.getElementById('biblioSearch');if(bs)bs.addEventListener('keydown',function(e){if(e.key==='Enter')searchBiblio();});
+    document.getElementById('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter')saveName();});
+});
+
+// ── NAVIGATION TV + CURSEUR VISUEL ──
+(function(){
+    var cursor=document.getElementById('tv-cursor');
+    var isTv=false;
+    var hideTimer;
+
+    function showCursor(){cursor.classList.add('visible');clearTimeout(hideTimer);hideTimer=setTimeout(function(){cursor.classList.remove('visible');},4000);}
+
+    function moveCursorTo(el){
+        if(!el)return;
+        var r=el.getBoundingClientRect();
+        var cx=r.left+r.width/2;
+        var cy=r.top+r.height/2;
+        cursor.style.left=cx+'px';
+        cursor.style.top=cy+'px';
+        showCursor();
+    }
+
+    function getFocusables(){
+        var sel='.focusable,button.ep-btn,.chapter-read-btn,.selector-btn,.reader-btn,.load-more-btn';
+        return Array.from(document.querySelectorAll(sel)).filter(function(el){
+            var r=el.getBoundingClientRect();
+            return r.width>0&&r.height>0&&el.offsetParent!==null;
+        });
+    }
+
+    document.addEventListener('keydown',function(e){
+        var k=e.key;
+
+        // Echap / Retour
+        if(k==='Escape'||k==='Backspace'){
+            if(document.getElementById('readerView').style.display==='block'){e.preventDefault();closeReader();return;}
+            if(document.getElementById('nameModal').classList.contains('open')){closeNameModal();return;}
+        }
+
+        if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Enter'].indexOf(k)===-1)return;
+        e.preventDefault();
+        isTv=true;showCursor();
+
+        var els=getFocusables();
+        var cur=document.activeElement;
+        var idx=els.indexOf(cur);
+
+        if(k==='Enter'){
+            if(cur&&cur!==document.body&&cur.tagName!=='INPUT'){
+                cursor.classList.add('click');
+                setTimeout(function(){cursor.classList.remove('click');},200);
+                cur.click();
+            }
+            return;
+        }
+
+        var next=null;
+        if(k==='ArrowDown'||k==='ArrowRight'){
+            next=idx<els.length-1?els[idx+1]:els[0];
+        } else {
+            next=idx>0?els[idx-1]:els[els.length-1];
+        }
+
+        if(next){
+            next.focus();
+            moveCursorTo(next);
+            // Scroll smooth vers l'élément
+            next.scrollIntoView({behavior:'smooth',block:'nearest'});
+        }
+    });
+
+    // Curseur souris normal sur mobile/desktop
+    document.addEventListener('mousemove',function(e){
+        if(isTv){isTv=false;cursor.classList.remove('visible');}
+    });
+
+    // Suivre le focus clavier
+    document.addEventListener('focusin',function(e){
+        if(isTv)moveCursorTo(e.target);
+    });
+})();
+
+// ── AD-BLOCK INTÉGRÉ ──
+(function(){
+    // Domaines publicitaires à bloquer
+    var AD_DOMAINS=[
+        'doubleclick.net','googlesyndication.com','googleadservices.com',
+        'adservice.google.com','ads.yahoo.com','adnxs.com','adsystem.amazon.com',
+        'popads.net','popcash.net','trafficjunky.com','exoclick.com',
+        'juicyads.com','hilltopads.net','propellerads.com','adsterra.com',
+        'clickadu.com','evadav.com','zeropark.com','adcash.com','bidvertiser.com',
+        'revcontent.com','outbrain.com','taboola.com','mgid.com',
+        'pornhub-ads.com','plugrush.com','tsyndicate.com','adhub.com'
+    ];
+
+    // Bloquer les nouvelles fenêtres/popups
+    var _open=window.open;
+    window.open=function(url){
+        if(!url)return null;
+        var isAd=AD_DOMAINS.some(function(d){return url.indexOf(d)>-1;});
+        if(isAd){console.log('[OtAkU+ AdBlock] Popup bloqué :',url);return null;}
+        return _open.apply(window,arguments);
+    };
+
+    // Bloquer les redirections indésirables
+    var _assign=window.location.assign.bind(window.location);
+    var _replace=window.location.replace.bind(window.location);
+    var safeRedirect=function(fn,url){
+        if(!url)return;
+        var isAd=AD_DOMAINS.some(function(d){return url.indexOf(d)>-1;});
+        if(isAd){console.log('[OtAkU+ AdBlock] Redirection bloquée :',url);showToast('🛡️ Pub bloquée !');return;}
+        fn(url);
+    };
+    window.location.assign=function(url){safeRedirect(_assign,url);};
+    window.location.replace=function(url){safeRedirect(_replace,url);};
+
+    // Observer les iframes publicitaires et les supprimer
+    var adObserver=new MutationObserver(function(mutations){
+        mutations.forEach(function(m){
+            m.addedNodes.forEach(function(node){
+                if(node.nodeName==='IFRAME'||node.nodeName==='SCRIPT'){
+                    var src=node.src||node.getAttribute('src')||'';
+                    var isAd=AD_DOMAINS.some(function(d){return src.indexOf(d)>-1;});
+                    if(isAd){
+                        node.parentNode&&node.parentNode.removeChild(node);
+                        console.log('[OtAkU+ AdBlock] Iframe/Script pub supprimé :',src);
+                        return;
+                    }
+                }
+                // Supprimer les divs overlay suspects (popunders)
+                if(node.nodeType===1){
+                    var style=window.getComputedStyle(node);
+                    var z=parseInt(style.zIndex)||0;
+                    var pos=style.position;
+                    if(z>9000&&z<9998&&(pos==='fixed'||pos==='absolute')&&node.id!=='tv-cursor'&&node.id!=='toast'){
+                        var src2=node.innerHTML||'';
+                        var isAdDiv=AD_DOMAINS.some(function(d){return src2.indexOf(d)>-1;});
+                        if(isAdDiv){
+                            node.parentNode&&node.parentNode.removeChild(node);
+                            console.log('[OtAkU+ AdBlock] Overlay pub supprimé');
+                        }
+                    }
+                }
+            });
+        });
+    });
+    adObserver.observe(document.body,{childList:true,subtree:true});
+
+    // Bloquer les événements de clic sur les pubs dans les iframes vidéo
+    document.addEventListener('click',function(e){
+        var target=e.target;
+        if(target.tagName==='A'){
+            var href=target.href||'';
+            var isAd=AD_DOMAINS.some(function(d){return href.indexOf(d)>-1;});
+            if(isAd){e.preventDefault();e.stopPropagation();showToast('🛡️ Lien pub bloqué !');return false;}
+        }
+    },true);
+
+    console.log('[OtAkU+ AdBlock] ✅ Protection active');
+})();
+
+window.addEventListener('DOMContentLoaded',function(){
+    var bs=document.getElementById('biblioSearch');if(bs)bs.addEventListener('keydown',function(e){if(e.key==='Enter')searchBiblio();});
+    document.getElementById('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter')saveName();});
+});
+window.onload=function(){checkAuth();loadProfile();checkNotifStatus();};
+</script>
+</body>
+</html>
