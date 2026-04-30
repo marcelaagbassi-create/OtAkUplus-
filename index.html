@@ -246,7 +246,7 @@ nav{background:rgba(2,6,23,0.92);backdrop-filter:blur(14px);padding:11px 16px;di
 
 .hero-progress{position:absolute;bottom:0;left:0;width:100%;height:3px;background:rgba(255,255,255,0.1);z-index:4;}
 .hero-progress-bar{height:100%;background:var(--primary);width:0%;transition:none;}
-.hero-progress-bar.animate{transition:width 98s linear;}
+.hero-progress-bar.animate{transition:width 4s linear;}
 
 /* CERCLE PROFIL BANNIÈRE */
 .hero-profile-btn{position:absolute;top:14px;right:14px;z-index:5;width:38px;height:38px;border-radius:50%;background:linear-gradient(45deg,var(--primary),#fbbf24);border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;cursor:pointer;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.5);transition:transform 0.2s;}
@@ -324,6 +324,17 @@ nav{background:rgba(2,6,23,0.92);backdrop-filter:blur(14px);padding:11px 16px;di
 
 /* PLAYER */
 .vid-container{background:#000;width:100%;aspect-ratio:16/9;position:relative;}
+
+/* MINI LECTEUR ACCUEIL */
+.home-resume-box{background:var(--card2);border-radius:16px;overflow:hidden;border:1px solid rgba(249,115,22,0.2);}
+.home-resume-header{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.home-resume-cover{width:40px;height:56px;border-radius:6px;object-fit:cover;flex-shrink:0;}
+.home-resume-info{flex:1;min-width:0;}
+.home-resume-title{font-size:12px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.home-resume-sub{font-size:10px;color:var(--primary);margin-top:2px;font-weight:700;}
+.home-resume-vid{width:100%;aspect-ratio:16/9;border-radius:0 0 16px 16px;overflow:hidden;position:relative;}
+.home-resume-vid iframe{width:100%;height:100%;border:none;display:block;}
+.home-resume-vid .vid-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;gap:10px;}
 /* SPLASH SCREEN */
 #splashScreen{position:fixed;inset:0;background:#020617;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.6s ease;}
 #splashScreen.fade{opacity:0;pointer-events:none;}
@@ -701,7 +712,8 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
 <div id="homeView" class="view active">
     <!-- HERO BANNER bande annonce / reprise -->
     <div class="hero-banner" id="heroBanner">
-        <img class="hero-img-bg" id="heroBgImg" src="" alt="">
+        <img class="hero-img-bg" id="heroBgImg" src="" alt=""
+            onerror="this.src=PH;this.style.objectFit='contain';this.style.padding='40px';">
         <iframe class="hero-iframe" id="heroFrame" src="" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen frameborder="0"></iframe>
         <div class="hero-overlay"></div>
         <!-- Cercle profil bannière -->
@@ -733,6 +745,9 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
     <div id="lastScansScroll" style="display:flex;gap:8px;overflow-x:auto;padding:0 10px 12px;"></div>
     <h3 class="section-title">Les Classiques</h3>
     <div class="grid" id="classicsGrid"></div>
+
+    <!-- MINI LECTEUR REPRISE -->
+    <div id="homeResumePlayer" style="display:none;margin:14px 12px 20px;"></div>
 </div>
 
 <!-- DISCOVER -->
@@ -1146,7 +1161,7 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
     </div>
 
     <!-- PARTIE BASSE SCROLLABLE (épisodes uniquement) -->
-    <div id="playerEpScroll" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:100px;">
+    <div id="playerEpScroll" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:100px;min-height:200px;">
         <div id="epList" class="ep-netflix-list"></div>
         <div style="padding:0 14px 10px;">
             <button class="ep-btn focusable" tabindex="0" style="width:100%;margin-top:9px;background:#334155;padding:13px;font-size:12px;" onclick="loadHome()">← RETOUR ACCUEIL</button>
@@ -1566,15 +1581,61 @@ function startHeroAuto(){
         if(heroPaused)return;
         heroIdx=(heroIdx+1)%heroList.length;
         showHeroSlide(heroIdx);
-    },98000);
+    },4000); // 4 secondes entre chaque image
 }
 
 function heroPlay(){if(heroData.malId)pA(heroData.title,heroData.malId);}
 function heroResume(){var btn=document.getElementById('heroResumeBtn');var t=btn.getAttribute('data-title');var id=btn.getAttribute('data-id');if(t&&id)pA(t,parseInt(id)||0);}
 
+// ── MINI LECTEUR REPRISE ACCUEIL ──
+function loadHomeResumePlayer(){
+    var box=document.getElementById('homeResumePlayer');
+    if(!box)return;
+    var lw=JSON.parse(localStorage.getItem('otaku_last_watch')||'{}');
+    if(!lw.title||!lw.malId){box.style.display='none';return;}
+
+    var sn=lw.sn||1;
+    var ep=lw.ep||1;
+    var title=lw.title;
+    var malId=lw.malId;
+    var cover=lw.cover||PH;
+    var tmdbId=lw.tmdbId||null;
+
+    // Construire l'URL stream
+    var streamUrl=tmdbId?
+        'https://vidsrc.cc/v2/embed/tv/'+tmdbId+'/'+sn+'/'+ep+'?autoPlay=1':
+        'https://vidsrc.cc/v2/embed/tv/'+encodeURIComponent(title)+'/'+sn+'/'+ep+'?autoPlay=1';
+
+    box.style.display='block';
+    box.innerHTML=
+        '<div class="section-title" style="margin:0 0 10px;">Reprendre où tu t\'es arrêté</div>'+
+        '<div class="home-resume-box">'+
+            '<div class="home-resume-header">'+
+                '<img class="home-resume-cover" src="'+cover+'" onerror="this.src=\''+PH+'\'">'+
+                '<div class="home-resume-info">'+
+                    '<div class="home-resume-title">'+title+'</div>'+
+                    '<div class="home-resume-sub">Saison '+sn+' — Épisode '+ep+'</div>'+
+                '</div>'+
+                '<button onclick="pA(\''+title.replace(/'/g,"\\'")+'\','+malId+')" style="background:var(--primary);border:none;color:white;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;">Ouvrir</button>'+
+            '</div>'+
+            '<div class="home-resume-vid">'+
+                '<div class="vid-loading">'+
+                    '<div class="otaku-spinner"><div class="otaku-spinner-ring"></div><div class="otaku-spinner-ring2"></div><div class="otaku-spinner-logo">O+</div></div>'+
+                '</div>'+
+                '<iframe src="'+streamUrl+'" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture" '+
+                'style="position:absolute;inset:0;width:100%;height:100%;border:none;" referrerpolicy="no-referrer" '+
+                'onload="this.previousElementSibling.style.display=\'none\'"></iframe>'+
+            '</div>'+
+        '</div>';
+}
+
 // ── HOME ──
 function loadHome(){
     sV('homeView');
+
+    // MINI LECTEUR REPRISE — lancer automatiquement la dernière vidéo
+    loadHomeResumePlayer();
+
     // Varier la page pour montrer de nouveaux animes
     var popPage=Math.floor(Math.random()*4)+1;
     fetch('https://api.jikan.moe/v4/top/anime?limit=20&type=tv&page='+popPage).then(function(r){return r.json();}).then(function(d){
@@ -1815,7 +1876,7 @@ async function pA(title,malId){
     document.getElementById('seasonLabel').textContent='Saison 1';
     document.getElementById('audioLabel').textContent=cLang==='vf'?'🇫🇷 VF':'🎌 VOSTFR';
     sSt('');sV('playerView');sI.value='';sB.style.display='none';
-    localStorage.setItem('otaku_last_watch',JSON.stringify({title:title,malId:malId,ep:1}));
+    localStorage.setItem('otaku_last_watch',JSON.stringify({title:title,malId:malId,ep:1,sn:1,tmdbId:cTId,cover:''}));
 
     // Image bannière depuis Jikan
     try{
@@ -1827,6 +1888,10 @@ async function pA(title,malId){
         if(bannerImg){
             document.getElementById('playerBannerImg').src=bannerImg;
             document.getElementById('playerBannerImg').style.display='block';
+            // Sauvegarder la cover pour le mini lecteur accueil
+            var lw2=JSON.parse(localStorage.getItem('otaku_last_watch')||'{}');
+            lw2.cover=bannerImg;
+            localStorage.setItem('otaku_last_watch',JSON.stringify(lw2));
         }
         // Meta infos
         var year=dj.data.aired&&dj.data.aired.from?new Date(dj.data.aired.from).getFullYear():'';
