@@ -108,7 +108,49 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;margi
 /* MODE VEILLE */
 #sleepScreen{position:fixed;inset:0;z-index:9998;display:none;background:#000;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;}
 #sleepScreen.active{display:flex;}
-.sleep-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:opacity 1.5s ease,background-image 0s;}
+/* MODE VEILLE — STYLES */
+.sleep-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:background-image 0.8s ease;}
+/* Style: Net (par défaut) */
+body[data-sleep-style="net"] .sleep-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.5) 70%,rgba(0,0,0,0.85) 100%);}
+/* Style: Flou doux */
+body[data-sleep-style="blur"] .sleep-bg{filter:blur(6px);transform:scale(1.08);}
+body[data-sleep-style="blur"] .sleep-bg::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.35);}
+/* Style: Transparent */
+body[data-sleep-style="glass"] .sleep-bg{filter:blur(20px);transform:scale(1.1);}
+body[data-sleep-style="glass"] .sleep-bg::after{content:'';position:absolute;inset:0;background:rgba(2,6,23,0.55);}
+/* Style: Noir profond */
+body[data-sleep-style="dark"] .sleep-bg{filter:brightness(0.3);}
+body[data-sleep-style="dark"] .sleep-bg::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.5);}
+/* Style: Vintage */
+body[data-sleep-style="vintage"] .sleep-bg{filter:sepia(0.6) contrast(1.1) brightness(0.8);}
+body[data-sleep-style="vintage"] .sleep-bg::after{content:'';position:absolute;inset:0;background:rgba(20,10,0,0.4);}
+
+.sleep-time{font-size:72px;font-weight:900;letter-spacing:-4px;line-height:1;text-shadow:0 4px 24px rgba(0,0,0,0.8);}
+/* Styles d'heure */
+body[data-sleep-font="thin"] .sleep-time{font-weight:100;letter-spacing:-2px;}
+body[data-sleep-font="round"] .sleep-time{font-family:Georgia,serif;letter-spacing:2px;}
+body[data-sleep-font="digital"] .sleep-time{font-family:'Courier New',monospace;letter-spacing:4px;}
+
+/* Format heure */
+.sleep-ampm{font-size:18px;font-weight:700;margin-left:4px;vertical-align:super;}
+
+/* PAGE PARAMÈTRES VEILLE */
+#sleepSettingsView{display:none;position:fixed;inset:0;background:var(--bg);z-index:9997;overflow-y:auto;padding:62px 0 100px;}
+#sleepSettingsView.open{display:block;}
+.sleep-preview{width:100%;height:160px;border-radius:16px;overflow:hidden;position:relative;margin-bottom:14px;background:#0f172a;}
+.sleep-preview-bg{position:absolute;inset:0;background-size:cover;background-position:center;}
+.sleep-preview-time{position:absolute;bottom:16px;left:16px;font-size:28px;font-weight:900;text-shadow:0 2px 8px rgba(0,0,0,0.8);color:white;}
+.style-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 14px;}
+.style-card{background:var(--card);border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.2s;}
+.style-card.active{border-color:var(--primary);}
+.style-card-preview{height:60px;background:linear-gradient(135deg,#1e293b,#0f172a);}
+.style-card-label{padding:8px 10px;font-size:11px;font-weight:700;}
+.font-row{display:flex;gap:8px;padding:0 14px;overflow-x:auto;}
+.font-btn{flex-shrink:0;padding:8px 14px;background:var(--card);border-radius:8px;font-size:13px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;white-space:nowrap;}
+.font-btn.active{border-color:var(--primary);color:var(--primary);}
+.time-fmt-row{display:flex;gap:8px;padding:0 14px;}
+.time-fmt-btn{flex:1;padding:10px;background:var(--card);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid transparent;text-align:center;transition:all 0.2s;}
+.time-fmt-btn.active{border-color:var(--primary);color:var(--primary);}
 .sleep-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.6) 60%,rgba(0,0,0,0.92) 100%);}
 .sleep-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px;}
 .sleep-time{font-size:72px;font-weight:900;letter-spacing:-4px;line-height:1;text-shadow:0 4px 24px rgba(0,0,0,0.8);}
@@ -260,7 +302,7 @@ nav{background:rgba(2,6,23,0.92);backdrop-filter:blur(14px);padding:11px 16px;di
 .hero-img-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.8s ease;}
 
 /* HERO BANNER */
-.hero-banner{position:relative;width:100%;height:42vh;overflow:hidden;margin-bottom:0;}
+.hero-banner{position:relative;width:calc(100% - 20px);height:42vh;overflow:hidden;margin:0 10px 0;border-radius:18px;}
 .hero-video-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 .hero-iframe{position:absolute;inset:0;width:100%;height:100%;border:none;pointer-events:none;transition:opacity 0.8s ease;}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(2,6,23,0.1) 0%,rgba(2,6,23,0.5) 60%,rgba(2,6,23,1) 100%);}
@@ -275,7 +317,7 @@ nav{background:rgba(2,6,23,0.92);backdrop-filter:blur(14px);padding:11px 16px;di
 
 /* GRID 4 cols */
 .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:0 8px 14px;}
-.manga-card{background:var(--card);border-radius:6px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.2s;position:relative;}
+.manga-card{background:var(--card);border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.2s;position:relative;}
 .manga-card img{width:100%;aspect-ratio:2/3;object-fit:cover;}
 .manga-card p{font-size:7px;padding:2px 4px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .manga-card:hover{border-color:var(--primary);transform:scale(1.03);}
@@ -334,8 +376,28 @@ nav{background:rgba(2,6,23,0.92);backdrop-filter:blur(14px);padding:11px 16px;di
 .player-banner-info{position:absolute;bottom:12px;left:14px;right:14px;}
 .player-anime-title{font-size:20px;font-weight:900;text-shadow:0 2px 8px rgba(0,0,0,0.8);}
 .player-season-label{font-size:11px;color:var(--primary);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
-.vid-container{background:#000;width:100%;aspect-ratio:16/9;position:relative;}
+/* LECTEUR — WRAPPER FLOU */
+.vid-wrapper{position:relative;margin:6px 12px;border-radius:14px;overflow:hidden;}
+.vid-blur-bg{
+    position:absolute;inset:-20px;
+    background-size:cover;background-position:center;
+    filter:blur(18px) brightness(0.5);
+    transform:scale(1.1);
+    z-index:0;
+    border-radius:14px;
+}
+.vid-container{
+    position:relative;z-index:1;
+    background:#000;width:100%;aspect-ratio:16/9;
+    border-radius:12px;overflow:hidden;
+    box-shadow:0 8px 32px rgba(0,0,0,0.6);
+}
 .vid-container iframe{width:100%;height:100%;border:none;display:block;}
+
+/* PLAYER SCROLL INDÉPENDANT */
+#playerView{overflow:hidden;}
+#playerEpScroll::-webkit-scrollbar{display:none;}
+#playerEpScroll{scrollbar-width:none;}
 .synopsis-box{margin:8px 14px;background:var(--card2);border-radius:10px;padding:10px 12px;border-left:3px solid var(--primary);}
 .synopsis-title{font-size:10px;font-weight:900;color:var(--primary);margin-bottom:5px;text-transform:uppercase;}
 .synopsis-text{font-size:10px;color:#94a3b8;line-height:1.65;}
@@ -372,7 +434,7 @@ nav{background:rgba(2,6,23,0.92);backdrop-filter:blur(14px);padding:11px 16px;di
 .sort-btn{padding:4px 11px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.1);background:#1e293b;color:#94a3b8;transition:all 0.15s;}
 .sort-btn.active{background:#334155;color:white;}
 .sort-btn:hover{border-color:var(--primary);}
-.manga-dex-card{background:var(--card);border-radius:8px;overflow:hidden;cursor:pointer;position:relative;border:2px solid transparent;transition:all 0.2s;}
+.manga-dex-card{background:var(--card);border-radius:12px;overflow:hidden;cursor:pointer;position:relative;border:2px solid transparent;transition:all 0.2s;}
 .manga-dex-card img{width:100%;aspect-ratio:2/3;object-fit:cover;background:#0f172a;min-height:80px;display:block;}
 .manga-dex-card p{font-size:8px;padding:3px 5px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .manga-dex-card:hover{border-color:var(--primary);transform:scale(1.03);}
@@ -381,7 +443,7 @@ nav{background:rgba(2,6,23,0.92);backdrop-filter:blur(14px);padding:11px 16px;di
 
 /* FAV / HIST */
 .fav-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:0 10px 14px;}
-.fav-card{background:var(--card);border-radius:8px;overflow:hidden;cursor:pointer;position:relative;border:2px solid transparent;transition:all 0.2s;}
+.fav-card{background:var(--card);border-radius:12px;overflow:hidden;cursor:pointer;position:relative;border:2px solid transparent;transition:all 0.2s;}
 .fav-card img{width:100%;aspect-ratio:2/3;object-fit:cover;}
 .fav-card p{font-size:8px;padding:3px 5px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .fav-card:hover{border-color:var(--primary);transform:scale(1.03);}
@@ -763,6 +825,79 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
     </div>
 </div>
 
+<!-- PARAMÈTRES MODE VEILLE -->
+<div id="sleepSettingsView">
+    <h3 class="section-title">Mode Veille — Personnalisation</h3>
+    <div style="padding:0 14px 14px;">
+
+        <!-- APERÇU -->
+        <div class="sleep-preview" id="sleepPreview">
+            <div class="sleep-preview-bg" id="sleepPreviewBg" style="background-image:url('https://cdn.myanimelist.net/images/anime/1015/138006l.jpg');"></div>
+            <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,0.7));"></div>
+            <div class="sleep-preview-time" id="sleepPreviewTime">21:30</div>
+        </div>
+
+        <!-- STYLE DE FOND -->
+        <h4 style="color:var(--primary);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:1px;margin:16px 0 10px;">Style de fond</h4>
+        <div class="style-grid">
+            <div class="style-card active focusable" tabindex="0" id="style-net" onclick="setSleepStyle('net')">
+                <div class="style-card-preview" style="background:linear-gradient(135deg,#1a2a4a,#0f172a);"></div>
+                <div class="style-card-label">Net (par défaut)</div>
+            </div>
+            <div class="style-card focusable" tabindex="0" id="style-blur" onclick="setSleepStyle('blur')">
+                <div class="style-card-preview" style="background:linear-gradient(135deg,#2a3a5a,#1e293b);filter:blur(3px);"></div>
+                <div class="style-card-label">Flou doux</div>
+            </div>
+            <div class="style-card focusable" tabindex="0" id="style-glass" onclick="setSleepStyle('glass')">
+                <div class="style-card-preview" style="background:linear-gradient(135deg,rgba(30,41,59,0.5),rgba(15,23,42,0.5));backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);"></div>
+                <div class="style-card-label">Effet verre</div>
+            </div>
+            <div class="style-card focusable" tabindex="0" id="style-dark" onclick="setSleepStyle('dark')">
+                <div class="style-card-preview" style="background:#000;"></div>
+                <div class="style-card-label">Noir profond</div>
+            </div>
+            <div class="style-card focusable" tabindex="0" id="style-vintage" onclick="setSleepStyle('vintage')">
+                <div class="style-card-preview" style="background:linear-gradient(135deg,#3d2b1f,#2a1a0e);filter:sepia(0.8);"></div>
+                <div class="style-card-label">Vintage</div>
+            </div>
+        </div>
+
+        <!-- FORMAT HEURE -->
+        <h4 style="color:var(--primary);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px;">Format de l'heure</h4>
+        <div class="time-fmt-row">
+            <div class="time-fmt-btn active focusable" tabindex="0" id="fmt-24" onclick="setSleepTimeFmt('24')">24h<br><span style="font-size:10px;color:#94a3b8;">21:30</span></div>
+            <div class="time-fmt-btn focusable" tabindex="0" id="fmt-12" onclick="setSleepTimeFmt('12')">12h<br><span style="font-size:10px;color:#94a3b8;">9:30 PM</span></div>
+        </div>
+
+        <!-- POLICE -->
+        <h4 style="color:var(--primary);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px;">Police de l'heure</h4>
+        <div class="font-row">
+            <div class="font-btn active focusable" tabindex="0" id="font-bold" onclick="setSleepFont('bold')" style="font-weight:900;">Gras</div>
+            <div class="font-btn focusable" tabindex="0" id="font-thin" onclick="setSleepFont('thin')" style="font-weight:100;">Fin</div>
+            <div class="font-btn focusable" tabindex="0" id="font-round" onclick="setSleepFont('round')" style="font-family:Georgia,serif;">Élégant</div>
+            <div class="font-btn focusable" tabindex="0" id="font-digital" onclick="setSleepFont('digital')" style="font-family:monospace;">Digital</div>
+        </div>
+
+        <!-- TAILLE HEURE -->
+        <h4 style="color:var(--primary);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px;">Taille de l'heure</h4>
+        <div style="padding:0 14px;display:flex;align-items:center;gap:12px;">
+            <span style="font-size:10px;color:#94a3b8;">Petit</span>
+            <input type="range" min="40" max="100" value="72" style="flex:1;accent-color:var(--primary);" oninput="setSleepTimeSize(this.value)">
+            <span style="font-size:10px;color:#94a3b8;">Grand</span>
+        </div>
+
+        <!-- INTERVALLE CHANGEMENT -->
+        <h4 style="color:var(--primary);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px;">Vitesse du défilement</h4>
+        <div class="time-fmt-row">
+            <div class="time-fmt-btn focusable" tabindex="0" id="speed-fast" onclick="setSleepSpeed(4000)">Rapide<br><span style="font-size:10px;color:#94a3b8;">4s</span></div>
+            <div class="time-fmt-btn active focusable" tabindex="0" id="speed-normal" onclick="setSleepSpeed(6000)">Normal<br><span style="font-size:10px;color:#94a3b8;">6s</span></div>
+            <div class="time-fmt-btn focusable" tabindex="0" id="speed-slow" onclick="setSleepSpeed(10000)">Lent<br><span style="font-size:10px;color:#94a3b8;">10s</span></div>
+        </div>
+
+        <button onclick="closeSleepSettings()" class="focusable" tabindex="0" style="width:100%;margin-top:24px;padding:13px;background:var(--primary);border:none;color:white;border-radius:12px;font-family:'Inter',sans-serif;font-weight:900;font-size:14px;cursor:pointer;">Sauvegarder</button>
+    </div>
+</div>
+
 <!-- ABOUT -->
 <div id="aboutView" class="view">
     <h3 class="section-title">À Propos</h3>
@@ -919,84 +1054,105 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
                 <div onclick="setDefaultLang('vf')" id="defVF" class="focusable" tabindex="0" style="flex:1;padding:9px;text-align:center;border-radius:8px;background:#1e293b;color:#94a3b8;font-size:12px;font-weight:700;cursor:pointer;">VF</div>
             </div>
         </div>
+
+        <!-- MODE VEILLE -->
+        <div style="background:var(--card);padding:14px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="loadSleepSettings()">
+            <div>
+                <div style="font-size:13px;font-weight:700;">Mode Veille</div>
+                <div style="font-size:10px;color:#94a3b8;margin-top:2px;">Style, police, format de l'heure</div>
+            </div>
+            <div style="background:var(--primary);border-radius:8px;padding:7px 12px;font-size:11px;font-weight:700;color:white;">PERSONNALISER</div>
+        </div>
     </div>
 </div>
 
 <!-- PLAYER -->
-<div id="playerView" class="view">
-    <!-- Bannière style Netflix -->
-    <div class="player-banner" id="playerBanner">
-        <img id="playerBannerImg" src="" alt="" onerror="this.style.display='none'">
-        <div class="player-banner-overlay"></div>
-        <div class="player-banner-info">
-            <div class="player-anime-title" id="vidTitle"></div>
-            <div class="player-meta" id="playerMeta"></div>
-            <div class="player-season-label" id="playerSeasonLabel">SAISON 1</div>
+<div id="playerView" class="view" style="padding:62px 0 0;display:flex;flex-direction:column;height:100vh;overflow:hidden;">
+
+    <!-- PARTIE HAUTE STICKY (ne scroll pas) -->
+    <div id="playerTop" style="flex-shrink:0;">
+        <!-- Bannière style Netflix -->
+        <div class="player-banner" id="playerBanner">
+            <img id="playerBannerImg" src="" alt="" onerror="this.style.display='none'">
+            <div class="player-banner-overlay"></div>
+            <div class="player-banner-info">
+                <div class="player-anime-title" id="vidTitle"></div>
+                <div class="player-meta" id="playerMeta"></div>
+                <div class="player-season-label" id="playerSeasonLabel">SAISON 1</div>
+            </div>
+        </div>
+
+        <!-- Boutons action -->
+        <div class="player-actions">
+            <button class="player-action-btn primary focusable" tabindex="0" onclick="lS(cEp,cSn)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                LECTURE
+            </button>
+            <button class="player-action-btn secondary focusable" tabindex="0" onclick="downloadEp()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                TÉLÉCHARGER
+            </button>
+        </div>
+
+        <!-- Synopsis -->
+        <div class="synopsis-box" id="synopsisBox" style="display:none;">
+            <div class="synopsis-title">Synopsis</div>
+            <div class="synopsis-text" id="synopsisText"></div>
+        </div>
+
+        <!-- Sélecteurs -->
+        <div class="player-selectors">
+            <div class="selector-wrap">
+                <div class="selector-btn focusable" tabindex="0" onclick="toggleDropdown('seasonDrop')">
+                    <span id="seasonLabel">Saison 1</span><span>▾</span>
+                </div>
+                <div class="selector-dropdown" id="seasonDrop"></div>
+            </div>
+            <div class="selector-wrap">
+                <div class="selector-btn focusable" tabindex="0" onclick="toggleDropdown('audioDrop')">
+                    <span id="audioLabel">🎌 VOSTFR</span><span>▾</span>
+                </div>
+                <div class="selector-dropdown" id="audioDrop">
+                    <div class="dropdown-item focusable" tabindex="0" onclick="selectAudio('vostfr')">🎌 VOSTFR</div>
+                    <div class="dropdown-item focusable" tabindex="0" onclick="selectAudio('vf')">🇫🇷 VF</div>
+                    <div class="dropdown-item focusable" tabindex="0" onclick="selectAudio('vo')">🇯🇵 VO Japonais</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stream-status" id="streamStatus"></div>
+
+        <!-- Lecteur vidéo avec effet flou autour -->
+        <div class="vid-wrapper">
+            <div class="vid-blur-bg" id="vidBlurBg"></div>
+            <div class="vid-container" id="vidContainer">
+                <div class="vid-loading" id="vidLoading">
+                    <div class="otaku-spinner">
+                        <div class="otaku-spinner-ring"></div>
+                        <div class="otaku-spinner-ring2"></div>
+                        <div class="otaku-spinner-logo">O+</div>
+                    </div>
+                    <span id="vidLoadingTxt">Recherche...</span>
+                </div>
+                <iframe id="vidFrame" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="display:none;" referrerpolicy="no-referrer"></iframe>
+            </div>
+        </div>
+
+        <!-- Header épisodes -->
+        <div style="padding:10px 14px 4px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <div style="font-size:13px;font-weight:900;">Épisodes</div>
+            <div style="font-size:11px;color:#94a3b8;" id="epCountLabel"></div>
         </div>
     </div>
 
-    <!-- Boutons action style Netflix -->
-    <div class="player-actions">
-        <button class="player-action-btn primary focusable" tabindex="0" onclick="lS(cEp,cSn)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            LECTURE
-        </button>
-        <button class="player-action-btn secondary focusable" tabindex="0" onclick="downloadEp()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-            TÉLÉCHARGER
-        </button>
-    </div>
-
-    <!-- Synopsis -->
-    <div class="synopsis-box" id="synopsisBox" style="display:none;">
-        <div class="synopsis-title">Synopsis</div>
-        <div class="synopsis-text" id="synopsisText"></div>
-    </div>
-
-    <!-- Sélecteurs saison + langue -->
-    <div class="player-selectors">
-        <div class="selector-wrap">
-            <div class="selector-btn focusable" tabindex="0" onclick="toggleDropdown('seasonDrop')">
-                <span id="seasonLabel">Saison 1</span><span>▾</span>
-            </div>
-            <div class="selector-dropdown" id="seasonDrop"></div>
-        </div>
-        <div class="selector-wrap">
-            <div class="selector-btn focusable" tabindex="0" onclick="toggleDropdown('audioDrop')">
-                <span id="audioLabel">🎌 VOSTFR</span><span>▾</span>
-            </div>
-            <div class="selector-dropdown" id="audioDrop">
-                <div class="dropdown-item focusable" tabindex="0" onclick="selectAudio('vostfr')">🎌 VOSTFR</div>
-                <div class="dropdown-item focusable" tabindex="0" onclick="selectAudio('vf')">🇫🇷 VF</div>
-                <div class="dropdown-item focusable" tabindex="0" onclick="selectAudio('vo')">🇯🇵 VO Japonais</div>
-            </div>
+    <!-- PARTIE BASSE SCROLLABLE (épisodes uniquement) -->
+    <div id="playerEpScroll" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:100px;">
+        <div id="epList" class="ep-netflix-list"></div>
+        <div style="padding:0 14px 10px;">
+            <button class="ep-btn focusable" tabindex="0" style="width:100%;margin-top:9px;background:#334155;padding:13px;font-size:12px;" onclick="loadHome()">← RETOUR ACCUEIL</button>
         </div>
     </div>
 
-    <div class="stream-status" id="streamStatus"></div>
-
-    <!-- Lecteur vidéo -->
-    <div class="vid-container" id="vidContainer">
-        <div class="vid-loading" id="vidLoading">
-            <div class="otaku-spinner">
-                <div class="otaku-spinner-ring"></div>
-                <div class="otaku-spinner-ring2"></div>
-                <div class="otaku-spinner-logo">O+</div>
-            </div>
-            <span id="vidLoadingTxt">Recherche...</span>
-        </div>
-        <iframe id="vidFrame" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="display:none;" referrerpolicy="no-referrer"></iframe>
-    </div>
-
-    <!-- Épisodes style Netflix -->
-    <div style="padding:14px 14px 4px;display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-size:13px;font-weight:900;color:white;">Épisodes</div>
-        <div style="font-size:11px;color:#94a3b8;" id="epCountLabel"></div>
-    </div>
-    <div id="epList" class="ep-netflix-list"></div>
-    <div style="padding:0 14px 10px;">
-        <button class="ep-btn focusable" tabindex="0" style="width:100%;margin-top:9px;background:#334155;padding:13px;font-size:12px;" onclick="loadHome()">← RETOUR ACCUEIL</button>
-    </div>
 </div>
 
 <!-- FOOTER PILL FLOTTANT avec icônes SVG custom -->
@@ -1118,6 +1274,109 @@ function sV(id){
 }
 function toggleMenu(f){var m=document.getElementById('sideMenu'),o=document.getElementById('menuOverlay');if(f===false){m.classList.remove('open');o.style.display='none';}else{m.classList.toggle('open');o.style.display=m.classList.contains('open')?'block':'none';}}
 function loadCommunity(){sV('communityView');}function loadAbout(){sV('aboutView');}
+// ── PARAMÈTRES MODE VEILLE ──
+var sleepStyle=localStorage.getItem('otaku_sleep_style')||'net';
+var sleepFont=localStorage.getItem('otaku_sleep_font')||'bold';
+var sleepTimeFmt=localStorage.getItem('otaku_sleep_timefmt')||'24';
+var sleepSpeed=parseInt(localStorage.getItem('otaku_sleep_speed'))||6000;
+var sleepTimeSize=parseInt(localStorage.getItem('otaku_sleep_size'))||72;
+
+function applySleepSettings(){
+    document.body.setAttribute('data-sleep-style',sleepStyle);
+    document.body.setAttribute('data-sleep-font',sleepFont);
+    var el=document.getElementById('sleepTime');
+    if(el)el.style.fontSize=sleepTimeSize+'px';
+}
+
+function setSleepStyle(s){
+    sleepStyle=s;
+    localStorage.setItem('otaku_sleep_style',s);
+    // Mettre à jour UI
+    document.querySelectorAll('[id^="style-"]').forEach(function(el){el.classList.remove('active');});
+    var btn=document.getElementById('style-'+s);
+    if(btn)btn.classList.add('active');
+    applySleepSettings();
+    updateSleepPreview();
+}
+
+function setSleepFont(f){
+    sleepFont=f;
+    localStorage.setItem('otaku_sleep_font',f);
+    document.querySelectorAll('.font-btn').forEach(function(el){el.classList.remove('active');});
+    var btn=document.getElementById('font-'+f);
+    if(btn)btn.classList.add('active');
+    applySleepSettings();
+    updateSleepPreview();
+}
+
+function setSleepTimeFmt(fmt){
+    sleepTimeFmt=fmt;
+    localStorage.setItem('otaku_sleep_timefmt',fmt);
+    document.querySelectorAll('.time-fmt-btn[id^="fmt-"]').forEach(function(el){el.classList.remove('active');});
+    var btn=document.getElementById('fmt-'+fmt);
+    if(btn)btn.classList.add('active');
+    updateSleepPreview();
+}
+
+function setSleepSpeed(ms){
+    sleepSpeed=ms;
+    localStorage.setItem('otaku_sleep_speed',ms);
+    var map={4000:'fast',6000:'normal',10000:'slow'};
+    document.querySelectorAll('[id^="speed-"]').forEach(function(el){el.classList.remove('active');});
+    var btn=document.getElementById('speed-'+(map[ms]||'normal'));
+    if(btn)btn.classList.add('active');
+}
+
+function setSleepTimeSize(sz){
+    sleepTimeSize=parseInt(sz);
+    localStorage.setItem('otaku_sleep_size',sz);
+    var el=document.getElementById('sleepTime');
+    if(el)el.style.fontSize=sz+'px';
+    var prev=document.getElementById('sleepPreviewTime');
+    if(prev)prev.style.fontSize=Math.max(16,sz*0.4)+'px';
+}
+
+function updateSleepPreview(){
+    var now=new Date();
+    var h=now.getHours();var m=String(now.getMinutes()).padStart(2,'0');
+    var timeStr;
+    if(sleepTimeFmt==='12'){
+        var ampm=h>=12?'PM':'AM';h=h%12||12;
+        timeStr=h+':'+m+' '+ampm;
+    } else {
+        timeStr=String(h).padStart(2,'0')+':'+m;
+    }
+    var pt=document.getElementById('sleepPreviewTime');
+    if(pt)pt.textContent=timeStr;
+}
+
+function loadSleepSettings(){
+    document.getElementById('sleepSettingsView').classList.add('open');
+    toggleMenu(false);
+    // Restaurer état UI
+    document.querySelectorAll('[id^="style-"]').forEach(function(el){el.classList.remove('active');});
+    var sb=document.getElementById('style-'+sleepStyle);if(sb)sb.classList.add('active');
+    document.querySelectorAll('.font-btn').forEach(function(el){el.classList.remove('active');});
+    var fb=document.getElementById('font-'+sleepFont);if(fb)fb.classList.add('active');
+    document.querySelectorAll('.time-fmt-btn[id^="fmt-"]').forEach(function(el){el.classList.remove('active');});
+    var tfb=document.getElementById('fmt-'+sleepTimeFmt);if(tfb)tfb.classList.add('active');
+    updateSleepPreview();
+    // Charger une image de fond pour la préview
+    if(sleepAnimes&&sleepAnimes.length){
+        var img=sleepAnimes[0].images.jpg.large_image_url||sleepAnimes[0].images.jpg.image_url;
+        var bg=document.getElementById('sleepPreviewBg');
+        if(bg)bg.style.backgroundImage='url('+img+')';
+    }
+}
+
+function closeSleepSettings(){
+    document.getElementById('sleepSettingsView').classList.remove('open');
+    showToast('Paramètres veille sauvegardés');
+}
+
+// Appliquer au démarrage
+applySleepSettings();
+
 // ── THÈME ──
 function setTheme(t){
     localStorage.setItem('otaku_theme',t);
@@ -1316,9 +1575,15 @@ function heroResume(){var btn=document.getElementById('heroResumeBtn');var t=btn
 // ── HOME ──
 function loadHome(){
     sV('homeView');
-    fetch('https://api.jikan.moe/v4/top/anime?limit=12&type=tv').then(function(r){return r.json();}).then(function(d){
-        if(d.data&&d.data.length)loadHero(d.data);
-        rG(d.data,'popGrid');
+    // Varier la page pour montrer de nouveaux animes
+    var popPage=Math.floor(Math.random()*4)+1;
+    fetch('https://api.jikan.moe/v4/top/anime?limit=20&type=tv&page='+popPage).then(function(r){return r.json();}).then(function(d){
+        if(d.data&&d.data.length){
+            if(popPage===1)loadHero(d.data);
+            else fetch('https://api.jikan.moe/v4/top/anime?limit=8&type=tv').then(function(r2){return r2.json();}).then(function(d2){if(d2.data)loadHero(d2.data);}).catch(function(){});
+            var shuffled=d.data.slice().sort(function(){return Math.random()-0.5;});
+            rG(shuffled,'popGrid');
+        }
     }).catch(function(){});
 
     fetch('https://api.jikan.moe/v4/seasons/now?limit=12').then(function(r){return r.json();}).then(function(d){
@@ -1651,8 +1916,12 @@ function bEP(count){
                 cEp=ep;lS(ep,cSn);
                 var lw=JSON.parse(localStorage.getItem('otaku_last_watch')||'{}');
                 lw.ep=ep;localStorage.setItem('otaku_last_watch',JSON.stringify(lw));
-                // Scroll vers le lecteur
-                document.getElementById('vidContainer').scrollIntoView({behavior:'smooth'});
+                // Scroll l'épisode actif dans la zone scrollable sans bouger le lecteur
+                var epScroll=document.getElementById('playerEpScroll');
+                if(epScroll){
+                    var itemTop=item.offsetTop-epScroll.offsetTop;
+                    epScroll.scrollTo({top:itemTop-10,behavior:'smooth'});
+                }
             };
             item.onkeydown=function(e){if(e.key==='Enter')item.onclick();};
             list.appendChild(item);
@@ -1731,13 +2000,19 @@ function lS(ep,sn){
     var u,s=cSn||1;
     if(cLang==='vf'){
         u=cTId?'https://vidsrc.to/embed/tv/'+cTId+'/'+s+'/'+ep:'https://vidsrc.to/embed/tv/'+encodeURIComponent(cTitle)+'/'+s+'/'+ep;
-        sSt('🇫🇷 VF — S'+s+' É'+ep,'ok');
+        sSt('VF — S'+s+' É'+ep,'ok');
     }else{
         u=cTId?'https://vidsrc.cc/v2/embed/tv/'+cTId+'/'+s+'/'+ep+'?autoPlay=1':'https://vidsrc.cc/v2/embed/tv/'+encodeURIComponent(cTitle)+'/'+s+'/'+ep+'?autoPlay=1';
-        sSt('🎌 VOSTFR — S'+s+' É'+ep,'ok');
+        sSt('VOSTFR — S'+s+' É'+ep,'ok');
     }
     fr.onload=function(){document.getElementById('vidLoading').style.display='none';fr.style.display='block';};
     fr.src=u;
+    // Alimenter le fond flou avec l'image de l'anime
+    var bannerImg=document.getElementById('playerBannerImg');
+    var blurBg=document.getElementById('vidBlurBg');
+    if(blurBg&&bannerImg&&bannerImg.src){
+        blurBg.style.backgroundImage='url('+bannerImg.src+')';
+    }
 }
 
 // ── BIBLIO ──
@@ -1939,14 +2214,20 @@ function closeReader(){document.getElementById('readerView').style.display='none
         sleepBgTimer=setInterval(function(){
             sleepIdx=(sleepIdx+1)%sleepAnimes.length;
             showSleepBg();
-        },6000);
+        },sleepSpeed||6000);
     }
 
     function showSleepBg(){
         if(!sleepAnimes.length)return;
         var a=sleepAnimes[sleepIdx];
         var bg=document.getElementById('sleepBg');
-        if(bg)bg.style.backgroundImage='url('+(a.images.jpg.large_image_url||a.images.jpg.image_url)+')';
+        // Toujours utiliser large_image_url pour images nettes
+        var imgUrl=a.images.jpg.large_image_url||a.images.jpg.image_url;
+        if(bg){
+            bg.style.backgroundImage='url('+imgUrl+')';
+            bg.style.backgroundSize='cover';
+            bg.style.backgroundPosition='center top';
+        }
         var st=document.getElementById('sleepTitle');
         if(st)st.textContent=a.title||'OtAkU+';
         var sg=document.getElementById('sleepGenres');
@@ -1954,6 +2235,8 @@ function closeReader(){document.getElementById('readerView').style.display='none
             var picked=GENRES.slice().sort(function(){return Math.random()-0.5;}).slice(0,3);
             sg.innerHTML=picked.map(function(g){return '<span class="sleep-genre">'+g+'</span>';}).join('');
         }
+        // Appliquer le style choisi
+        applySleepSettings();
     }
 
     function startSleepClock(){
@@ -1965,7 +2248,22 @@ function closeReader(){document.getElementById('readerView').style.display='none
     function updateSleepClock(){
         var now=new Date();
         var el=document.getElementById('sleepTime');
-        if(el)el.textContent=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+        if(el){
+            var h=now.getHours();var m=String(now.getMinutes()).padStart(2,'0');
+            var timeStr;
+            if(sleepTimeFmt==='12'){
+                var ampm=h>=12?'PM':'AM';h=h%12||12;
+                timeStr=h+':'+m+'<span class="sleep-ampm">'+ampm+'</span>';
+                el.innerHTML=timeStr;
+            } else {
+                el.textContent=String(h).padStart(2,'0')+':'+m;
+            }
+            el.style.fontSize=(sleepTimeSize||72)+'px';
+            // Police
+            var fonts={bold:'',thin:'',round:'Georgia,serif',digital:"'Courier New',monospace"};
+            el.style.fontFamily=fonts[sleepFont||'bold']||'';
+            el.style.fontWeight=sleepFont==='thin'?'100':sleepFont==='bold'?'900':'700';
+        }
         var de=document.getElementById('sleepDate');
         if(de){
             var days=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
