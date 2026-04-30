@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "io.github.marcelaagbassi_create.twa",
+    "sha256_cert_fingerprints": [
+      "07:81:ED:16:77:64:A5:C7:D6:AB:39:99:63:8F:76:0A:D8:45:01:0D:03:96:36:D7:35:26:44:6D:54:57:B6:4F"
+    ]
+  }
+}]
