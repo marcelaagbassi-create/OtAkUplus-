@@ -414,9 +414,44 @@ nav{background:rgba(2,6,23,0.92);backdrop-filter:blur(14px);padding:11px 16px;di
 
 /* PLAYER VIEW LAYOUT */
 #playerView{overflow:hidden;}
-#playerView.active{display:flex;flex-direction:column;height:100vh;padding:62px 0 0;}
+#playerView.active{
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+    height:100dvh; /* dynamic viewport pour mobile */
+    padding:0;
+    overflow:hidden;
+}
+/* Zone haute fixe et compacte */
+#playerTop{
+    flex-shrink:0;
+    overflow:hidden;
+    padding-top:62px;
+}
+/* Zone épisodes — prend TOUT l'espace restant */
+#playerEpScroll{
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    padding-bottom:120px;
+    /* Hauteur minimale garantie */
+    min-height:0;
+}
 #playerEpScroll::-webkit-scrollbar{display:none;}
 #playerEpScroll{scrollbar-width:none;}
+
+/* Rendre la partie haute plus compacte */
+.player-banner{height:120px !important;}
+.player-actions{padding:6px 14px;}
+.player-action-btn{padding:8px 14px;font-size:11px;}
+.synopsis-box{margin:4px 14px;padding:8px 12px;max-height:80px;overflow:hidden;}
+.synopsis-text{-webkit-line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;}
+.player-selectors{padding:5px 14px 2px;}
+.stream-status{min-height:14px;padding:2px 14px 4px;font-size:9px;}
+.vid-wrapper{margin:4px 10px;}
+.ep-netflix-item{padding:8px 0;}
 .synopsis-box{margin:8px 14px;background:var(--card2);border-radius:10px;padding:10px 12px;border-left:3px solid var(--primary);}
 .synopsis-title{font-size:10px;font-weight:900;color:var(--primary);margin-bottom:5px;text-transform:uppercase;}
 .synopsis-text{font-size:10px;color:#94a3b8;line-height:1.65;}
@@ -895,6 +930,10 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
             <div class="font-btn focusable" tabindex="0" id="font-thin" onclick="setSleepFont('thin')" style="font-weight:100;">Fin</div>
             <div class="font-btn focusable" tabindex="0" id="font-round" onclick="setSleepFont('round')" style="font-family:Georgia,serif;">Élégant</div>
             <div class="font-btn focusable" tabindex="0" id="font-digital" onclick="setSleepFont('digital')" style="font-family:monospace;">Digital</div>
+            <div class="font-btn focusable" tabindex="0" id="font-light" onclick="setSleepFont('light')" style="font-weight:300;letter-spacing:3px;">Léger</div>
+            <div class="font-btn focusable" tabindex="0" id="font-serif" onclick="setSleepFont('serif')" style="font-family:'Times New Roman',serif;font-style:italic;">Serif</div>
+            <div class="font-btn focusable" tabindex="0" id="font-wide" onclick="setSleepFont('wide')" style="letter-spacing:8px;font-weight:700;">Espacé</div>
+            <div class="font-btn focusable" tabindex="0" id="font-shadow" onclick="setSleepFont('shadow')" style="text-shadow:3px 3px 6px rgba(249,115,22,0.8);">Ombré</div>
         </div>
 
         <!-- TAILLE HEURE -->
@@ -1089,7 +1128,7 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
 <div id="playerView" class="view player-view-layout">
 
     <!-- PARTIE HAUTE STICKY (ne scroll pas) -->
-    <div id="playerTop" style="flex-shrink:0;">
+    <div id="playerTop">
         <!-- Bannière style Netflix -->
         <div class="player-banner" id="playerBanner">
             <img id="playerBannerImg" src="" alt="" onerror="this.style.display='none'">
@@ -1165,7 +1204,7 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
     </div>
 
     <!-- PARTIE BASSE SCROLLABLE (épisodes uniquement) -->
-    <div id="playerEpScroll" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:100px;min-height:200px;">
+    <div id="playerEpScroll">
         <div id="epList" class="ep-netflix-list"></div>
         <div style="padding:0 14px 10px;">
             <button class="ep-btn focusable" tabindex="0" style="width:100%;margin-top:9px;background:#334155;padding:13px;font-size:12px;" onclick="loadHome()">← RETOUR ACCUEIL</button>
@@ -2336,10 +2375,22 @@ function closeReader(){document.getElementById('readerView').style.display='none
                 el.textContent=String(h).padStart(2,'0')+':'+m;
             }
             el.style.fontSize=(sleepTimeSize||72)+'px';
-            // Police
-            var fonts={bold:'',thin:'',round:'Georgia,serif',digital:"'Courier New',monospace"};
-            el.style.fontFamily=fonts[sleepFont||'bold']||'';
-            el.style.fontWeight=sleepFont==='thin'?'100':sleepFont==='bold'?'900':'700';
+            // Toutes les polices disponibles
+            var fontMap={
+                bold:       {family:'Inter,sans-serif',   weight:'900', spacing:'normal',   shadow:'none'},
+                thin:       {family:'Inter,sans-serif',   weight:'100', spacing:'2px',      shadow:'none'},
+                round:      {family:'Georgia,serif',      weight:'700', spacing:'normal',   shadow:'none'},
+                digital:    {family:"'Courier New',monospace", weight:'700', spacing:'4px', shadow:'none'},
+                light:      {family:'Inter,sans-serif',   weight:'300', spacing:'3px',      shadow:'none'},
+                serif:      {family:"'Times New Roman',serif", weight:'400', spacing:'1px', shadow:'none'},
+                wide:       {family:'Inter,sans-serif',   weight:'700', spacing:'8px',      shadow:'none'},
+                shadow:     {family:'Inter,sans-serif',   weight:'900', spacing:'normal',   shadow:'3px 3px 12px rgba(249,115,22,0.8)'},
+            };
+            var fStyle=fontMap[sleepFont||'bold']||fontMap.bold;
+            el.style.fontFamily=fStyle.family;
+            el.style.fontWeight=fStyle.weight;
+            el.style.letterSpacing=fStyle.spacing;
+            el.style.textShadow=fStyle.shadow;
         }
         var de=document.getElementById('sleepDate');
         if(de){
