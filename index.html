@@ -450,6 +450,17 @@ nav{background:rgba(2,6,23,0.92);backdrop-filter:blur(14px);padding:11px 16px;di
 .synopsis-text{-webkit-line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;}
 .player-selectors{padding:5px 14px 2px;}
 .stream-status{min-height:14px;padding:2px 14px 4px;font-size:9px;}
+
+/* ONGLETS LECTEUR */
+.player-tabs{display:flex;gap:6px;padding:8px 14px 4px;background:var(--card2);border-bottom:1px solid rgba(255,255,255,0.06);}
+.player-tab-btn{flex:1;padding:8px 4px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:2px solid transparent;text-align:center;transition:all 0.2s;background:transparent;color:#64748b;font-family:'Inter',sans-serif;}
+.player-tab-btn.active{background:var(--primary);color:white;border-color:var(--primary);}
+.player-tab-btn:not(.active):hover{border-color:var(--primary);color:var(--primary);}
+/* Zone lecteurs */
+.player-pane{display:none;}
+.player-pane.active{display:block;}
+/* Lecteur Davideo en iframe */
+#davideoPaneWrap{width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;margin:6px 0;}
 .vid-wrapper{margin:4px 10px;}
 .ep-netflix-item{padding:8px 0;}
 .synopsis-box{margin:8px 14px;background:var(--card2);border-radius:10px;padding:10px 12px;border-left:3px solid var(--primary);}
@@ -1180,19 +1191,57 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
 
         <div class="stream-status" id="streamStatus"></div>
 
-        <!-- Lecteur vidéo avec effet flou autour -->
-        <div class="vid-wrapper">
-            <div class="vid-blur-bg" id="vidBlurBg"></div>
-            <div class="vid-container" id="vidContainer">
-                <div class="vid-loading" id="vidLoading">
-                    <div class="otaku-spinner">
-                        <div class="otaku-spinner-ring"></div>
-                        <div class="otaku-spinner-ring2"></div>
-                        <div class="otaku-spinner-logo">O+</div>
+        <!-- ONGLETS LECTEUR -->
+        <div class="player-tabs">
+            <button class="player-tab-btn active focusable" id="tab-vidsrc" tabindex="0" onclick="switchPlayerTab('vidsrc')">Lecteur 1</button>
+            <button class="player-tab-btn focusable" id="tab-davideo" tabindex="0" onclick="switchPlayerTab('davideo')">Davideo</button>
+            <button class="player-tab-btn focusable" id="tab-vidsrc2" tabindex="0" onclick="switchPlayerTab('vidsrc2')">Lecteur 2</button>
+        </div>
+
+        <!-- PANE 1 : VidSrc CC (défaut) -->
+        <div class="player-pane active" id="pane-vidsrc">
+            <!-- Lecteur vidéo principal -->
+            <div class="vid-wrapper">
+                <div class="vid-blur-bg" id="vidBlurBg"></div>
+                <div class="vid-container" id="vidContainer">
+                    <div class="vid-loading" id="vidLoading">
+                        <div class="otaku-spinner">
+                            <div class="otaku-spinner-ring"></div>
+                            <div class="otaku-spinner-ring2"></div>
+                            <div class="otaku-spinner-logo">O+</div>
+                        </div>
+                        <span id="vidLoadingTxt">Recherche...</span>
                     </div>
-                    <span id="vidLoadingTxt">Recherche...</span>
+                    <iframe id="vidFrame" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="display:none;" referrerpolicy="no-referrer"></iframe>
                 </div>
-                <iframe id="vidFrame" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="display:none;" referrerpolicy="no-referrer"></iframe>
+            </div>
+        </div>
+
+        <!-- PANE 2 : Davideo (lecteur OtAkU+) -->
+        <div class="player-pane" id="pane-davideo">
+            <div style="margin:6px 10px;">
+                <div id="davideoPaneWrap">
+                    <iframe id="davideFrame" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="width:100%;height:100%;border:none;border-radius:12px;" referrerpolicy="no-referrer"></iframe>
+                </div>
+                <div style="font-size:10px;color:#64748b;padding:4px 2px;">Lecteur natif OtAkU+ — HLS/DASH · Sous-titres · PiP</div>
+            </div>
+        </div>
+
+        <!-- PANE 3 : VidSrc TO (secours) -->
+        <div class="player-pane" id="pane-vidsrc2">
+            <div class="vid-wrapper">
+                <div class="vid-blur-bg" id="vidBlurBg2"></div>
+                <div class="vid-container">
+                    <div class="vid-loading" id="vidLoading2" style="display:flex;">
+                        <div class="otaku-spinner">
+                            <div class="otaku-spinner-ring"></div>
+                            <div class="otaku-spinner-ring2"></div>
+                            <div class="otaku-spinner-logo">O+</div>
+                        </div>
+                        <span>Chargement...</span>
+                    </div>
+                    <iframe id="vidFrame2" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="display:none;" referrerpolicy="no-referrer"></iframe>
+                </div>
             </div>
         </div>
 
@@ -2108,26 +2157,72 @@ function downloadEpN(ep){
 
 function downloadEp(){downloadEpN(cEp);}
 
+// Tab actif
+var currentPlayerTab = 'vidsrc';
+
+function switchPlayerTab(tab){
+    currentPlayerTab = tab;
+    // Mettre à jour les boutons
+    ['vidsrc','davideo','vidsrc2'].forEach(function(t){
+        var btn=document.getElementById('tab-'+t);
+        var pane=document.getElementById('pane-'+t);
+        if(btn)btn.classList.toggle('active', t===tab);
+        if(pane)pane.classList.toggle('active', t===tab);
+    });
+    // Charger le bon lecteur
+    lS(cEp, cSn);
+}
+
 function lS(ep,sn){
     cEp=ep;if(sn)cSn=sn;
-    var fr=document.getElementById('vidFrame');
-    document.getElementById('vidLoading').style.display='flex';
-    fr.style.display='none';
-    var u,s=cSn||1;
+    var s=cSn||1;
+    var tab=currentPlayerTab||'vidsrc';
+
+    // URLs des différents lecteurs
+    var urlVidsrc, urlVidsrc2, urlDavideo;
     if(cLang==='vf'){
-        u=cTId?'https://vidsrc.to/embed/tv/'+cTId+'/'+s+'/'+ep:'https://vidsrc.to/embed/tv/'+encodeURIComponent(cTitle)+'/'+s+'/'+ep;
+        urlVidsrc  = cTId?'https://vidsrc.to/embed/tv/'+cTId+'/'+s+'/'+ep:'https://vidsrc.to/embed/tv/'+encodeURIComponent(cTitle)+'/'+s+'/'+ep;
+        urlVidsrc2 = cTId?'https://vidsrc.me/embed/tv?tmdb='+cTId+'&season='+s+'&episode='+ep:'https://vidsrc.me/embed/tv?imdb='+encodeURIComponent(cTitle)+'&season='+s+'&episode='+ep;
         sSt('VF — S'+s+' É'+ep,'ok');
-    }else{
-        u=cTId?'https://vidsrc.cc/v2/embed/tv/'+cTId+'/'+s+'/'+ep+'?autoPlay=1':'https://vidsrc.cc/v2/embed/tv/'+encodeURIComponent(cTitle)+'/'+s+'/'+ep+'?autoPlay=1';
+    } else {
+        urlVidsrc  = cTId?'https://vidsrc.cc/v2/embed/tv/'+cTId+'/'+s+'/'+ep+'?autoPlay=1':'https://vidsrc.cc/v2/embed/tv/'+encodeURIComponent(cTitle)+'/'+s+'/'+ep+'?autoPlay=1';
+        urlVidsrc2 = cTId?'https://vidsrc.me/embed/tv?tmdb='+cTId+'&season='+s+'&episode='+ep:'https://vidsrc.me/embed/tv?imdb='+encodeURIComponent(cTitle)+'&season='+s+'&episode='+ep;
         sSt('VOSTFR — S'+s+' É'+ep,'ok');
     }
-    fr.onload=function(){document.getElementById('vidLoading').style.display='none';fr.style.display='block';};
-    fr.src=u;
-    // Alimenter le fond flou avec l'image de l'anime
+    // URL Davideo — passe les paramètres au lecteur natif OtAkU+
+    urlDavideo = cTId?
+        'davideo-player.html?tmdb='+cTId+'&s='+s+'&e='+ep+'&lang='+cLang+'&title='+encodeURIComponent(cTitle):
+        'davideo-player.html?title='+encodeURIComponent(cTitle)+'&s='+s+'&e='+ep+'&lang='+cLang;
+
+    // Alimenter fond flou
     var bannerImg=document.getElementById('playerBannerImg');
     var blurBg=document.getElementById('vidBlurBg');
-    if(blurBg&&bannerImg&&bannerImg.src){
-        blurBg.style.backgroundImage='url('+bannerImg.src+')';
+    var blurBg2=document.getElementById('vidBlurBg2');
+    var imgSrc=bannerImg&&bannerImg.src?bannerImg.src:'';
+    if(blurBg&&imgSrc)blurBg.style.backgroundImage='url('+imgSrc+')';
+    if(blurBg2&&imgSrc)blurBg2.style.backgroundImage='url('+imgSrc+')';
+
+    if(tab==='vidsrc'){
+        var fr=document.getElementById('vidFrame');
+        var ld=document.getElementById('vidLoading');
+        if(ld)ld.style.display='flex';
+        if(fr){
+            fr.style.display='none';
+            fr.onload=function(){if(ld)ld.style.display='none';fr.style.display='block';};
+            fr.src=urlVidsrc;
+        }
+    } else if(tab==='davideo'){
+        var df=document.getElementById('davideFrame');
+        if(df)df.src=urlDavideo;
+    } else if(tab==='vidsrc2'){
+        var fr2=document.getElementById('vidFrame2');
+        var ld2=document.getElementById('vidLoading2');
+        if(ld2)ld2.style.display='flex';
+        if(fr2){
+            fr2.style.display='none';
+            fr2.onload=function(){if(ld2)ld2.style.display='none';fr2.style.display='block';};
+            fr2.src=urlVidsrc2;
+        }
     }
 }
 
