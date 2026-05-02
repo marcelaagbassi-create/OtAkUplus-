@@ -451,6 +451,47 @@ nav{background:rgba(2,6,23,0.92);backdrop-filter:blur(14px);padding:11px 16px;di
 .player-selectors{padding:5px 14px 2px;}
 .stream-status{min-height:14px;padding:2px 14px 4px;font-size:9px;}
 
+/* ══ DAVIDEO INTÉGRÉ ══ */
+#dv-wrap{position:relative;width:100%;background:#000;border-radius:12px;overflow:hidden;}
+#dv-bright-ov{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:4;transition:opacity .1s;}
+.dv-logo{position:absolute;top:10px;right:12px;z-index:6;pointer-events:none;font-family:'Bangers',cursive;font-size:1.2rem;letter-spacing:3px;color:rgba(255,255,255,0.2);text-shadow:0 0 18px rgba(255,140,0,0.25),2px 2px 0 rgba(0,0,0,0.6);}
+.dv-logo em{color:rgba(255,140,0,0.5);font-style:normal;}
+#dv-video{display:block;width:100%;aspect-ratio:16/9;background:#000;object-fit:contain;cursor:pointer;}
+#dv-bar{width:100%;background:rgba(10,10,10,0.85);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid rgba(255,255,255,0.06);padding:8px 10px 10px;display:flex;flex-direction:column;gap:7px;}
+.seek-row{display:flex;align-items:center;gap:8px;}
+#dv-seek{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:999px;background:rgba(255,255,255,0.18);outline:none;cursor:pointer;transition:height .15s;}
+#dv-seek:hover{height:7px;}
+#dv-seek::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#ff8c00;cursor:pointer;box-shadow:0 0 8px rgba(255,140,0,0.55);}
+#dv-time{font-size:0.68rem;font-weight:600;color:rgba(255,255,255,0.4);white-space:nowrap;min-width:80px;text-align:right;letter-spacing:.4px;}
+.dv-btn-row{display:flex;align-items:center;gap:4px;flex-wrap:nowrap;overflow-x:auto;}
+.dv-btn-row::-webkit-scrollbar{display:none;}
+.dvpill{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:5px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.13);background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);color:rgba(255,255,255,0.8);font-size:0.68rem;font-weight:600;letter-spacing:.6px;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s;font-family:'Inter',sans-serif;}
+.dvpill:hover{background:rgba(255,255,255,0.15);color:#fff;}
+.dvpill:active{transform:scale(0.94);}
+.dvpill.ico{padding:6px 9px;}
+.dvpill.dv-active{background:rgba(255,140,0,0.18);border-color:rgba(255,140,0,0.5);color:#ff8c00;}
+.dvpill svg.s{fill:none;stroke:rgba(255,255,255,0.8);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.dvpill svg.f{fill:rgba(255,255,255,0.8);stroke:none;}
+.dv-range-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.13);background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);}
+.dv-range-pill input[type=range]{width:50px;height:4px;-webkit-appearance:none;border-radius:999px;background:rgba(255,255,255,0.2);outline:none;cursor:pointer;}
+.dv-range-pill input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#fff;cursor:pointer;}
+.dvspc{flex:1;}
+.dv-tag-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.dv-row-lbl{font-size:0.6rem;font-weight:600;letter-spacing:1.5px;color:rgba(255,255,255,0.25);text-transform:uppercase;white-space:nowrap;}
+.dv-pop{display:none;position:absolute;z-index:30;background:rgba(12,12,12,0.94);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:14px;overflow:hidden;min-width:120px;box-shadow:0 8px 32px rgba(0,0,0,0.55);}
+.dv-pop.dvopen{display:block;}
+.dv-pop-title{padding:7px 13px 4px;font-size:0.58rem;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,0.28);text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,0.06);}
+.dv-pop-opt{display:flex;align-items:center;gap:8px;width:100%;padding:8px 13px;background:none;border:none;color:rgba(255,255,255,0.72);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;cursor:pointer;text-align:left;transition:background .1s;}
+.dv-pop-opt:hover{background:rgba(255,255,255,0.07);color:#fff;}
+.dv-pop-opt.dv-active{color:#ff8c00;}
+.dv-pop-opt .dvchk{width:14px;height:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+#dv-pop-speed{bottom:120px;right:100px;}
+#dv-pop-qual{bottom:120px;right:8px;}
+#dv-pip-ind{display:none;position:absolute;top:10px;left:12px;z-index:6;background:rgba(255,140,0,0.15);border:1px solid rgba(255,140,0,0.4);border-radius:999px;padding:3px 10px;font-size:0.65rem;font-weight:700;letter-spacing:1px;color:#ff8c00;}
+#dv-pip-ind.show{display:block;}
+#pane-davideo{display:none;padding:6px 10px;}
+#pane-davideo.active{display:block;}
+
 /* ONGLETS LECTEUR */
 .player-tabs{display:flex;gap:6px;padding:8px 14px 4px;background:var(--card2);border-bottom:1px solid rgba(255,255,255,0.06);}
 .player-tab-btn{flex:1;padding:8px 4px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:2px solid transparent;text-align:center;transition:all 0.2s;background:transparent;color:#64748b;font-family:'Inter',sans-serif;}
@@ -1217,13 +1258,99 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
             </div>
         </div>
 
-        <!-- PANE 2 : Davideo (lecteur OtAkU+) -->
+        <!-- PANE 2 : Davideo (lecteur OtAkU+ natif) -->
         <div class="player-pane" id="pane-davideo">
-            <div style="margin:6px 10px;">
-                <div id="davideoPaneWrap">
-                    <iframe id="davideFrame" src="" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="width:100%;height:100%;border:none;border-radius:12px;" referrerpolicy="no-referrer"></iframe>
+            <div id="dv-wrap">
+                <div id="dv-bright-ov"></div>
+                <div class="dv-logo">Ot<em>AkU</em>+</div>
+                <div id="dv-pip-ind">PiP ACTIF</div>
+                <video id="dv-video" preload="auto" playsinline></video>
+                <!-- Popup vitesse -->
+                <div class="dv-pop" id="dv-pop-speed">
+                    <div class="dv-pop-title">Vitesse</div>
+                    <button class="dv-pop-opt" onclick="dvSetSpeed(0.5)"><span class="dvchk"></span>0.5×</button>
+                    <button class="dv-pop-opt" onclick="dvSetSpeed(0.75)"><span class="dvchk"></span>0.75×</button>
+                    <button class="dv-pop-opt dv-active" onclick="dvSetSpeed(1)"><span class="dvchk"></span>1× <span style="font-size:0.6rem;opacity:.5;margin-left:4px;">normal</span></button>
+                    <button class="dv-pop-opt" onclick="dvSetSpeed(1.25)"><span class="dvchk"></span>1.25×</button>
+                    <button class="dv-pop-opt" onclick="dvSetSpeed(1.5)"><span class="dvchk"></span>1.5×</button>
+                    <button class="dv-pop-opt" onclick="dvSetSpeed(2)"><span class="dvchk"></span>2×</button>
                 </div>
-                <div style="font-size:10px;color:#64748b;padding:4px 2px;">Lecteur natif OtAkU+ — HLS/DASH · Sous-titres · PiP</div>
+                <!-- Popup qualité -->
+                <div class="dv-pop" id="dv-pop-qual">
+                    <div class="dv-pop-title">Qualité</div>
+                    <button class="dv-pop-opt dv-active" onclick="dvSetQuality(this,'Auto','auto')"><span class="dvchk"></span>Auto <span class="dv-bdg">IA</span></button>
+                    <button class="dv-pop-opt" onclick="dvSetQuality(this,'1080p','1080p')"><span class="dvchk"></span>1080p</button>
+                    <button class="dv-pop-opt" onclick="dvSetQuality(this,'720p','720p')"><span class="dvchk"></span>720p</button>
+                    <button class="dv-pop-opt" onclick="dvSetQuality(this,'480p','480p')"><span class="dvchk"></span>480p</button>
+                    <button class="dv-pop-opt" onclick="dvSetQuality(this,'360p','360p')"><span class="dvchk"></span>360p</button>
+                </div>
+                <!-- Barre de contrôle -->
+                <div id="dv-bar">
+                    <div class="seek-row">
+                        <input type="range" id="dv-seek" min="0" max="100" value="0" step="0.1">
+                        <span id="dv-time">0:00 / 0:00</span>
+                    </div>
+                    <div class="dv-btn-row">
+                        <!-- Play/Pause -->
+                        <button class="dvpill ico" onclick="dvTogglePlay()">
+                            <svg id="dv-ico-play" width="13" height="13" viewBox="0 0 24 24" class="f"><path d="M8 5v14l11-7z"/></svg>
+                            <svg id="dv-ico-pause" width="13" height="13" viewBox="0 0 24 24" class="f" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        </button>
+                        <!-- -10s -->
+                        <button class="dvpill ico" onclick="dvSeekBy(-10)">
+                            <svg width="13" height="13" viewBox="0 0 24 24" class="s"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+                        </button>
+                        <!-- +10s -->
+                        <button class="dvpill ico" onclick="dvSeekBy(10)">
+                            <svg width="13" height="13" viewBox="0 0 24 24" class="s"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.49-3.5"/></svg>
+                        </button>
+                        <!-- Volume -->
+                        <div class="dv-range-pill">
+                            <button class="dvpill ico" style="padding:0;background:none;border:none;" onclick="dvToggleMute()">
+                                <svg id="dv-ico-vol" width="13" height="13" viewBox="0 0 24 24" class="s"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                                <svg id="dv-ico-mute" width="13" height="13" viewBox="0 0 24 24" class="s" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                            </button>
+                            <input type="range" id="dv-vol-range" min="0" max="1" step="0.05" value="1">
+                        </div>
+                        <!-- Luminosité -->
+                        <div class="dv-range-pill">
+                            <svg width="11" height="11" viewBox="0 0 24 24" class="s" style="fill:none;stroke:rgba(255,255,255,0.5);stroke-width:2;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+                            <input type="range" id="dv-bright-range" min="0" max="0.8" step="0.05" value="0">
+                        </div>
+                        <span class="dvspc"></span>
+                        <!-- Vitesse -->
+                        <button class="dvpill" id="dv-btn-speed" onclick="dvTogglePop('dv-pop-speed')">
+                            <span id="dv-lbl-speed">1×</span>
+                        </button>
+                        <!-- Qualité -->
+                        <button class="dvpill" id="dv-btn-qual" onclick="dvTogglePop('dv-pop-qual')">
+                            <span id="dv-lbl-qual">Auto</span>
+                        </button>
+                        <!-- PiP -->
+                        <button class="dvpill ico" id="dv-btn-pip" onclick="dvTogglePiP()">
+                            <svg width="13" height="13" viewBox="0 0 24 24" class="s"><rect x="2" y="3" width="20" height="14" rx="2"/><rect x="12" y="10" width="9" height="6" rx="1"/></svg>
+                        </button>
+                        <!-- Plein écran -->
+                        <button class="dvpill ico" onclick="dvToggleFS()">
+                            <svg id="dv-ico-fse" width="13" height="13" viewBox="0 0 24 24" class="s"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                            <svg id="dv-ico-fsc" width="13" height="13" viewBox="0 0 24 24" class="s" style="display:none;"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/></svg>
+                        </button>
+                    </div>
+                    <!-- Langue / Sous-titres -->
+                    <div class="dv-tag-row">
+                        <span class="dv-row-lbl">Langue</span>
+                        <button class="dvpill dv-active" id="dv-btn-vostfr" onclick="dvSwitchLang(this,'vostfr')">VOSTFR</button>
+                        <button class="dvpill" id="dv-btn-vf" onclick="dvSwitchLang(this,'vf')">VF</button>
+                        <button class="dvpill" id="dv-btn-vo" onclick="dvSwitchLang(this,'vo')">VO</button>
+                        <span style="width:1px;height:16px;background:rgba(255,255,255,0.1);margin:0 2px;flex-shrink:0;"></span>
+                        <span class="dv-row-lbl">Sous-titres</span>
+                        <button class="dvpill" id="dv-sub-fr" onclick="dvSwitchSub(this,'fr')">FR</button>
+                        <button class="dvpill" id="dv-sub-en" onclick="dvSwitchSub(this,'en')">EN</button>
+                        <button class="dvpill dv-active" id="dv-sub-off" onclick="dvSwitchSub(this,'off')">
+                            <svg width="11" height="11" viewBox="0 0 24 24" class="s"><rect x="2" y="6" width="20" height="13" rx="2"/><line x1="2" y1="6" x2="22" y2="19" stroke-width="2"/></svg>OFF
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -2157,19 +2284,200 @@ function downloadEpN(ep){
 
 function downloadEp(){downloadEpN(cEp);}
 
+// ── DAVIDEO LECTEUR NATIF INTÉGRÉ ──
+(function(){
+    var dvVid, dvSeek, dvTime, dvVol, dvBright, dvBrightOv;
+
+    function dvInit(){
+        dvVid=document.getElementById('dv-video');
+        dvSeek=document.getElementById('dv-seek');
+        dvTime=document.getElementById('dv-time');
+        dvVol=document.getElementById('dv-vol-range');
+        dvBright=document.getElementById('dv-bright-range');
+        dvBrightOv=document.getElementById('dv-bright-ov');
+        if(!dvVid)return;
+
+        var fmt=function(s){return isNaN(s)||s<0?'0:00':Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');};
+
+        dvVid.addEventListener('click',function(){dvTogglePlay();});
+        dvVid.addEventListener('play',function(){
+            var p=document.getElementById('dv-ico-play');
+            var pa=document.getElementById('dv-ico-pause');
+            if(p)p.style.display='none';if(pa)pa.style.display='block';
+        });
+        dvVid.addEventListener('pause',function(){
+            var p=document.getElementById('dv-ico-play');
+            var pa=document.getElementById('dv-ico-pause');
+            if(p)p.style.display='block';if(pa)pa.style.display='none';
+        });
+        dvVid.addEventListener('ended',function(){
+            var p=document.getElementById('dv-ico-play');
+            if(p)p.style.display='block';
+            document.getElementById('dv-ico-pause').style.display='none';
+        });
+        dvVid.addEventListener('timeupdate',function(){
+            if(!dvVid.duration)return;
+            var pct=(dvVid.currentTime/dvVid.duration)*100;
+            dvSeek.value=pct;
+            dvSeek.style.background='linear-gradient(to right,#ff8c00 '+pct+'%,rgba(255,255,255,0.18) '+pct+'%)';
+            dvTime.textContent=fmt(dvVid.currentTime)+' / '+fmt(dvVid.duration);
+        });
+        dvVid.addEventListener('loadedmetadata',function(){
+            var s=parseFloat(localStorage.getItem('dv_pos_'+cMalId)||0);
+            if(s>5)dvVid.currentTime=s;
+        });
+        dvSeek.addEventListener('input',function(){dvVid.currentTime=(dvSeek.value/100)*dvVid.duration;});
+        dvVol.addEventListener('input',function(){dvVid.volume=dvVol.value;dvVid.muted=dvVol.value==0;dvUpdVol();});
+        dvBright.addEventListener('input',function(){dvBrightOv.style.opacity=dvBright.value;});
+
+        // PiP events
+        dvVid.addEventListener('leavepictureinpicture',function(){
+            var ind=document.getElementById('dv-pip-ind');
+            var btn=document.getElementById('dv-btn-pip');
+            if(ind)ind.classList.remove('show');
+            if(btn)btn.classList.remove('dv-active');
+        });
+        // Plein écran
+        document.addEventListener('fullscreenchange',function(){
+            var fs=!!document.fullscreenElement;
+            var fe=document.getElementById('dv-ico-fse');
+            var fc=document.getElementById('dv-ico-fsc');
+            if(fe)fe.style.display=fs?'none':'block';
+            if(fc)fc.style.display=fs?'block':'none';
+        });
+    }
+
+    // Fonctions globales Davideo
+    window.dvTogglePlay=function(){
+        if(!dvVid)dvInit();
+        if(!dvVid)return;
+        dvVid.paused?dvVid.play().catch(function(){}):dvVid.pause();
+    };
+    window.dvSeekBy=function(s){if(dvVid)dvVid.currentTime=Math.max(0,dvVid.currentTime+s);};
+    window.dvToggleMute=function(){if(dvVid){dvVid.muted=!dvVid.muted;dvUpdVol();}};
+    window.dvUpdVol=function(){
+        var m=dvVid&&(dvVid.muted||dvVid.volume===0);
+        var iv=document.getElementById('dv-ico-vol');
+        var im=document.getElementById('dv-ico-mute');
+        if(iv)iv.style.display=m?'none':'block';
+        if(im)im.style.display=m?'block':'none';
+    };
+    window.dvTogglePop=function(id){
+        var el=document.getElementById(id);
+        var was=el.classList.contains('dvopen');
+        document.querySelectorAll('.dv-pop').forEach(function(p){p.classList.remove('dvopen');});
+        if(!was)el.classList.add('dvopen');
+    };
+    document.addEventListener('click',function(e){
+        if(!e.target.closest('.dv-pop')&&!e.target.closest('#dv-btn-speed')&&!e.target.closest('#dv-btn-qual'))
+            document.querySelectorAll('.dv-pop').forEach(function(p){p.classList.remove('dvopen');});
+    });
+    window.dvSetSpeed=function(s){
+        if(dvVid)dvVid.playbackRate=s;
+        var lbl=document.getElementById('dv-lbl-speed');
+        if(lbl)lbl.textContent=s+'×';
+        document.querySelectorAll('#dv-pop-speed .dv-pop-opt').forEach(function(b){
+            var on=b.textContent.trim().startsWith(s+'×');
+            b.classList.toggle('dv-active',on);
+            b.querySelector('.dvchk').innerHTML=on?dvChkSVG():'';
+        });
+        var pop=document.getElementById('dv-pop-speed');
+        if(pop)pop.classList.remove('dvopen');
+    };
+    window.dvSetQuality=function(btn,lbl,res){
+        var lblEl=document.getElementById('dv-lbl-qual');
+        if(lblEl)lblEl.textContent=lbl;
+        document.querySelectorAll('#dv-pop-qual .dv-pop-opt').forEach(function(b){
+            b.classList.toggle('dv-active',b===btn);
+            b.querySelector('.dvchk').innerHTML=(b===btn)?dvChkSVG():'';
+        });
+        var pop=document.getElementById('dv-pop-qual');
+        if(pop)pop.classList.remove('dvopen');
+    };
+    window.dvChkSVG=function(){return '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';};
+    window.dvTogglePiP=async function(){
+        if(!dvVid)return;
+        var pip=document.getElementById('dv-pip-ind');
+        var btn=document.getElementById('dv-btn-pip');
+        if(document.pictureInPictureElement){
+            await document.exitPictureInPicture();
+            if(pip)pip.classList.remove('show');
+            if(btn)btn.classList.remove('dv-active');
+        } else if(document.pictureInPictureEnabled){
+            try{
+                await dvVid.requestPictureInPicture();
+                if(pip)pip.classList.add('show');
+                if(btn)btn.classList.add('dv-active');
+            }catch(e){showToast('PiP non supporté');}
+        }
+    };
+    window.dvToggleFS=function(){
+        var wrap=document.getElementById('dv-wrap');
+        if(!wrap)return;
+        if(!document.fullscreenElement&&!document.webkitFullscreenElement){
+            (wrap.requestFullscreen||wrap.webkitRequestFullscreen).call(wrap);
+        } else {
+            (document.exitFullscreen||document.webkitExitFullscreen).call(document);
+        }
+    };
+    window.dvSwitchLang=function(btn,lang){
+        ['dv-btn-vostfr','dv-btn-vf','dv-btn-vo'].forEach(function(id){
+            var el=document.getElementById(id);
+            if(el)el.classList.remove('dv-active');
+        });
+        if(btn)btn.classList.add('dv-active');
+        // Recharger avec la nouvelle langue
+        cLang=lang;
+        dvLoadStream(cMalId,cSn,cEp,lang);
+    };
+    window.dvSwitchSub=function(btn,lang){
+        ['dv-sub-fr','dv-sub-en','dv-sub-off'].forEach(function(id){
+            var el=document.getElementById(id);
+            if(el)el.classList.remove('dv-active');
+        });
+        if(btn)btn.classList.add('dv-active');
+        if(!dvVid)return;
+        for(var i=0;i<dvVid.textTracks.length;i++){
+            dvVid.textTracks[i].mode=(dvVid.textTracks[i].language===lang)?'showing':'hidden';
+        }
+        if(lang==='off')for(var i=0;i<dvVid.textTracks.length;i++)dvVid.textTracks[i].mode='hidden';
+    };
+
+    // Charger un stream dans Davideo
+    window.dvLoadStream=function(malId,sn,ep,lang){
+        if(!dvVid){dvInit();}
+        if(!dvVid)return;
+        lang=lang||cLang||'vostfr';
+        // Construire URL stream direct
+        var streamUrl=cTId?
+            'https://vidsrc.cc/v2/embed/tv/'+cTId+'/'+sn+'/'+ep+'?autoPlay=1':
+            'https://vidsrc.cc/v2/embed/tv/'+encodeURIComponent(cTitle)+'/'+sn+'/'+ep+'?autoPlay=1';
+        // Charger via src natif
+        dvVid.src=streamUrl;
+        dvVid.load();
+        dvVid.play().catch(function(){});
+        // Sauvegarder position
+        dvVid.addEventListener('timeupdate',function(){
+            localStorage.setItem('dv_pos_'+malId, dvVid.currentTime);
+        });
+        showToast('Davideo — S'+sn+' É'+ep);
+    };
+
+    // Init au démarrage de la page
+    document.addEventListener('DOMContentLoaded',function(){dvInit();});
+})();
+
 // Tab actif
 var currentPlayerTab = 'vidsrc';
 
 function switchPlayerTab(tab){
     currentPlayerTab = tab;
-    // Mettre à jour les boutons
     ['vidsrc','davideo','vidsrc2'].forEach(function(t){
         var btn=document.getElementById('tab-'+t);
         var pane=document.getElementById('pane-'+t);
         if(btn)btn.classList.toggle('active', t===tab);
         if(pane)pane.classList.toggle('active', t===tab);
     });
-    // Charger le bon lecteur
     lS(cEp, cSn);
 }
 
@@ -2212,8 +2520,7 @@ function lS(ep,sn){
             fr.src=urlVidsrc;
         }
     } else if(tab==='davideo'){
-        var df=document.getElementById('davideFrame');
-        if(df)df.src=urlDavideo;
+        dvLoadStream(cMalId, s, ep, cLang);
     } else if(tab==='vidsrc2'){
         var fr2=document.getElementById('vidFrame2');
         var ld2=document.getElementById('vidLoading2');
