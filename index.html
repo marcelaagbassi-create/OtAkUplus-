@@ -415,32 +415,16 @@ nav{background:rgba(2,6,23,0.92);backdrop-filter:blur(14px);padding:11px 16px;di
 /* PLAYER VIEW LAYOUT */
 #playerView{overflow:hidden;}
 #playerView.active{
-    display:flex;
-    flex-direction:column;
-    height:100vh;
-    height:100dvh; /* dynamic viewport pour mobile */
-    padding:0;
-    overflow:hidden;
-}
-/* Zone haute fixe et compacte */
-#playerTop{
-    flex-shrink:0;
-    overflow:hidden;
-    padding-top:62px;
-}
-/* Zone épisodes — prend TOUT l'espace restant */
-#playerEpScroll{
-    flex:1;
+    display:block;
+    padding:62px 0 100px;
     overflow-y:auto;
-    overflow-x:hidden;
-    -webkit-overflow-scrolling:touch;
-    overscroll-behavior:contain;
-    padding-bottom:120px;
-    /* Hauteur minimale garantie */
-    min-height:0;
 }
-#playerEpScroll::-webkit-scrollbar{display:none;}
-#playerEpScroll{scrollbar-width:none;}
+#playerTop{
+    padding-top:0;
+}
+#playerEpScroll{
+    display:block;
+}
 
 /* Rendre la partie haute plus compacte */
 .player-banner{height:120px !important;}
@@ -452,7 +436,7 @@ nav{background:rgba(2,6,23,0.92);backdrop-filter:blur(14px);padding:11px 16px;di
 .stream-status{min-height:14px;padding:2px 14px 4px;font-size:9px;}
 
 /* ══ DAVIDEO INTÉGRÉ ══ */
-#dv-wrap{position:relative;width:100%;background:#000;border-radius:12px;overflow:hidden;}
+#dv-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;min-height:200px;}
 #dv-bright-ov{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:4;transition:opacity .1s;}
 .dv-logo{position:absolute;top:10px;right:12px;z-index:6;pointer-events:none;font-family:'Bangers',cursive;font-size:1.2rem;letter-spacing:3px;color:rgba(255,255,255,0.2);text-shadow:0 0 18px rgba(255,140,0,0.25),2px 2px 0 rgba(0,0,0,0.6);}
 .dv-logo em{color:rgba(255,140,0,0.5);font-style:normal;}
@@ -621,6 +605,27 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
 .loading-txt{text-align:center;color:#94a3b8;padding:24px;font-size:13px;}
 .load-more-btn{display:block;margin:8px auto 18px;padding:10px 28px;background:#1e293b;border:2px solid rgba(255,255,255,0.1);color:var(--text);border-radius:9px;font-family:'Inter',sans-serif;font-weight:700;font-size:11px;cursor:pointer;transition:all 0.2s;}
 .load-more-btn:hover{border-color:var(--primary);}
+
+/* ══ SYSTÈME XP & RANGS ══ */
+.xp-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:900;letter-spacing:0.5px;}
+.xp-bar-wrap{width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;margin-top:4px;}
+.xp-bar-fill{height:100%;border-radius:4px;transition:width 0.6s cubic-bezier(.16,1,.3,1);}
+.xp-notif{position:fixed;top:80px;right:14px;background:rgba(10,17,40,0.95);border:2px solid var(--rang-color,#f97316);border-radius:12px;padding:10px 14px;z-index:5001;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;animation:xpSlide 0.4s ease;pointer-events:none;backdrop-filter:blur(12px);}
+@keyframes xpSlide{from{transform:translateX(120%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.rang-unlock{position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;animation:fadeIn 0.3s ease;}
+.rang-unlock-icon{font-size:72px;animation:rangPop 0.5s cubic-bezier(.16,1,.3,1);}
+.rang-unlock-title{font-size:14px;font-weight:900;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;}
+.rang-unlock-name{font-size:32px;font-weight:900;}
+.rang-unlock-desc{font-size:13px;color:#94a3b8;text-align:center;max-width:260px;line-height:1.6;}
+.rang-unlock-btn{margin-top:10px;background:var(--primary);border:none;color:white;padding:12px 32px;border-radius:12px;font-family:'Inter',sans-serif;font-weight:900;font-size:14px;cursor:pointer;}
+@keyframes rangPop{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+.xp-profile-section{background:var(--card);border-radius:14px;padding:14px;margin:10px 14px;}
+.xp-rang-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.xp-rang-name{font-size:16px;font-weight:900;}
+.xp-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+.xp-stat-box{background:var(--card2);border-radius:10px;padding:10px;text-align:center;}
+.xp-stat-val{font-size:18px;font-weight:900;color:var(--primary);}
+.xp-stat-lbl{font-size:9px;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;}
 
 /* TOAST */
 .toast{position:fixed;top:76px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.98);border:2px solid var(--primary);border-radius:12px;padding:10px 18px;font-size:12px;font-weight:700;z-index:5000;white-space:nowrap;transition:opacity 0.4s;pointer-events:none;}
@@ -855,7 +860,7 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
 
 <!-- BIBLIO -->
 <div id="bibliothequeView" class="view">
-    <h3 class="section-title">📚 Bibliothèque</h3>
+    <h3 class="section-title">Bibliothèque</h3>
     <div style="display:flex;padding:0 14px 11px;">
         <div id="tabBiblio" onclick="sBT('biblio')" class="focusable" tabindex="0" style="flex:1;padding:8px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;background:var(--primary);color:white;border-radius:8px 0 0 8px;">CATALOGUE</div>
         <div id="tabHistTab" onclick="sBT('historique')" class="focusable" tabindex="0" style="flex:1;padding:8px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;background:#1e293b;color:#94a3b8;border-radius:0 8px 8px 0;">EN COURS</div>
@@ -885,14 +890,14 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
 
 <!-- FAVORIS -->
 <div id="favorisView" class="view">
-    <h3 class="section-title">❤️ Mes Favoris</h3>
+    <h3 class="section-title">️ Mes Favoris</h3>
     <div id="favGrid" class="fav-grid"></div>
     <div id="favEmpty" style="display:none;" class="loading-txt">Aucun favori pour l'instant.</div>
 </div>
 
 <!-- HISTORIQUE -->
 <div id="historiqueView" class="view">
-    <h3 class="section-title">🕘 Historique</h3>
+    <h3 class="section-title">Historique</h3>
     <div id="histListMain"></div>
     <div id="histEmpty" style="display:none;" class="loading-txt">Aucun historique.</div>
 </div>
@@ -928,7 +933,75 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
         <a href="https://discord.gg/w3Tst5te8" target="_blank" style="text-decoration:none;"><div class="ep-btn focusable" tabindex="0" style="background:#5865F2;font-weight:bold;padding:14px;">REJOINDRE LE DISCORD</div></a>
         <div class="ep-btn" style="background:#E1306C;font-weight:bold;padding:14px;">SUIVRE SUR INSTAGRAM</div>
         <div class="ep-btn" style="background:#1e293b;color:#94a3b8;padding:12px;font-size:12px;">davidlaurens090@gmail.com</div>
+        <div class="ep-btn focusable" tabindex="0" style="background:linear-gradient(135deg,#1e293b,#0f172a);border:1px solid rgba(249,115,22,0.3);padding:14px;" onclick="loadWatchParty()">
+            <span style="color:var(--primary);font-weight:900;">WATCH PARTY</span>
+            <span style="font-size:10px;color:#94a3b8;display:block;margin-top:2px;">Regarder en groupe avec tes amis</span>
+        </div>
     </div>
+</div>
+
+<!-- WATCH PARTY -->
+<div id="watchPartyView" class="view">
+    <h3 class="section-title">Watch Party</h3>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:12px;">
+        <div id="wp-lobby" style="display:flex;flex-direction:column;gap:10px;">
+            <div style="background:var(--card);border-radius:14px;padding:16px;">
+                <div style="font-size:13px;font-weight:900;margin-bottom:12px;color:var(--primary);">Créer un salon</div>
+                <input id="wp-create-name" class="modal-input focusable" tabindex="0" type="text" placeholder="Ton pseudo" maxlength="20" style="margin-bottom:8px;width:100%;">
+                <input id="wp-create-anime" class="modal-input focusable" tabindex="0" type="text" placeholder="Nom de l'anime" maxlength="50" style="margin-bottom:8px;width:100%;">
+                <button class="modal-btn confirm focusable" tabindex="0" onclick="wpCreate()" style="width:100%;padding:10px;">CRÉER LE SALON</button>
+            </div>
+            <div style="background:var(--card);border-radius:14px;padding:16px;">
+                <div style="font-size:13px;font-weight:900;margin-bottom:12px;">Rejoindre un salon</div>
+                <input id="wp-join-name" class="modal-input focusable" tabindex="0" type="text" placeholder="Ton pseudo" maxlength="20" style="margin-bottom:8px;width:100%;">
+                <input id="wp-join-code" class="modal-input focusable" tabindex="0" type="text" placeholder="Code du salon (ex: WP-1234)" maxlength="10" style="margin-bottom:8px;width:100%;">
+                <button class="modal-btn cancel focusable" tabindex="0" onclick="wpJoin()" style="width:100%;padding:10px;">REJOINDRE</button>
+            </div>
+        </div>
+        <div id="wp-room" style="display:none;flex-direction:column;gap:10px;">
+            <div style="background:var(--card);border-radius:14px;padding:14px;display:flex;align-items:center;justify-content:space-between;">
+                <div><div style="font-size:11px;color:#94a3b8;">Code du salon</div><div id="wp-room-code" style="font-size:20px;font-weight:900;color:var(--primary);letter-spacing:3px;"></div></div>
+                <div style="text-align:right;"><div id="wp-room-anime" style="font-size:12px;font-weight:700;"></div><div id="wp-members-count" style="font-size:10px;color:#94a3b8;margin-top:2px;"></div></div>
+            </div>
+            <div style="background:var(--card);border-radius:14px;padding:14px;">
+                <div style="font-size:11px;font-weight:900;color:#94a3b8;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">Membres</div>
+                <div id="wp-members-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+            </div>
+            <div style="background:var(--card);border-radius:14px;padding:14px;">
+                <div style="font-size:11px;font-weight:900;color:#94a3b8;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">Chat en direct</div>
+                <div id="wp-chat-msgs" style="height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:10px;"></div>
+                <div style="display:flex;gap:8px;">
+                    <input id="wp-chat-input" class="modal-input focusable" tabindex="0" type="text" placeholder="Réagis..." maxlength="100" style="flex:1;">
+                    <button onclick="wpSendMsg()" style="background:var(--primary);border:none;color:white;padding:8px 14px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">Envoyer</button>
+                </div>
+            </div>
+            <button onclick="wpLeave()" style="background:#334155;border:none;color:#94a3b8;padding:12px;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;width:100%;">Quitter le salon</button>
+        </div>
+    </div>
+</div>
+
+<!-- DASHBOARD STATISTIQUES -->
+<div id="statsView" class="view">
+    <h3 class="section-title">Mes Statistiques</h3>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:12px;">
+        <div id="stats-rang-section" class="xp-profile-section"></div>
+        <div class="xp-stats-grid" id="stats-grid"></div>
+        <div style="background:var(--card);border-radius:14px;padding:14px;">
+            <div style="font-size:12px;font-weight:900;margin-bottom:12px;">Activité cette semaine</div>
+            <div id="stats-week-chart" style="display:flex;align-items:flex-end;gap:6px;height:80px;"></div>
+            <div style="display:flex;gap:6px;margin-top:6px;" id="stats-week-labels"></div>
+        </div>
+        <div style="background:var(--card);border-radius:14px;padding:14px;">
+            <div style="font-size:12px;font-weight:900;margin-bottom:12px;">Badges débloqués</div>
+            <div id="stats-badges" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- QUIZ HEBDOMADAIRE -->
+<div id="quizView" class="view">
+    <h3 class="section-title">Quiz Hebdomadaire</h3>
+    <div style="padding:14px;" id="quizContent"></div>
 </div>
 
 <!-- PARAMÈTRES MODE VEILLE -->
@@ -1071,7 +1144,7 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
 
 <!-- AIDE -->
 <div id="aideView" class="view">
-    <h3 class="section-title">❓ Centre d'Aide</h3>
+    <h3 class="section-title">Centre d'Aide</h3>
     <div class="about-content">
         <div class="about-card" style="border-left:3px solid var(--primary);">
             <h4 style="color:var(--primary);margin:0 0 10px;font-size:13px;">🔍 RECHERCHE</h4>
@@ -1172,6 +1245,53 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
                 <div style="font-size:10px;color:#94a3b8;margin-top:2px;">Style, police, format de l'heure</div>
             </div>
             <div style="background:var(--primary);border-radius:8px;padding:7px 12px;font-size:11px;font-weight:700;color:white;">PERSONNALISER</div>
+        </div>
+
+        <!-- THÈMES DYNAMIQUES -->
+        <div style="background:var(--card);padding:14px;border-radius:12px;">
+            <div style="font-size:13px;font-weight:900;margin-bottom:12px;">Thèmes dynamiques</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="dynamic-themes-grid">
+                <div onclick="setDynamicTheme('orange','#f97316')" class="focusable" tabindex="0" id="dt-orange" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid var(--primary);">
+                    <div style="height:36px;background:linear-gradient(135deg,#020617,#1e293b);display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;border-radius:50%;background:#f97316;"></div></div>
+                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;">OtAkU+</div>
+                </div>
+                <div onclick="setDynamicTheme('blue','#3b82f6')" class="focusable" tabindex="0" id="dt-blue" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;">
+                    <div style="height:36px;background:linear-gradient(135deg,#030712,#1e3a5f);display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;border-radius:50%;background:#3b82f6;"></div></div>
+                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;">Bleu Glacial</div>
+                </div>
+                <div onclick="setDynamicTheme('red','#ef4444')" class="focusable" tabindex="0" id="dt-red" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;">
+                    <div style="height:36px;background:linear-gradient(135deg,#0a0203,#2d0a0a);display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;border-radius:50%;background:#ef4444;"></div></div>
+                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;">Rouge Écarlate</div>
+                </div>
+                <div onclick="setDynamicTheme('green','#22c55e')" class="focusable" tabindex="0" id="dt-green" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;">
+                    <div style="height:36px;background:linear-gradient(135deg,#020a05,#0a2d16);display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;border-radius:50%;background:#22c55e;"></div></div>
+                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;">Vert Forêt</div>
+                </div>
+                <div onclick="setDynamicTheme('purple','#8b5cf6')" class="focusable" tabindex="0" id="dt-purple" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;">
+                    <div style="height:36px;background:linear-gradient(135deg,#05020a,#1a0a2d);display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;border-radius:50%;background:#8b5cf6;"></div></div>
+                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;">Violet Mystique</div>
+                </div>
+                <div onclick="setDynamicTheme('gold','#f59e0b')" class="focusable" tabindex="0" id="dt-gold" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;">
+                    <div style="height:36px;background:linear-gradient(135deg,#0a0803,#2d200a);display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;border-radius:50%;background:#f59e0b;"></div></div>
+                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;">Or Légendaire</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BINGE-WATCHING AUTO -->
+        <div style="background:var(--card);padding:13px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;">
+            <div><div style="font-size:13px;font-weight:700;">Binge-Watching</div><div style="font-size:10px;color:#94a3b8;margin-top:2px;">Épisode suivant automatique</div></div>
+            <div id="binge-slider" onclick="toggleBinge()" style="width:44px;height:24px;background:#1e293b;border-radius:24px;cursor:pointer;position:relative;transition:background 0.3s;">
+                <div id="binge-knob" style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:white;border-radius:50%;transition:transform 0.3s;"></div>
+            </div>
+        </div>
+
+        <!-- MODE ÉCONOMIE DONNÉES -->
+        <div style="background:var(--card);padding:13px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;">
+            <div><div style="font-size:13px;font-weight:700;">Économie de données</div><div style="font-size:10px;color:#94a3b8;margin-top:2px;">Images basse résolution, moins d'animations</div></div>
+            <div id="datasaver-slider" onclick="toggleDataSaver()" style="width:44px;height:24px;background:#1e293b;border-radius:24px;cursor:pointer;position:relative;transition:background 0.3s;">
+                <div id="datasaver-knob" style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:white;border-radius:50%;transition:transform 0.3s;"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -1420,7 +1540,18 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
 <script>
 var sT;var TK='4f5f43495afcc67e9553f6c684a82f84';var TB='https://api.themoviedb.org/3';
 var MX='https://api.mangadex.org';var MI='https://uploads.mangadex.org';
-var PX='https://corsproxy.io/?url=';
+var PX='https://api.allorigins.win/raw?url=';
+var PX2='https://corsproxy.io/?url=';
+
+// Fetch MangaDex avec fallback proxy
+function mF(u){
+    return fetch(PX+encodeURIComponent(u)).then(function(r){
+        if(!r.ok)throw new Error('proxy1 fail');
+        return r.json();
+    }).catch(function(){
+        return fetch(PX2+encodeURIComponent(u)).then(function(r){return r.json();});
+    });
+}
 var PH='data:image/svg+xml;base64,'+btoa('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0f172a"/><stop offset="100%" style="stop-color:#1e293b"/></linearGradient></defs><rect width="300" height="450" fill="url(#g)"/><rect x="0" y="0" width="300" height="4" fill="#f97316"/><rect x="0" y="446" width="300" height="4" fill="#f97316"/><rect x="20" y="180" width="260" height="1" fill="rgba(249,115,22,0.2)"/><rect x="20" y="270" width="260" height="1" fill="rgba(249,115,22,0.2)"/><text x="150" y="215" font-family="Arial" font-weight="bold" font-size="38" fill="#f97316" text-anchor="middle">OtAkU+</text><text x="150" y="250" font-family="Arial" font-size="11" fill="#475569" text-anchor="middle" letter-spacing="3">STREAMING</text></svg>');
 var YT_KEY='AIzaSyD-PLACEHOLDER';
 
@@ -1441,7 +1572,7 @@ var GM=[
     {l:'Isekai',id:'ace04997-f6bd-436e-b261-779182193d3d'}
 ];
 
-function mF(u){return fetch(PX+encodeURIComponent(u)).then(function(r){return r.json();});}
+// mF défini plus haut avec fallback proxy
 
 // ── FOOTER APPARAÎT AU SCROLL / SURVOL BAS ──
 (function(){
@@ -2445,21 +2576,41 @@ function downloadEp(){downloadEpN(cEp);}
 
     // Charger un stream dans Davideo
     window.dvLoadStream=function(malId,sn,ep,lang){
-        if(!dvVid){dvInit();}
-        if(!dvVid)return;
         lang=lang||cLang||'vostfr';
-        // Construire URL stream direct
-        var streamUrl=cTId?
-            'https://vidsrc.cc/v2/embed/tv/'+cTId+'/'+sn+'/'+ep+'?autoPlay=1':
-            'https://vidsrc.cc/v2/embed/tv/'+encodeURIComponent(cTitle)+'/'+sn+'/'+ep+'?autoPlay=1';
-        // Charger via src natif
-        dvVid.src=streamUrl;
-        dvVid.load();
-        dvVid.play().catch(function(){});
-        // Sauvegarder position
-        dvVid.addEventListener('timeupdate',function(){
-            localStorage.setItem('dv_pos_'+malId, dvVid.currentTime);
-        });
+
+        // URL selon la langue
+        var streamUrl;
+        if(lang==='vf'){
+            streamUrl=cTId?
+                'https://vidsrc.to/embed/tv/'+cTId+'/'+sn+'/'+ep:
+                'https://vidsrc.to/embed/tv/'+encodeURIComponent(cTitle)+'/'+sn+'/'+ep;
+        } else {
+            streamUrl=cTId?
+                'https://vidsrc.cc/v2/embed/tv/'+cTId+'/'+sn+'/'+ep+'?autoPlay=1':
+                'https://vidsrc.cc/v2/embed/tv/'+encodeURIComponent(cTitle)+'/'+sn+'/'+ep+'?autoPlay=1';
+        }
+
+        // Davideo = iframe dans le wrapper (les sources sont des embeds, pas des flux directs)
+        var wrap=document.getElementById('dv-wrap');
+        if(!wrap)return;
+
+        // Remplacer par une iframe plein écran dans le wrapper
+        var existing=document.getElementById('dv-embed-frame');
+        if(!existing){
+            existing=document.createElement('iframe');
+            existing.id='dv-embed-frame';
+            existing.allowFullscreen=true;
+            existing.setAttribute('allow','autoplay;encrypted-media;picture-in-picture;fullscreen');
+            existing.setAttribute('referrerpolicy','no-referrer');
+            existing.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:none;z-index:2;border-radius:12px;';
+            wrap.appendChild(existing);
+        }
+        existing.src=streamUrl;
+
+        // Cacher les contrôles Davideo natifs (pas utiles pour les embeds)
+        var bar=document.getElementById('dv-bar');
+        if(bar)bar.style.display='none';
+
         showToast('Davideo — S'+sn+' É'+ep);
     };
 
@@ -2485,6 +2636,12 @@ function lS(ep,sn){
     cEp=ep;if(sn)cSn=sn;
     var s=cSn||1;
     var tab=currentPlayerTab||'vidsrc';
+    // XP episode
+    if(typeof xpGain==='function')xpGain('episode_watch','Episode '+ep+' — '+cTitle);
+    if(typeof trackWeekActivity==='function')trackWeekActivity();
+    // Binge watch check apres 30s
+    clearInterval(bingeTimer);
+    setTimeout(function(){if(typeof checkBinge==='function')checkBinge();},30000);
 
     // URLs des différents lecteurs
     var urlVidsrc, urlVidsrc2, urlDavideo;
@@ -2661,6 +2818,7 @@ async function rCh(index,mid,title,cover,chapNum){
     document.getElementById('readerView').style.display='block';window.scrollTo(0,0);
     sHist(mid||cMId,title,cover,num);
     rChaps[(mid||cMId)+'_'+num]=true;localStorage.setItem('otaku_read_chaps',JSON.stringify(rChaps));
+    if(typeof xpGain==='function')xpGain('chapter_read','Ch. '+num+' — '+title);
     try{
         var j=await mF(MX+'/at-home/server/'+ch.id);
         var pages=j.chapter.data.map(function(f){return j.baseUrl+'/data/'+j.chapter.hash+'/'+f;});
@@ -3318,7 +3476,398 @@ window.addEventListener('DOMContentLoaded',function(){
     var bs=document.getElementById('biblioSearch');if(bs)bs.addEventListener('keydown',function(e){if(e.key==='Enter')searchBiblio();});
     document.getElementById('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter')saveName();});
 });
-window.onload=function(){checkAuth();loadProfile();checkNotifStatus();loadTheme();};
+
+// ── STATS ──
+function loadStats(){sV('statsView');renderStats();}
+
+function renderStats(){
+    var data=xpGetData();
+    var rangIdx=xpGetRang(data.xp);
+    var rang=RANGS[rangIdx];
+    var next=RANGS[rangIdx+1];
+    var pct=next?Math.min(100,Math.round(((data.xp-rang.min)/(next.min-rang.min))*100)):100;
+    var rs=document.getElementById('stats-rang-section');
+    if(rs)rs.innerHTML='<div class="xp-rang-row"><div class="xp-rang-name" style="color:'+rang.color+';">'+rang.icon+' '+rang.nom+'</div><div style="font-size:12px;color:#94a3b8;">'+data.xp+' XP</div></div><div class="xp-bar-wrap"><div class="xp-bar-fill" style="width:'+pct+'%;background:'+rang.color+';"></div></div><div style="font-size:10px;color:#64748b;margin-top:4px;">'+(next?'Prochain : '+next.icon+' '+next.nom+' a '+next.min+' XP':'Rang maximum !')+'</div>';
+    var sg=document.getElementById('stats-grid');
+    if(sg)sg.innerHTML='<div class="xp-stat-box"><div class="xp-stat-val">'+(data.totalEpisodes||0)+'</div><div class="xp-stat-lbl">Episodes</div></div><div class="xp-stat-box"><div class="xp-stat-val">'+(data.totalChapters||0)+'</div><div class="xp-stat-lbl">Chapitres</div></div><div class="xp-stat-box"><div class="xp-stat-val">'+(data.totalFavs||0)+'</div><div class="xp-stat-lbl">Favoris</div></div>';
+    var week=JSON.parse(localStorage.getItem('otaku_week_activity')||'[0,0,0,0,0,0,0]');
+    var maxW=Math.max(1,Math.max.apply(null,week));
+    var days=['L','M','M','J','V','S','D'];
+    var chart=document.getElementById('stats-week-chart');
+    if(chart)chart.innerHTML=week.map(function(v,i){var h=Math.max(4,Math.round((v/maxW)*70));var isT=i===new Date().getDay();return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;"><div style="height:'+h+'px;width:100%;background:'+(isT?'var(--primary)':'rgba(249,115,22,0.25)')+';border-radius:4px 4px 0 0;"></div></div>';}).join('');
+    var labels=document.getElementById('stats-week-labels');
+    if(labels)labels.innerHTML=days.map(function(d,i){var isT=i===new Date().getDay();return '<div style="flex:1;text-align:center;font-size:9px;color:'+(isT?'var(--primary)':'#64748b')+';font-weight:'+(isT?900:400)+';">'+d+'</div>';}).join('');
+    var badgesEl=document.getElementById('stats-badges');
+    if(badgesEl){
+        var badges=[];
+        if((data.totalEpisodes||0)>=1)badges.push({icon:'▶',label:'1er episode',color:'#22c55e'});
+        if((data.totalEpisodes||0)>=10)badges.push({icon:'🎬',label:'10 episodes',color:'#3b82f6'});
+        if((data.totalChapters||0)>=1)badges.push({icon:'📖',label:'1er chapitre',color:'#8b5cf6'});
+        if((data.totalFavs||0)>=5)badges.push({icon:'❤️',label:'5 favoris',color:'#ec4899'});
+        if(rangIdx>=2)badges.push({icon:rang.icon,label:rang.nom,color:rang.color});
+        if(!badges.length)badges.push({icon:'🌱',label:'Debutant',color:'#64748b'});
+        badgesEl.innerHTML=badges.map(function(b){return '<div style="background:var(--card2);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:6px;"><span style="font-size:16px;">'+b.icon+'</span><span style="font-size:10px;font-weight:700;color:'+b.color+';">'+b.label+'</span></div>';}).join('');
+    }
+}
+
+// ── QUIZ ──
+var QUIZ_Q=[
+    {q:'Quel est le vrai nom de Tanjiro ?',opts:['Tanjiro Kamado','Tanjiro Uzumaki','Tanjiro Shinomiya','Tanjiro Agatsuma'],ans:0},
+    {q:'Quel est le grade de Gojo Satoru ?',opts:['Grade 1','Grade Special 1','Grade 0','Sans grade'],ans:1},
+    {q:'Dans Solo Leveling, quel est le heros ?',opts:['Sung Jinwoo','Kim Dokja','Han Sooyoung','Yoo Jonghyuk'],ans:0},
+    {q:'Quelle est la technique de Naruto ?',opts:['Chidori','Rasengan','Sharingan','Byakugan'],ans:1},
+    {q:'Dans HxH, quel Nen utilise Gon ?',opts:['Transmutation','Emission','Renforcement','Manipulation'],ans:2},
+    {q:'La race de Frieren ?',opts:['Humaine','Elfe','Naine','Demon'],ans:1},
+    {q:'Dans Attack on Titan, l\'ile principale s\'appelle ?',opts:['Marley','Paradis','Eldia','Hizuru'],ans:1},
+    {q:'La soeur de Tanjiro dans Demon Slayer ?',opts:['Nezuko','Kanao','Shinobu','Mitsuri'],ans:0},
+];
+var quizState={q:0,score:0,done:false};
+
+function loadQuiz(){sV('quizView');quizState={q:0,score:0,done:false,forceNew:false};renderQuiz();}
+
+function renderQuiz(){
+    var cont=document.getElementById('quizContent');if(!cont)return;
+    var thisWeek=getWeekNumber();
+    var lastDone=localStorage.getItem('otaku_quiz_week');
+    if(lastDone===String(thisWeek)&&!quizState.forceNew){
+        var lastScore=parseInt(localStorage.getItem('otaku_quiz_score')||'0');
+        cont.innerHTML='<div style="text-align:center;padding:30px 14px;"><div style="font-size:48px;margin-bottom:12px;">🏆</div><div style="font-size:16px;font-weight:900;margin-bottom:6px;">Quiz termine !</div><div style="font-size:13px;color:#94a3b8;margin-bottom:16px;">Score : <span style="color:var(--primary);font-weight:900;">'+lastScore+'/'+QUIZ_Q.length+'</span></div><button onclick="quizState.forceNew=true;quizState.q=0;quizState.score=0;renderQuiz();" style="background:#334155;border:none;color:white;padding:10px 24px;border-radius:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">Rejouer</button></div>';
+        return;
+    }
+    if(quizState.done){
+        localStorage.setItem('otaku_quiz_week',String(thisWeek));
+        localStorage.setItem('otaku_quiz_score',String(quizState.score));
+        for(var i=0;i<quizState.score;i++)xpGain('fav_add','Bonne reponse quiz');
+        cont.innerHTML='<div style="text-align:center;padding:30px 14px;"><div style="font-size:56px;margin-bottom:12px;">'+(quizState.score>=6?'🌟':quizState.score>=4?'👍':'📚')+'</div><div style="font-size:18px;font-weight:900;margin-bottom:6px;">'+quizState.score+'/'+QUIZ_Q.length+'</div><div style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.3);border-radius:10px;padding:10px;font-size:12px;font-weight:700;color:var(--primary);margin-top:12px;">+'+(quizState.score*10)+' XP gagnes !</div></div>';
+        return;
+    }
+    var q=QUIZ_Q[quizState.q];
+    cont.innerHTML='<div><div style="display:flex;justify-content:space-between;font-size:11px;color:#94a3b8;margin-bottom:8px;"><span>Question '+(quizState.q+1)+'/'+QUIZ_Q.length+'</span><span style="color:var(--primary);">Score : '+quizState.score+'</span></div><div style="background:var(--card);border-radius:12px;padding:14px;margin-bottom:16px;"><div style="font-size:13px;font-weight:700;line-height:1.6;">'+q.q+'</div></div><div style="display:flex;flex-direction:column;gap:8px;">'+q.opts.map(function(opt,i){return '<button onclick="quizAnswer('+i+')" style="background:var(--card);border:2px solid rgba(255,255,255,0.1);color:var(--text);padding:12px 14px;border-radius:10px;font-family:Inter,sans-serif;font-size:12px;font-weight:700;cursor:pointer;text-align:left;">'+opt+'</button>';}).join('')+'</div></div>';
+}
+
+function quizAnswer(idx){
+    var q=QUIZ_Q[quizState.q];
+    if(idx===q.ans)quizState.score++;
+    quizState.q++;
+    if(quizState.q>=QUIZ_Q.length)quizState.done=true;
+    renderQuiz();
+}
+
+function getWeekNumber(){
+    var d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+4-(d.getDay()||7));
+    var y=new Date(d.getFullYear(),0,1);return Math.ceil((((d-y)/86400000)+1)/7);
+}
+
+// ── TRACKING SEMAINE ──
+
+// ── BINGE-WATCHING AUTO ──
+var bingeTimer=null;
+function toggleBinge(){
+    var on=localStorage.getItem('otaku_binge')!=='1';
+    localStorage.setItem('otaku_binge',on?'1':'0');
+    var sl=document.getElementById('binge-slider');var kn=document.getElementById('binge-knob');
+    if(sl)sl.style.background=on?'var(--primary)':'#1e293b';
+    if(kn)kn.style.transform=on?'translateX(20px)':'translateX(0)';
+    showToast(on?'Binge-Watching active !':'Binge-Watching desactive');
+}
+
+function checkBinge(){
+    if(localStorage.getItem('otaku_binge')!=='1')return;
+    var nextEp=cEp+1;if(nextEp>cEpN)return;
+    var existing=document.getElementById('binge-countdown');if(existing)existing.remove();
+    var cnt=document.createElement('div');
+    cnt.id='binge-countdown';
+    cnt.style.cssText='position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(10,17,40,0.97);border:2px solid var(--primary);border-radius:14px;padding:14px 20px;z-index:5002;display:flex;align-items:center;gap:14px;font-size:13px;font-weight:700;backdrop-filter:blur(12px);white-space:nowrap;';
+    cnt.innerHTML='<div id="binge-num" style="font-size:24px;font-weight:900;color:var(--primary);">15</div><div>Episode '+nextEp+' dans...<br><span style="font-size:10px;color:#94a3b8;">appuie pour annuler</span></div><button onclick="clearInterval(bingeTimer);this.parentNode.remove();" style="background:#334155;border:none;color:white;padding:6px 12px;border-radius:8px;font-size:11px;cursor:pointer;font-family:Inter,sans-serif;">Annuler</button>';
+    document.body.appendChild(cnt);
+    var count=15;
+    clearInterval(bingeTimer);
+    bingeTimer=setInterval(function(){
+        count--;
+        var num=document.getElementById('binge-num');if(num)num.textContent=count;
+        if(count<=0){
+            clearInterval(bingeTimer);
+            var el=document.getElementById('binge-countdown');if(el)el.remove();
+            lS(nextEp,cSn);
+        }
+    },1000);
+}
+
+function trackWeekActivity(){
+    var week=JSON.parse(localStorage.getItem('otaku_week_activity')||'[0,0,0,0,0,0,0]');
+    week[new Date().getDay()]=(week[new Date().getDay()]||0)+1;
+    localStorage.setItem('otaku_week_activity',JSON.stringify(week));
+}
+
+
+// ── THÈMES DYNAMIQUES ──
+function setDynamicTheme(name, color){
+    localStorage.setItem('otaku_dyn_theme', name);
+    localStorage.setItem('otaku_dyn_color', color);
+    document.documentElement.style.setProperty('--primary', color);
+    var mt = document.querySelector('meta[name="theme-color"]');
+    if(mt) mt.content = color;
+    // Mettre à jour les bordures des cartes de thème
+    var map = {orange:'dt-orange',blue:'dt-blue',red:'dt-red',green:'dt-green',purple:'dt-purple',gold:'dt-gold'};
+    Object.values(map).forEach(function(id){
+        var el = document.getElementById(id);
+        if(el) el.style.borderColor = 'transparent';
+    });
+    var sel = document.getElementById(map[name]);
+    if(sel) sel.style.borderColor = color;
+    showToast('Thème ' + name + ' appliqué !');
+}
+
+function loadDynamicTheme(){
+    var color = localStorage.getItem('otaku_dyn_color') || '#f97316';
+    var name = localStorage.getItem('otaku_dyn_theme') || 'orange';
+    document.documentElement.style.setProperty('--primary', color);
+    var mt = document.querySelector('meta[name="theme-color"]');
+    if(mt) mt.content = color;
+    // Toggles binge et datasaver
+    var binge = localStorage.getItem('otaku_binge') === '1';
+    var ds = localStorage.getItem('otaku_data_saver') === '1';
+    var bsl = document.getElementById('binge-slider');
+    var bkn = document.getElementById('binge-knob');
+    if(bsl) bsl.style.background = binge ? 'var(--primary)' : '#1e293b';
+    if(bkn) bkn.style.transform = binge ? 'translateX(20px)' : 'translateX(0)';
+    var dsl = document.getElementById('datasaver-slider');
+    var dkn = document.getElementById('datasaver-knob');
+    if(dsl) dsl.style.background = ds ? 'var(--primary)' : '#1e293b';
+    if(dkn) dkn.style.transform = ds ? 'translateX(20px)' : 'translateX(0)';
+    if(ds) applyDataSaver(true);
+}
+
+function toggleDataSaver(){
+    var on = localStorage.getItem('otaku_data_saver') !== '1';
+    localStorage.setItem('otaku_data_saver', on ? '1' : '0');
+    var sl = document.getElementById('datasaver-slider');
+    var kn = document.getElementById('datasaver-knob');
+    if(sl) sl.style.background = on ? 'var(--primary)' : '#1e293b';
+    if(kn) kn.style.transform = on ? 'translateX(20px)' : 'translateX(0)';
+    applyDataSaver(on);
+    showToast(on ? 'Economie de données activée' : 'Mode normal');
+}
+
+function applyDataSaver(on){
+    var style = document.getElementById('data-saver-style');
+    if(!style){
+        style = document.createElement('style');
+        style.id = 'data-saver-style';
+        document.head.appendChild(style);
+    }
+    style.textContent = on ?
+        '*{animation-duration:0.01s!important;transition-duration:0.01s!important;}.vid-blur-bg{display:none!important;}' : '';
+    window._dataSaver = on;
+}
+
+function loadWatchParty(){ sV('watchPartyView'); }
+
+// ══ WATCH PARTY ══
+var wpRoom=null,wpName='',wpInterval=null;
+
+function wpCreate(){
+    var name=(document.getElementById('wp-create-name')||{}).value||'';
+    var anime=(document.getElementById('wp-create-anime')||{}).value||'';
+    name=name.trim();anime=anime.trim();
+    if(!name||!anime){showToast('Remplis tous les champs');return;}
+    wpName=name;
+    var code='WP-'+Math.floor(1000+Math.random()*9000);
+    wpRoom={code:code,anime:anime,host:name,members:[{name:name,isHost:true}],messages:[]};
+    localStorage.setItem('wp_'+code,JSON.stringify(wpRoom));
+    wpEnterRoom(code);
+    showToast('Salon cree : '+code);
+}
+
+function wpJoin(){
+    var name=(document.getElementById('wp-join-name')||{}).value||'';
+    var code=(document.getElementById('wp-join-code')||{}).value||'';
+    name=name.trim();code=code.trim().toUpperCase();
+    if(!name||!code){showToast('Remplis tous les champs');return;}
+    wpName=name;
+    var saved=localStorage.getItem('wp_'+code);
+    if(!saved){showToast('Salon introuvable');return;}
+    wpRoom=JSON.parse(saved);
+    if(!wpRoom.members.find(function(m){return m.name===name;})){
+        wpRoom.members.push({name:name,isHost:false});
+        localStorage.setItem('wp_'+code,JSON.stringify(wpRoom));
+    }
+    wpEnterRoom(code);
+    showToast('Salon rejoint !');
+}
+
+function wpEnterRoom(code){
+    var lobby=document.getElementById('wp-lobby');
+    var room=document.getElementById('wp-room');
+    if(lobby)lobby.style.display='none';
+    if(room)room.style.display='flex';
+    var rc=document.getElementById('wp-room-code');
+    var ra=document.getElementById('wp-room-anime');
+    if(rc)rc.textContent=code;
+    if(ra)ra.textContent=wpRoom.anime;
+    wpRefresh();
+    clearInterval(wpInterval);
+    wpInterval=setInterval(function(){
+        var saved=localStorage.getItem('wp_'+code);
+        if(saved)wpRoom=JSON.parse(saved);
+        wpRefresh();
+    },1500);
+    var inp=document.getElementById('wp-chat-input');
+    if(inp)inp.onkeydown=function(e){if(e.key==='Enter')wpSendMsg();};
+}
+
+function wpRefresh(){
+    if(!wpRoom)return;
+    var ml=document.getElementById('wp-members-list');
+    if(ml)ml.innerHTML=(wpRoom.members||[]).map(function(m){
+        return '<div style="background:var(--card2);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;">'+(m.isHost?'<span style="color:var(--primary);">★ </span>':'')+m.name+'</div>';
+    }).join('');
+    var mc=document.getElementById('wp-members-count');
+    if(mc)mc.textContent=(wpRoom.members||[]).length+' membre'+((wpRoom.members||[]).length>1?'s':'');
+    var msgs=document.getElementById('wp-chat-msgs');
+    if(msgs){
+        msgs.innerHTML=(wpRoom.messages||[]).map(function(m){
+            var isMe=m.author===wpName;
+            return '<div style="display:flex;flex-direction:column;align-items:'+(isMe?'flex-end':'flex-start')+';gap:2px;">'+
+                '<div style="font-size:9px;color:#64748b;">'+m.author+'</div>'+
+                '<div style="background:'+(isMe?'var(--primary)':'var(--card2)')+';color:white;padding:6px 10px;border-radius:10px;font-size:12px;max-width:80%;">'+m.text+'</div>'+
+            '</div>';
+        }).join('');
+        msgs.scrollTop=msgs.scrollHeight;
+    }
+}
+
+function wpSendMsg(){
+    var inp=document.getElementById('wp-chat-input');
+    var txt=inp?inp.value.trim():'';
+    if(!txt||!wpRoom)return;
+    wpRoom.messages=wpRoom.messages||[];
+    wpRoom.messages.push({author:wpName,text:txt,time:Date.now()});
+    if(wpRoom.messages.length>100)wpRoom.messages=wpRoom.messages.slice(-100);
+    localStorage.setItem('wp_'+wpRoom.code,JSON.stringify(wpRoom));
+    inp.value='';
+    wpRefresh();
+}
+
+function wpLeave(){
+    clearInterval(wpInterval);wpRoom=null;wpName='';
+    var lobby=document.getElementById('wp-lobby');
+    var room=document.getElementById('wp-room');
+    if(lobby)lobby.style.display='flex';
+    if(room)room.style.display='none';
+    showToast('Tu as quitte le salon');
+}
+
+// ══ SYSTÈME XP & RANGS ══
+var RANGS=[
+    {nom:'Passant',  min:0,    icon:'👤',color:'#64748b'},
+    {nom:'Genin',    min:100,  icon:'🥷',color:'#22c55e'},
+    {nom:'Chunin',   min:300,  icon:'⚔️',color:'#3b82f6'},
+    {nom:'Jonin',    min:700,  icon:'🗡️',color:'#8b5cf6'},
+    {nom:'Anbu',     min:1500, icon:'🎭',color:'#ec4899'},
+    {nom:'Hokage',   min:3000, icon:'🏮',color:'#f97316'},
+    {nom:'Kage',     min:6000, icon:'👑',color:'#f59e0b'},
+    {nom:'Legende',  min:10000,icon:'⚡',color:'#fff'},
+];
+var XP_ACTIONS={episode_watch:15,chapter_read:10,fav_add:5,search:1,login_daily:20};
+
+function xpGetData(){return JSON.parse(localStorage.getItem('otaku_xp_data')||JSON.stringify({xp:0,rang:0,totalEpisodes:0,totalChapters:0,totalFavs:0,lastLogin:''}));}
+function xpSave(d){localStorage.setItem('otaku_xp_data',JSON.stringify(d));}
+function xpGetRang(xp){for(var i=RANGS.length-1;i>=0;i--){if(xp>=RANGS[i].min)return i;}return 0;}
+
+function xpGain(action,label){
+    if(typeof RANGS==='undefined')return;
+    var pts=XP_ACTIONS[action]||5;
+    var data=xpGetData();
+    var oldRang=xpGetRang(data.xp);
+    data.xp+=pts;
+    if(action==='episode_watch')data.totalEpisodes=(data.totalEpisodes||0)+1;
+    if(action==='chapter_read')data.totalChapters=(data.totalChapters||0)+1;
+    if(action==='fav_add')data.totalFavs=(data.totalFavs||0)+1;
+    var newRang=xpGetRang(data.xp);
+    xpSave(data);
+    xpShowNotif(pts,label||action,RANGS[newRang]);
+    if(newRang>oldRang){data.rang=newRang;xpSave(data);setTimeout(function(){xpShowRangUnlock(RANGS[newRang]);},1200);}
+    xpUpdateProfileDisplay();
+    if(typeof trackWeekActivity==='function')trackWeekActivity();
+}
+
+function xpShowNotif(pts,label,rang){
+    var n=document.createElement('div');
+    n.className='xp-notif';
+    n.style.setProperty('--rang-color',rang.color);
+    n.innerHTML='<div style="font-size:20px;">'+rang.icon+'</div><div><div style="font-size:11px;color:#94a3b8;">'+label+'</div><div style="color:'+rang.color+';">+'+pts+' XP</div></div>';
+    document.body.appendChild(n);
+    setTimeout(function(){n.style.transition='opacity 0.4s,transform 0.4s';n.style.opacity='0';n.style.transform='translateX(120%)';setTimeout(function(){if(n.parentNode)n.parentNode.removeChild(n);},400);},2200);
+}
+
+function xpShowRangUnlock(rang){
+    var ol=document.createElement('div');
+    ol.className='rang-unlock';
+    ol.innerHTML='<div class="rang-unlock-icon">'+rang.icon+'</div><div class="rang-unlock-title">Rang debloque !</div><div class="rang-unlock-name" style="color:'+rang.color+';">'+rang.nom+'</div><div class="rang-unlock-desc">Tu as atteint le rang <strong>'+rang.nom+'</strong> !</div><button class="rang-unlock-btn" onclick="this.parentNode.remove()">Continuer</button>';
+    document.body.appendChild(ol);
+}
+
+function xpUpdateProfileDisplay(){
+    var data=xpGetData();
+    var rangIdx=xpGetRang(data.xp);
+    var rang=RANGS[rangIdx];
+    var next=RANGS[rangIdx+1];
+    var pct=next?Math.min(100,Math.round(((data.xp-rang.min)/(next.min-rang.min))*100)):100;
+    var badge=document.getElementById('xp-menu-badge');
+    if(badge){badge.textContent=rang.icon+' '+rang.nom;badge.style.color=rang.color;}
+    var bar=document.getElementById('xp-bar-fill');
+    if(bar){bar.style.width=pct+'%';bar.style.background=rang.color;}
+    var lbl=document.getElementById('xp-label');
+    if(lbl)lbl.textContent=data.xp+' XP'+(next?' / '+next.min:' MAX');
+}
+
+function xpDailyLogin(){
+    var data=xpGetData();
+    var today=new Date().toDateString();
+    if(data.lastLogin!==today){data.lastLogin=today;xpSave(data);xpGain('login_daily','Connexion du jour');}
+}
+
+function xpInjectMenu(){
+    var profSub=document.querySelector('.profile-sub');
+    if(!profSub||document.getElementById('xp-menu-badge'))return;
+    var data=xpGetData();
+    var rang=RANGS[xpGetRang(data.xp)];
+    var next=RANGS[xpGetRang(data.xp)+1];
+    var pct=next?Math.min(100,Math.round(((data.xp-rang.min)/(next.min-rang.min))*100)):100;
+    var badgeEl=document.createElement('div');
+    badgeEl.id='xp-menu-badge';
+    badgeEl.style.cssText='font-size:10px;font-weight:900;margin-top:3px;color:'+rang.color+';';
+    badgeEl.textContent=rang.icon+' '+rang.nom;
+    profSub.parentNode.insertBefore(badgeEl,profSub.nextSibling);
+    var barWrap=document.createElement('div');
+    barWrap.className='xp-bar-wrap';
+    barWrap.style.cssText='margin-top:5px;width:120px;';
+    barWrap.innerHTML='<div id="xp-bar-fill" class="xp-bar-fill" style="width:'+pct+'%;background:'+rang.color+';"></div>';
+    badgeEl.after(barWrap);
+    var xpLbl=document.createElement('div');
+    xpLbl.id='xp-label';
+    xpLbl.style.cssText='font-size:9px;color:#64748b;margin-top:2px;';
+    xpLbl.textContent=data.xp+' XP'+(next?' / '+next.min:' MAX');
+    barWrap.after(xpLbl);
+}
+
+// ══ TRACKING SEMAINE ══
+function trackWeekActivity(){
+    var week=JSON.parse(localStorage.getItem('otaku_week_activity')||'[0,0,0,0,0,0,0]');
+    week[new Date().getDay()]=(week[new Date().getDay()]||0)+1;
+    localStorage.setItem('otaku_week_activity',JSON.stringify(week));
+}
+
+window.onload=function(){
+    checkAuth();
+    loadProfile();
+    checkNotifStatus();
+    loadTheme();
+    loadDynamicTheme();
+    xpDailyLogin();
+    setTimeout(xpInjectMenu,600);
+};
 </script>
 
 <!-- ═══════════════════════════════════════════════ -->
