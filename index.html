@@ -1251,29 +1251,40 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
         <div style="background:var(--card);padding:14px;border-radius:12px;">
             <div style="font-size:13px;font-weight:900;margin-bottom:12px;">Thèmes dynamiques</div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="dynamic-themes-grid">
-                <div onclick="setDynamicTheme('orange','#f97316')" class="focusable" tabindex="0" id="dt-orange" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid var(--primary);">
+                <!-- Rang 0 - Libre -->
+                <div onclick="setDynamicTheme('orange','#f97316')" class="focusable" tabindex="0" id="dt-orange" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid var(--primary);position:relative;">
                     <div style="height:36px;background:linear-gradient(135deg,#020617,#1e293b);display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;border-radius:50%;background:#f97316;"></div></div>
                     <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;">OtAkU+</div>
                 </div>
-                <div onclick="setDynamicTheme('blue','#3b82f6')" class="focusable" tabindex="0" id="dt-blue" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;">
+                <!-- Rang 1 Genin -->
+                <div onclick="setDynamicTheme('blue','#3b82f6')" class="focusable" tabindex="0" id="dt-blue" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;position:relative;">
                     <div style="height:36px;background:linear-gradient(135deg,#030712,#1e3a5f);display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;border-radius:50%;background:#3b82f6;"></div></div>
-                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;">Bleu Glacial</div>
+                    <div id="dt-blue-lock" style="position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;border-radius:8px;flex-direction:column;gap:2px;"><span style="font-size:14px;">🔒</span><span style="font-size:8px;color:#94a3b8;font-weight:700;">Genin</span></div>
+                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;color:#64748b;">Bleu Glacial</div>
                 </div>
-                <div onclick="setDynamicTheme('red','#ef4444')" class="focusable" tabindex="0" id="dt-red" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;">
+                <!-- Rang 2 Chunin -->
+                <div onclick="setDynamicTheme('red','#ef4444')" class="focusable" tabindex="0" id="dt-red" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;position:relative;">
                     <div style="height:36px;background:linear-gradient(135deg,#0a0203,#2d0a0a);display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;border-radius:50%;background:#ef4444;"></div></div>
-                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;">Rouge Écarlate</div>
+                    <div id="dt-red-lock" style="position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;border-radius:8px;flex-direction:column;gap:2px;"><span style="font-size:14px;">🔒</span><span style="font-size:8px;color:#94a3b8;font-weight:700;">Chunin</span></div>
+                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;color:#64748b;">Rouge Ecarlate</div>
                 </div>
-                <div onclick="setDynamicTheme('green','#22c55e')" class="focusable" tabindex="0" id="dt-green" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;">
+                <!-- Rang 3 Jonin -->
+                <div onclick="setDynamicTheme('green','#22c55e')" class="focusable" tabindex="0" id="dt-green" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;position:relative;">
                     <div style="height:36px;background:linear-gradient(135deg,#020a05,#0a2d16);display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;border-radius:50%;background:#22c55e;"></div></div>
-                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;">Vert Forêt</div>
+                    <div id="dt-green-lock" style="position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;border-radius:8px;flex-direction:column;gap:2px;"><span style="font-size:14px;">🔒</span><span style="font-size:8px;color:#94a3b8;font-weight:700;">Jonin</span></div>
+                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;color:#64748b;">Vert Foret</div>
                 </div>
-                <div onclick="setDynamicTheme('purple','#8b5cf6')" class="focusable" tabindex="0" id="dt-purple" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;">
+                <!-- Rang 4 Anbu -->
+                <div onclick="setDynamicTheme('purple','#8b5cf6')" class="focusable" tabindex="0" id="dt-purple" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;position:relative;">
                     <div style="height:36px;background:linear-gradient(135deg,#05020a,#1a0a2d);display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;border-radius:50%;background:#8b5cf6;"></div></div>
-                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;">Violet Mystique</div>
+                    <div id="dt-purple-lock" style="position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;border-radius:8px;flex-direction:column;gap:2px;"><span style="font-size:14px;">🔒</span><span style="font-size:8px;color:#94a3b8;font-weight:700;">Anbu</span></div>
+                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;color:#64748b;">Violet Mystique</div>
                 </div>
-                <div onclick="setDynamicTheme('gold','#f59e0b')" class="focusable" tabindex="0" id="dt-gold" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;">
+                <!-- Rang 5 Hokage -->
+                <div onclick="setDynamicTheme('gold','#f59e0b')" class="focusable" tabindex="0" id="dt-gold" style="border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;position:relative;">
                     <div style="height:36px;background:linear-gradient(135deg,#0a0803,#2d200a);display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;border-radius:50%;background:#f59e0b;"></div></div>
-                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;">Or Légendaire</div>
+                    <div id="dt-gold-lock" style="position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;border-radius:8px;flex-direction:column;gap:2px;"><span style="font-size:14px;">🔒</span><span style="font-size:8px;color:#94a3b8;font-weight:700;">Hokage</span></div>
+                    <div style="padding:5px;text-align:center;font-size:9px;font-weight:700;color:#64748b;">Or Legendaire</div>
                 </div>
             </div>
         </div>
@@ -1759,7 +1770,7 @@ function loadTheme(){
     var t=localStorage.getItem('otaku_theme')||'dark';
     setTheme(t);
 }
-function loadSettings(){
+function loadSettings(){updateThemeLocks();
     sV('settingsView');
     uLU();
     checkNotifStatus();
@@ -2639,9 +2650,10 @@ function lS(ep,sn){
     // XP episode
     if(typeof xpGain==='function')xpGain('episode_watch','Episode '+ep+' — '+cTitle);
     if(typeof trackWeekActivity==='function')trackWeekActivity();
-    // Binge watch check apres 30s
+    // Binge: NE PAS lancer ici - attend message de fin d'épisode via postMessage
     clearInterval(bingeTimer);
-    setTimeout(function(){if(typeof checkBinge==='function')checkBinge();},30000);
+    var existing=document.getElementById('binge-countdown');
+    if(existing)existing.remove();
 
     // URLs des différents lecteurs
     var urlVidsrc, urlVidsrc2, urlDavideo;
@@ -2720,12 +2732,15 @@ async function fB(reset){
                 MI+'/covers/'+m.id+'/'+cr.attributes.fileName+'.512.jpg':PH;
             var iF=fIds.indexOf(m.id)>-1;
             return '<div class="manga-dex-card focusable" tabindex="0" onclick="oMD(\''+m.id+'\')" onkeydown="if(event.key===\'Enter\')oMD(\''+m.id+'\')">'+
+                '<div style="position:relative;">'+
                 '<img src="'+cu+'" loading="lazy" '+
-                // Si l'image MangaDex échoue → placeholder OtAkU+ immédiat, pas de fallback vers leur site
                 'onerror="this.onerror=null;this.src=\''+PH+'\';" '+
-                'style="background:#0f172a;">'+
+                'style="width:100%;aspect-ratio:2/3;object-fit:cover;display:block;background:#0f172a;">'+
+                // Overlay blanc en bas pour couvrir le logo MangaDex
+                '<div style="position:absolute;bottom:0;left:0;right:0;height:35%;background:linear-gradient(to bottom,transparent,#0f172a);"></div>'+
                 '<div class="card-badge">OtAkU+</div>'+
                 '<button class="card-heart'+(iF?' liked':'')+'" onclick="event.stopPropagation();tFav(\''+m.id+'\',\''+tt.replace(/'/g,"\\'")+'\',\''+cu+'\')" id="fav-'+m.id+'">'+HEART_SVG+'</button>'+
+                '</div>'+
                 '<p>'+tt+'</p></div>';
         }).join('');
         bOff+=24;bLoaded=true;
@@ -2856,16 +2871,44 @@ function closeReader(){document.getElementById('readerView').style.display='none
         var ps=document.getElementById('profileSelector');
         if(auth&&!auth.classList.contains('hidden'))return;
         if(ps&&ps.classList.contains('open'))return;
-        sleepActive=true;
-        document.getElementById('sleepScreen').classList.add('active');
-        // Stopper le player pour économiser ressources
-        var fr=document.getElementById('vidFrame');
-        if(fr&&fr.src)fr.src='';
-        loadSleepData().then(function(){
-            startSleepBg();
-            startSleepClock();
-        });
+
+        // Prévenir l'utilisateur avant d'activer le mode veille
+        var warn=document.getElementById('sleep-warning');
+        if(!warn){
+            warn=document.createElement('div');
+            warn.id='sleep-warning';
+            warn.style.cssText='position:fixed;bottom:130px;left:50%;transform:translateX(-50%);background:rgba(10,17,40,0.97);border:2px solid var(--primary);border-radius:14px;padding:14px 20px;z-index:5003;display:flex;align-items:center;gap:14px;font-size:13px;font-weight:700;backdrop-filter:blur(12px);white-space:nowrap;';
+            warn.innerHTML='<span style="font-size:20px;">🌙</span><div>Mode veille dans <span id="sleep-count" style="color:var(--primary);">30</span>s<br><span style="font-size:10px;color:#94a3b8;">touche l\'ecran pour annuler</span></div><button onclick="cancelSleep()" style="background:#334155;border:none;color:white;padding:6px 12px;border-radius:8px;font-size:11px;cursor:pointer;font-family:Inter,sans-serif;">Annuler</button>';
+            document.body.appendChild(warn);
+        }
+        warn.style.display='flex';
+        var sleepCount=30;
+        var sleepWarnTimer=setInterval(function(){
+            sleepCount--;
+            var sc=document.getElementById('sleep-count');
+            if(sc)sc.textContent=sleepCount;
+            if(sleepCount<=0){
+                clearInterval(sleepWarnTimer);
+                warn.style.display='none';
+                // Activer vraiment le mode veille
+                sleepActive=true;
+                document.getElementById('sleepScreen').classList.add('active');
+                var fr=document.getElementById('vidFrame');
+                if(fr&&fr.src)fr.src='';
+                loadSleepData().then(function(){
+                    startSleepBg();
+                    startSleepClock();
+                });
+            }
+        },1000);
+        warn._timer=sleepWarnTimer;
     }
+
+    window.cancelSleep=function(){
+        var warn=document.getElementById('sleep-warning');
+        if(warn){clearInterval(warn._timer);warn.style.display='none';}
+        sleepTimeout=setTimeout(activateSleep, 3*60*1000);
+    };
 
     function loadSleepData(){
         if(sleepDataLoaded&&sleepAnimes.length)return Promise.resolve();
@@ -3601,7 +3644,18 @@ function trackWeekActivity(){
 
 
 // ── THÈMES DYNAMIQUES ──
+// Rangs requis par thème
+var THEME_REQS={orange:0,blue:1,red:2,green:3,purple:4,gold:5};
+var THEME_RANG_NAMES={0:'Passant',1:'Genin',2:'Chunin',3:'Jonin',4:'Anbu',5:'Hokage'};
+
 function setDynamicTheme(name, color){
+    var req=THEME_REQS[name]||0;
+    var data=xpGetData();
+    var userRang=xpGetRang(data.xp);
+    if(userRang<req){
+        showToast('Debloquer a partir du rang '+THEME_RANG_NAMES[req]+' !');
+        return;
+    }
     localStorage.setItem('otaku_dyn_theme', name);
     localStorage.setItem('otaku_dyn_color', color);
     document.documentElement.style.setProperty('--primary', color);
@@ -3618,6 +3672,26 @@ function setDynamicTheme(name, color){
     showToast('Thème ' + name + ' appliqué !');
 }
 
+
+// Mettre à jour les cadenas des thèmes selon le rang
+function updateThemeLocks(){
+    var data=xpGetData();
+    var userRang=xpGetRang(data.xp);
+    var locks={blue:1,red:2,green:3,purple:4,gold:5};
+    Object.entries(locks).forEach(function(e){
+        var name=e[0],req=e[1];
+        var lockEl=document.getElementById('dt-'+name+'-lock');
+        var card=document.getElementById('dt-'+name);
+        if(lockEl&&card){
+            if(userRang>=req){
+                lockEl.style.display='none';
+                card.querySelector('div:last-child').style.color='';
+            } else {
+                lockEl.style.display='flex';
+            }
+        }
+    });
+}
 function loadDynamicTheme(){
     var color = localStorage.getItem('otaku_dyn_color') || '#f97316';
     var name = localStorage.getItem('otaku_dyn_theme') || 'orange';
@@ -3661,10 +3735,11 @@ function applyDataSaver(on){
     window._dataSaver = on;
 }
 
-function loadWatchParty(){ sV('watchPartyView'); }
+function loadWatchParty(){sV('watchPartyView');}
 
-// ══ WATCH PARTY ══
+// ══ WATCH PARTY — Firebase Realtime ══
 var wpRoom=null,wpName='',wpInterval=null;
+var WP_DB='https://otakuplus-wp-default-rtdb.firebaseio.com';
 
 function wpCreate(){
     var name=(document.getElementById('wp-create-name')||{}).value||'';
@@ -3673,10 +3748,11 @@ function wpCreate(){
     if(!name||!anime){showToast('Remplis tous les champs');return;}
     wpName=name;
     var code='WP-'+Math.floor(1000+Math.random()*9000);
-    wpRoom={code:code,anime:anime,host:name,members:[{name:name,isHost:true}],messages:[]};
-    localStorage.setItem('wp_'+code,JSON.stringify(wpRoom));
-    wpEnterRoom(code);
-    showToast('Salon cree : '+code);
+    var room={code:code,anime:anime,host:name,messages:{},created:Date.now()};
+    room['mb_'+name.replace(/[^a-zA-Z0-9]/g,'_')]={name:name,isHost:true};
+    fetch(WP_DB+'/rooms/'+code+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(room)})
+    .then(function(){wpRoom=room;localStorage.setItem('wp_'+code,JSON.stringify(room));wpEnterRoom(code);showToast('Salon cree : '+code);})
+    .catch(function(){wpRoom=room;localStorage.setItem('wp_'+code,JSON.stringify(room));wpEnterRoom(code);showToast('Salon cree : '+code);});
 }
 
 function wpJoin(){
@@ -3685,15 +3761,16 @@ function wpJoin(){
     name=name.trim();code=code.trim().toUpperCase();
     if(!name||!code){showToast('Remplis tous les champs');return;}
     wpName=name;
-    var saved=localStorage.getItem('wp_'+code);
-    if(!saved){showToast('Salon introuvable');return;}
-    wpRoom=JSON.parse(saved);
-    if(!wpRoom.members.find(function(m){return m.name===name;})){
-        wpRoom.members.push({name:name,isHost:false});
+    showToast('Connexion...');
+    fetch(WP_DB+'/rooms/'+code+'.json').then(function(r){return r.json();}).then(function(room){
+        if(!room||room.error||room===null){showToast('Salon introuvable. Verifie le code.');return;}
+        wpRoom=room;
+        var mbKey='mb_'+name.replace(/[^a-zA-Z0-9]/g,'_');
+        fetch(WP_DB+'/rooms/'+code+'/'+mbKey+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,isHost:false})}).catch(function(){});
         localStorage.setItem('wp_'+code,JSON.stringify(wpRoom));
-    }
-    wpEnterRoom(code);
-    showToast('Salon rejoint !');
+        wpEnterRoom(code);
+        showToast('Salon rejoint !');
+    }).catch(function(){showToast('Erreur connexion. Verifie le code.');});
 }
 
 function wpEnterRoom(code){
@@ -3701,37 +3778,32 @@ function wpEnterRoom(code){
     var room=document.getElementById('wp-room');
     if(lobby)lobby.style.display='none';
     if(room)room.style.display='flex';
-    var rc=document.getElementById('wp-room-code');
-    var ra=document.getElementById('wp-room-anime');
-    if(rc)rc.textContent=code;
-    if(ra)ra.textContent=wpRoom.anime;
+    var rc=document.getElementById('wp-room-code');if(rc)rc.textContent=code;
+    var ra=document.getElementById('wp-room-anime');if(ra)ra.textContent=wpRoom.anime||'';
     wpRefresh();
     clearInterval(wpInterval);
     wpInterval=setInterval(function(){
-        var saved=localStorage.getItem('wp_'+code);
-        if(saved)wpRoom=JSON.parse(saved);
-        wpRefresh();
-    },1500);
+        fetch(WP_DB+'/rooms/'+code+'.json').then(function(r){return r.json();}).then(function(d){
+            if(d&&d!==null&&!d.error){wpRoom=d;wpRefresh();}
+        }).catch(function(){});
+    },2000);
     var inp=document.getElementById('wp-chat-input');
     if(inp)inp.onkeydown=function(e){if(e.key==='Enter')wpSendMsg();};
 }
 
 function wpRefresh(){
     if(!wpRoom)return;
+    var members=Object.entries(wpRoom).filter(function(e){return e[0].startsWith('mb_');}).map(function(e){return e[1];});
     var ml=document.getElementById('wp-members-list');
-    if(ml)ml.innerHTML=(wpRoom.members||[]).map(function(m){
-        return '<div style="background:var(--card2);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;">'+(m.isHost?'<span style="color:var(--primary);">★ </span>':'')+m.name+'</div>';
-    }).join('');
+    if(ml)ml.innerHTML=members.map(function(m){return '<div style="background:var(--card2);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;">'+(m.isHost?'<span style="color:var(--primary);">★ </span>':'')+m.name+'</div>';}).join('');
     var mc=document.getElementById('wp-members-count');
-    if(mc)mc.textContent=(wpRoom.members||[]).length+' membre'+((wpRoom.members||[]).length>1?'s':'');
+    if(mc)mc.textContent=members.length+' membre'+(members.length>1?'s':'');
     var msgs=document.getElementById('wp-chat-msgs');
-    if(msgs){
-        msgs.innerHTML=(wpRoom.messages||[]).map(function(m){
+    if(msgs&&wpRoom.messages){
+        var ml2=Object.values(wpRoom.messages).sort(function(a,b){return a.time-b.time;});
+        msgs.innerHTML=ml2.map(function(m){
             var isMe=m.author===wpName;
-            return '<div style="display:flex;flex-direction:column;align-items:'+(isMe?'flex-end':'flex-start')+';gap:2px;">'+
-                '<div style="font-size:9px;color:#64748b;">'+m.author+'</div>'+
-                '<div style="background:'+(isMe?'var(--primary)':'var(--card2)')+';color:white;padding:6px 10px;border-radius:10px;font-size:12px;max-width:80%;">'+m.text+'</div>'+
-            '</div>';
+            return '<div style="display:flex;flex-direction:column;align-items:'+(isMe?'flex-end':'flex-start')+';gap:2px;"><div style="font-size:9px;color:#64748b;">'+m.author+'</div><div style="background:'+(isMe?'var(--primary)':'var(--card2)')+';color:white;padding:6px 10px;border-radius:10px;font-size:12px;max-width:80%;">'+m.text+'</div></div>';
         }).join('');
         msgs.scrollTop=msgs.scrollHeight;
     }
@@ -3741,20 +3813,24 @@ function wpSendMsg(){
     var inp=document.getElementById('wp-chat-input');
     var txt=inp?inp.value.trim():'';
     if(!txt||!wpRoom)return;
-    wpRoom.messages=wpRoom.messages||[];
-    wpRoom.messages.push({author:wpName,text:txt,time:Date.now()});
-    if(wpRoom.messages.length>100)wpRoom.messages=wpRoom.messages.slice(-100);
-    localStorage.setItem('wp_'+wpRoom.code,JSON.stringify(wpRoom));
-    inp.value='';
+    var msg={author:wpName,text:txt,time:Date.now()};
+    var msgId='msg_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+    fetch(WP_DB+'/rooms/'+wpRoom.code+'/messages/'+msgId+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(msg)}).catch(function(){});
+    if(!wpRoom.messages)wpRoom.messages={};
+    wpRoom.messages[msgId]=msg;
     wpRefresh();
+    inp.value='';
 }
 
 function wpLeave(){
-    clearInterval(wpInterval);wpRoom=null;wpName='';
-    var lobby=document.getElementById('wp-lobby');
-    var room=document.getElementById('wp-room');
-    if(lobby)lobby.style.display='flex';
-    if(room)room.style.display='none';
+    clearInterval(wpInterval);
+    if(wpRoom&&wpName){
+        var mbKey='mb_'+wpName.replace(/[^a-zA-Z0-9]/g,'_');
+        fetch(WP_DB+'/rooms/'+wpRoom.code+'/'+mbKey+'.json',{method:'DELETE'}).catch(function(){});
+    }
+    wpRoom=null;wpName='';
+    var lobby=document.getElementById('wp-lobby');var room=document.getElementById('wp-room');
+    if(lobby)lobby.style.display='flex';if(room)room.style.display='none';
     showToast('Tu as quitte le salon');
 }
 
