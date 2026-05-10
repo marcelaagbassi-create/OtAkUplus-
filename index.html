@@ -55,11 +55,11 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;margi
 .ps-title{font-size:20px;font-weight:900;margin-bottom:6px;}
 .ps-sub{font-size:12px;color:#94a3b8;margin-bottom:28px;}
 .ps-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%;max-width:340px;margin-bottom:20px;}
-.ps-card{background:var(--card);border-radius:14px;padding:18px 10px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;}
+.ps-card{background:var(--card);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:0;cursor:pointer;border:2px solid transparent;transition:all 0.2s;padding:0;}
 .ps-card:hover,.ps-card:focus{border-color:var(--primary);transform:scale(1.04);}
 .ps-card.add-card{border:2px dashed rgba(255,255,255,0.15);color:#64748b;}
-.ps-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;border:2px solid rgba(255,255,255,0.1);overflow:hidden;position:relative;}
-.ps-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.ps-avatar{width:100%;aspect-ratio:1/1;border-radius:0;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900;border:none;overflow:hidden;position:relative;}
+.ps-avatar img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:0;}
 .ps-name{font-size:12px;font-weight:700;text-align:center;}
 .ps-del{position:absolute;top:6px;right:6px;background:rgba(239,68,68,0.85);border:none;border-radius:50%;width:18px;height:18px;color:white;font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center;}
 .ps-card:hover .ps-del{display:flex;}
@@ -630,6 +630,25 @@ footer.visible{opacity:1;transform:translateX(-50%) translateY(0);}
 /* TOAST */
 .toast{position:fixed;top:76px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.98);border:2px solid var(--primary);border-radius:12px;padding:10px 18px;font-size:12px;font-weight:700;z-index:5000;white-space:nowrap;transition:opacity 0.4s;pointer-events:none;}
 .toast.hidden{opacity:0;}
+
+/* BLOQUER MARQUE MANGADEX PARTOUT */
+img[src*="mangadex"]{
+    position:relative;
+}
+/* Overlay sur toutes les images covers MangaDex */
+.manga-dex-card img::after,
+.fav-card img::after,
+.history-item img::after{
+    content:'';
+    position:absolute;
+    bottom:0;left:0;right:0;
+    height:40%;
+    background:linear-gradient(to bottom,transparent,#0f172a);
+}
+/* Placeholder SVG OtAkU+ si image échoue */
+img[src*="mangadex.org"]{
+    background:#0f172a;
+}
 </style>
 </head>
 <body>
@@ -2737,7 +2756,8 @@ async function fB(reset){
                 'onerror="this.onerror=null;this.src=\''+PH+'\';" '+
                 'style="width:100%;aspect-ratio:2/3;object-fit:cover;display:block;background:#0f172a;">'+
                 // Overlay blanc en bas pour couvrir le logo MangaDex
-                '<div style="position:absolute;bottom:0;left:0;right:0;height:35%;background:linear-gradient(to bottom,transparent,#0f172a);"></div>'+
+                '<div style="position:absolute;bottom:0;left:0;right:0;height:55%;background:linear-gradient(to bottom,transparent 0%,rgba(15,23,42,0.7) 40%,#0f172a 100%);pointer-events:none;"></div>'+
+                '<div style="position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:7px;font-weight:900;color:var(--primary);letter-spacing:2px;z-index:2;">OtAkU+</div>'+
                 '<div class="card-badge">OtAkU+</div>'+
                 '<button class="card-heart'+(iF?' liked':'')+'" onclick="event.stopPropagation();tFav(\''+m.id+'\',\''+tt.replace(/'/g,"\\'")+'\',\''+cu+'\')" id="fav-'+m.id+'">'+HEART_SVG+'</button>'+
                 '</div>'+
@@ -2845,7 +2865,7 @@ function closeReader(){document.getElementById('readerView').style.display='none
 
 // ── MODE VEILLE ──
 (function(){
-    var IDLE_DELAY=3*60*1000;
+    var IDLE_DELAY=30*60*1000;
     var idleTimer=null;
     var sleepActive=false;
     var sleepBgTimer=null;
@@ -2907,7 +2927,7 @@ function closeReader(){document.getElementById('readerView').style.display='none
     window.cancelSleep=function(){
         var warn=document.getElementById('sleep-warning');
         if(warn){clearInterval(warn._timer);warn.style.display='none';}
-        sleepTimeout=setTimeout(activateSleep, 3*60*1000);
+        sleepTimeout=setTimeout(activateSleep, 30*60*1000);
     };
 
     function loadSleepData(){
@@ -3257,18 +3277,18 @@ function renderProfiles(){
     var grid=document.getElementById('psGrid');
     grid.innerHTML=profiles.map(function(p,i){
         var avHTML=p.avatarImg?
-            '<img src="'+p.avatarImg+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">':
-            p.avatar;
+            '<img src="'+p.avatarImg+'" style="width:100%;height:100%;object-fit:cover;object-position:top;">':
+            '<span style="font-size:40px;">'+p.avatar+'</span>';
         return '<div class="ps-card focusable" tabindex="0" onclick="selectProfile('+i+')" style="position:relative;">'+
             '<div class="ps-avatar" style="background:'+(p.color||'#1e293b')+';">'+avHTML+'</div>'+
-            '<div class="ps-name">'+p.name+'</div>'+
-            (profiles.length>1?'<button class="ps-del" onclick="event.stopPropagation();deleteProfile('+i+')">✕</button>':'')+
+            '<div style="font-size:11px;font-weight:700;padding:6px 8px;text-align:center;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+p.name+'</div>'+
+            (profiles.length>1?'<button class="ps-del" onclick="event.stopPropagation();deleteProfile('+i+')" style="display:flex;">✕</button>':'')+
         '</div>';
     }).join('');
     if(profiles.length<4){
-        grid.innerHTML+='<div class="ps-card add-card focusable" tabindex="0" onclick="openNewProfile()">'+
-            '<div class="ps-avatar" style="background:#1e293b;font-size:28px;">＋</div>'+
-            '<div class="ps-name" style="color:#64748b;">Ajouter</div>'+
+        grid.innerHTML+='<div class="ps-card add-card focusable" tabindex="0" onclick="openNewProfile()" style="padding:18px 10px;gap:9px;">'+
+            '<div style="font-size:36px;color:#64748b;">＋</div>'+
+            '<div style="font-size:11px;font-weight:700;color:#64748b;">Ajouter</div>'+
         '</div>';
     }
 }
@@ -3605,6 +3625,36 @@ function getWeekNumber(){
 
 // ── BINGE-WATCHING AUTO ──
 var bingeTimer=null;
+var bingeProgressTimer=null;
+
+// Écouter les messages des iframes (fin d'épisode)
+window.addEventListener('message',function(e){
+    if(!e.data)return;
+    var d=typeof e.data==='string'?e.data:JSON.stringify(e.data);
+    // Détecter fin de vidéo via différents formats de message
+    if(d.indexOf('ended')>-1||d.indexOf('finish')>-1||d.indexOf('complete')>-1||d.indexOf('end')>-1){
+        if(localStorage.getItem('otaku_binge')==='1'){
+            checkBinge();
+        }
+    }
+});
+
+// Surveiller la barre de progression de l'iframe via polling
+function startBingeProgressWatch(){
+    clearInterval(bingeProgressTimer);
+    if(localStorage.getItem('otaku_binge')!=='1')return;
+    var checkCount=0;
+    bingeProgressTimer=setInterval(function(){
+        checkCount++;
+        // Après 22 minutes (1320s) on considère que l'épisode est bientôt fini
+        // et on active le countdown
+        if(checkCount>=1320){
+            clearInterval(bingeProgressTimer);
+            checkBinge();
+        }
+    },1000);
+}
+
 function toggleBinge(){
     var on=localStorage.getItem('otaku_binge')!=='1';
     localStorage.setItem('otaku_binge',on?'1':'0');
@@ -3618,11 +3668,25 @@ function checkBinge(){
     if(localStorage.getItem('otaku_binge')!=='1')return;
     var nextEp=cEp+1;if(nextEp>cEpN)return;
     var existing=document.getElementById('binge-countdown');if(existing)existing.remove();
+
+    // Afficher le countdown DANS la zone du lecteur (pas en bas)
+    var playerTop=document.getElementById('playerTop');
     var cnt=document.createElement('div');
     cnt.id='binge-countdown';
-    cnt.style.cssText='position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(10,17,40,0.97);border:2px solid var(--primary);border-radius:14px;padding:14px 20px;z-index:5002;display:flex;align-items:center;gap:14px;font-size:13px;font-weight:700;backdrop-filter:blur(12px);white-space:nowrap;';
-    cnt.innerHTML='<div id="binge-num" style="font-size:24px;font-weight:900;color:var(--primary);">15</div><div>Episode '+nextEp+' dans...<br><span style="font-size:10px;color:#94a3b8;">appuie pour annuler</span></div><button onclick="clearInterval(bingeTimer);this.parentNode.remove();" style="background:#334155;border:none;color:white;padding:6px 12px;border-radius:8px;font-size:11px;cursor:pointer;font-family:Inter,sans-serif;">Annuler</button>';
+    cnt.style.cssText='position:fixed;bottom:200px;left:50%;transform:translateX(-50%);background:rgba(2,6,23,0.96);border:2px solid var(--primary);border-radius:16px;padding:16px 22px;z-index:5002;display:flex;align-items:center;gap:14px;font-size:13px;font-weight:700;backdrop-filter:blur(16px);white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.6);';
+    cnt.innerHTML=
+        '<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">'+
+            '<div id="binge-num" style="font-size:32px;font-weight:900;color:var(--primary);line-height:1;">15</div>'+
+            '<div style="font-size:9px;color:#94a3b8;font-weight:700;">secondes</div>'+
+        '</div>'+
+        '<div>'+
+            '<div style="font-weight:900;font-size:13px;">Episode '+nextEp+' suivant</div>'+
+            '<div style="font-size:10px;color:#94a3b8;margin-top:2px;">'+cTitle+'</div>'+
+        '</div>'+
+        '<button onclick="clearInterval(bingeTimer);clearInterval(bingeProgressTimer);document.getElementById(\'binge-countdown\').remove();" '+
+        'style="background:#334155;border:none;color:white;padding:8px 14px;border-radius:10px;font-size:11px;cursor:pointer;font-family:Inter,sans-serif;font-weight:700;">Annuler</button>';
     document.body.appendChild(cnt);
+
     var count=15;
     clearInterval(bingeTimer);
     bingeTimer=setInterval(function(){
