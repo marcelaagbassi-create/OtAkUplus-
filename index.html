@@ -51,18 +51,21 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;margi
 .ps-bg{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);gap:3px;opacity:0.15;filter:blur(2px);transform:scale(1.05);}
 .ps-bg img{width:100%;height:100%;object-fit:cover;}
 .ps-bg-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(2,6,23,0.7),rgba(2,6,23,0.85));}
-.ps-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:100%;}
-.ps-title{font-size:20px;font-weight:900;margin-bottom:6px;}
-.ps-sub{font-size:12px;color:#94a3b8;margin-bottom:28px;}
-.ps-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%;max-width:340px;margin-bottom:20px;}
-.ps-card{background:var(--card);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:0;cursor:pointer;border:2px solid transparent;transition:all 0.2s;padding:0;}
-.ps-card:hover,.ps-card:focus{border-color:var(--primary);transform:scale(1.04);}
-.ps-card.add-card{border:2px dashed rgba(255,255,255,0.15);color:#64748b;}
-.ps-avatar{width:100%;aspect-ratio:1/1;border-radius:0;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900;border:none;overflow:hidden;position:relative;}
-.ps-avatar img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:0;}
-.ps-name{font-size:12px;font-weight:700;text-align:center;}
-.ps-del{position:absolute;top:6px;right:6px;background:rgba(239,68,68,0.85);border:none;border-radius:50%;width:18px;height:18px;color:white;font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center;}
+/* PROFIL SELECTOR STYLE NETFLIX */
+#profileSelector{position:fixed;inset:0;background:#000;z-index:9999;display:none;overflow:hidden;}
+#profileSelector.open{display:block;}
+.ps-content{position:relative;z-index:2;}
+.ps-title{display:none;}
+.ps-sub{display:none;}
+.ps-grid{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+.ps-card{display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;border:2px solid transparent;border-radius:6px;transition:all 0.2s;padding:0;background:transparent;width:80px;position:relative;}
+.ps-card:hover,.ps-card:focus{border-color:white;transform:scale(1.08);}
+.ps-card.add-card{color:#fff;width:80px;}
+.ps-card .ps-del{display:none;position:absolute;top:-4px;right:-4px;background:rgba(239,68,68,0.9);border:none;border-radius:50%;width:18px;height:18px;color:white;font-size:9px;cursor:pointer;align-items:center;justify-content:center;z-index:2;}
 .ps-card:hover .ps-del{display:flex;}
+.ps-avatar{width:80px;height:80px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;overflow:hidden;position:relative;border:none;flex-shrink:0;}
+.ps-avatar img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:4px;}
+.ps-name{font-size:11px;font-weight:700;text-align:center;color:rgba(255,255,255,0.85);width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* GALERIE AVATARS MANGA */
 #avatarGalleryModal{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10002;display:none;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:60px;}
@@ -717,14 +720,31 @@ img[src*="mangadex.org"]{
 
 <!-- PROFILE SELECTOR -->
 <div id="profileSelector">
-    <!-- Fond manga animé -->
-    <div class="ps-bg" id="psBg"></div>
-    <div class="ps-bg-overlay"></div>
-    <div class="ps-content">
-        <div class="ps-title">Qui regarde ? 👀</div>
-        <div class="ps-sub">Choisis ton profil</div>
-        <div class="ps-grid" id="psGrid"></div>
-        <button class="auth-btn focusable" tabindex="0" style="max-width:200px;font-size:12px;background:#334155;" onclick="logoutAuth()">← CHANGER DE COMPTE</button>
+    <!-- IMAGE ANIME PLEIN ÉCRAN qui défile -->
+    <div id="ps-hero-img" style="position:absolute;inset:0;background-size:cover;background-position:center top;transition:background-image 1s ease;"></div>
+    <!-- Dégradé bas -->
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(2,6,23,0.1) 0%,rgba(2,6,23,0.2) 40%,rgba(2,6,23,0.85) 65%,rgba(2,6,23,0.98) 100%);"></div>
+
+    <!-- BADGE OtAkU+ en haut -->
+    <div style="position:absolute;top:28px;left:50%;transform:translateX(-50%);font-size:22px;font-weight:900;color:var(--primary);letter-spacing:-1px;z-index:2;">OtAkU+</div>
+
+    <!-- TITRE ANIME en bas de l'image -->
+    <div style="position:absolute;top:52%;left:50%;transform:translateX(-50%);text-align:center;z-index:2;width:90%;">
+        <div id="ps-anime-badge" style="font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;"></div>
+        <div id="ps-anime-title" style="font-size:22px;font-weight:900;line-height:1.2;text-shadow:0 2px 12px rgba(0,0,0,0.8);"></div>
+    </div>
+
+    <!-- CONTENU BAS — Profils compacts style Netflix -->
+    <div class="ps-content" style="position:absolute;bottom:0;left:0;right:0;padding:0 20px 40px;z-index:3;">
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.7);text-align:center;margin-bottom:16px;letter-spacing:0.5px;">Choisissez votre profil</div>
+
+        <!-- Grille profils compacts -->
+        <div class="ps-grid" id="psGrid" style="display:flex;gap:16px;justify-content:center;margin-bottom:20px;flex-wrap:wrap;"></div>
+
+        <!-- Bouton Modifier -->
+        <div style="display:flex;justify-content:center;">
+            <button class="focusable" tabindex="0" onclick="logoutAuth()" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.3);color:white;padding:10px 28px;border-radius:6px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:1px;backdrop-filter:blur(8px);">CHANGER DE COMPTE</button>
+        </div>
     </div>
 </div>
 
@@ -3254,20 +3274,71 @@ function showProfileSelector(){
     var ps=document.getElementById('profileSelector');
     ps.classList.add('open');
     renderProfiles();
-    // Charger fond manga aléatoire
-    var mangaIds=[21,11061,40748,38000,33338,38671,51535,58426,1535,16498];
-    var shuffled=mangaIds.sort(function(){return Math.random()-0.5;}).slice(0,12);
-    var bg=document.getElementById('psBg');
-    if(bg){
-        bg.innerHTML='';
-        shuffled.forEach(function(id){
-            var img=document.createElement('img');
-            img.src='https://cdn.myanimelist.net/images/anime/'+id+'/'+id+'l.jpg';
-            fetch('https://api.jikan.moe/v4/anime/'+id).then(function(r){return r.json();}).then(function(d){
-                if(d.data&&d.data.images)img.src=d.data.images.jpg.large_image_url||d.data.images.jpg.image_url;
-            }).catch(function(){});
-            bg.appendChild(img);
-        });
+    // Lancer le défilement d'images plein écran style Netflix
+    startProfileHeroSlider();
+}
+
+// Animes pour le fond du sélecteur de profils
+var PS_ANIME_LIST=[
+    {id:52991, title:'Sousou no Frieren'},
+    {id:58426, title:'Solo Leveling'},
+    {id:40748, title:'Jujutsu Kaisen'},
+    {id:38000, title:'Demon Slayer'},
+    {id:11061, title:'Hunter x Hunter'},
+    {id:51535, title:"Hell's Paradise"},
+    {id:38671, title:'Fire Force'},
+    {id:55791, title:'Oshi no Ko'},
+    {id:16498, title:'Attack on Titan'},
+    {id:1535,  title:'Death Note'},
+];
+var psSliderIdx=0;var psSliderTimer=null;var psAnimeData=[];
+
+async function startProfileHeroSlider(){
+    clearInterval(psSliderTimer);
+    // Charger images via Jikan
+    if(psAnimeData.length===0){
+        for(var i=0;i<PS_ANIME_LIST.length;i++){
+            try{
+                var r=await fetch('https://api.jikan.moe/v4/anime/'+PS_ANIME_LIST[i].id);
+                var d=await r.json();
+                if(d.data){
+                    psAnimeData.push({
+                        title:d.data.title||PS_ANIME_LIST[i].title,
+                        img:d.data.images.jpg.large_image_url||d.data.images.jpg.image_url,
+                        score:d.data.score,
+                        year:d.data.year||''
+                    });
+                }
+            }catch(e){
+                psAnimeData.push({title:PS_ANIME_LIST[i].title,img:'',score:'',year:''});
+            }
+        }
+    }
+    psSliderIdx=Math.floor(Math.random()*psAnimeData.length);
+    showPsSlide(psSliderIdx);
+    psSliderTimer=setInterval(function(){
+        var ps=document.getElementById('profileSelector');
+        if(!ps||!ps.classList.contains('open')){clearInterval(psSliderTimer);return;}
+        psSliderIdx=(psSliderIdx+1)%psAnimeData.length;
+        showPsSlide(psSliderIdx);
+    },6000);
+}
+
+function showPsSlide(idx){
+    var a=psAnimeData[idx];
+    if(!a)return;
+    var hero=document.getElementById('ps-hero-img');
+    if(hero&&a.img){
+        hero.style.backgroundImage='url('+a.img+')';
+        hero.style.backgroundSize='cover';
+        hero.style.backgroundPosition='center top';
+    }
+    var titleEl=document.getElementById('ps-anime-title');
+    var badgeEl=document.getElementById('ps-anime-badge');
+    if(titleEl)titleEl.textContent=a.title;
+    if(badgeEl){
+        if(a.score)badgeEl.innerHTML='<span style="color:var(--primary);">★ '+a.score+'</span>'+(a.year?' &nbsp;·&nbsp; '+a.year:'');
+        else badgeEl.textContent='';
     }
 }
 
@@ -3275,20 +3346,23 @@ function renderProfiles(){
     if(!currentUser)return;
     var profiles=currentUser.profiles||[];
     var grid=document.getElementById('psGrid');
+    if(!grid)return;
     grid.innerHTML=profiles.map(function(p,i){
         var avHTML=p.avatarImg?
-            '<img src="'+p.avatarImg+'" style="width:100%;height:100%;object-fit:cover;object-position:top;">':
-            '<span style="font-size:40px;">'+p.avatar+'</span>';
+            '<img src="'+p.avatarImg+'" alt="">':
+            '<span style="font-size:32px;">'+p.avatar+'</span>';
         return '<div class="ps-card focusable" tabindex="0" onclick="selectProfile('+i+')" style="position:relative;">'+
             '<div class="ps-avatar" style="background:'+(p.color||'#1e293b')+';">'+avHTML+'</div>'+
-            '<div style="font-size:11px;font-weight:700;padding:6px 8px;text-align:center;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+p.name+'</div>'+
+            '<div class="ps-name">'+p.name+'</div>'+
             (profiles.length>1?'<button class="ps-del" onclick="event.stopPropagation();deleteProfile('+i+')" style="display:flex;">✕</button>':'')+
         '</div>';
     }).join('');
     if(profiles.length<4){
-        grid.innerHTML+='<div class="ps-card add-card focusable" tabindex="0" onclick="openNewProfile()" style="padding:18px 10px;gap:9px;">'+
-            '<div style="font-size:36px;color:#64748b;">＋</div>'+
-            '<div style="font-size:11px;font-weight:700;color:#64748b;">Ajouter</div>'+
+        grid.innerHTML+='<div class="ps-card add-card focusable" tabindex="0" onclick="openNewProfile()">'+
+            '<div class="ps-avatar" style="background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.3);">'+
+                '<svg width="28" height="28" viewBox="0 0 24 24" fill="rgba(255,255,255,0.6)"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>'+
+            '</div>'+
+            '<div class="ps-name" style="color:rgba(255,255,255,0.6);">Ajouter</div>'+
         '</div>';
     }
 }
