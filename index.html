@@ -652,6 +652,17 @@ img[src*="mangadex"]{
 img[src*="mangadex.org"]{
     background:#0f172a;
 }
+
+/* GALERIE AVATARS STYLE NETFLIX */
+#avatarGalleryModal{position:fixed;inset:0;background:#000;z-index:10002;display:none;flex-direction:column;overflow:hidden;}
+#avatarGalleryModal.open{display:flex;}
+#agGrid{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+#agGrid::-webkit-scrollbar{display:none;}
+.ag-search{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:10px 14px;color:white;font-family:'Inter',sans-serif;font-size:13px;outline:none;}
+.ag-search::placeholder{color:#64748b;}
+.ag-search:focus{border-color:rgba(255,255,255,0.4);}
+.ag-confirm{display:none;background:white;color:black;border:none;padding:14px 32px;border-radius:6px;font-family:'Inter',sans-serif;font-weight:900;font-size:14px;cursor:pointer;letter-spacing:0.5px;}
+.ag-confirm.show{display:block;}
 </style>
 </head>
 <body>
@@ -684,13 +695,13 @@ img[src*="mangadex.org"]{
 
 <!-- GALERIE AVATARS MANGA -->
 <div id="avatarGalleryModal">
-    <div class="ag-header">
-        <div class="ag-title">🎭 Choisis ton avatar manga</div>
-        <button class="ag-close focusable" tabindex="0" onclick="closeAvatarGallery()">✕</button>
+    <div style="position:sticky;top:0;background:#000;z-index:2;padding:16px 16px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.08);">
+        <div style="font-size:18px;font-weight:900;">Choisir une icône</div>
+        <button style="background:none;border:none;color:white;font-size:20px;cursor:pointer;padding:4px 8px;" onclick="closeAvatarGallery()">✕</button>
     </div>
-    <input class="ag-search focusable" id="agSearch" tabindex="0" type="text" placeholder="🔍 Rechercher un personnage...">
-    <div class="ag-grid" id="agGrid"><div class="ag-load">Chargement des personnages...</div></div>
-    <button class="ag-confirm focusable" id="agConfirm" tabindex="0" onclick="confirmAvatar()">✅ CHOISIR CET AVATAR</button>
+    <input class="ag-search focusable" id="agSearch" tabindex="0" type="text" placeholder="Rechercher un personnage..." style="margin:12px 16px;width:calc(100% - 32px);">
+    <div id="agGrid" style="padding:0 12px 100px;overflow-y:auto;"></div>
+    <button class="ag-confirm focusable" id="agConfirm" tabindex="0" onclick="confirmAvatar()" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);">CHOISIR CET AVATAR</button>
 </div>
 
 <!-- AUTH SCREEN -->
@@ -1226,9 +1237,30 @@ img[src*="mangadex.org"]{
 
 <!-- TÉLÉCHARGEMENTS -->
 <div id="downloadsView" class="view">
-    <h3 class="section-title">⬇️ Téléchargements</h3>
-    <div id="downloadsList" style="padding:14px;display:flex;flex-direction:column;gap:10px;"></div>
-    <div id="downloadsEmpty" class="loading-txt" style="display:none;">Aucun téléchargement pour l'instant.<br><span style="font-size:11px;color:#475569;">Clique sur ⬇️ sur un épisode pour le sauvegarder.</span></div>
+    <h3 class="section-title">Téléchargements</h3>
+
+    <!-- Bandeau info style Netflix -->
+    <div style="margin:0 14px 16px;background:var(--card);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;" onclick="sV('playerView')">
+        <div style="width:44px;height:44px;background:rgba(249,115,22,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="var(--primary)"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        </div>
+        <div style="flex:1;">
+            <div style="font-size:14px;font-weight:900;">Téléchargements hors ligne</div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:2px;">Les épisodes téléchargés s'affichent ici</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#94a3b8"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+    </div>
+
+    <!-- Liste téléchargements -->
+    <div id="downloadsList" style="padding:0 14px;display:flex;flex-direction:column;gap:0;"></div>
+
+    <!-- Vide -->
+    <div id="downloadsEmpty" style="display:none;padding:40px 20px;text-align:center;">
+        <div style="font-size:48px;margin-bottom:16px;">📥</div>
+        <div style="font-size:16px;font-weight:900;margin-bottom:8px;">Aucun téléchargement</div>
+        <div style="font-size:13px;color:#94a3b8;line-height:1.6;">Les épisodes que tu télécharges<br>apparaissent ici pour être regardés<br>sans connexion internet.</div>
+        <button onclick="loadHome()" style="margin-top:20px;background:white;color:black;border:none;padding:12px 28px;border-radius:6px;font-weight:900;font-size:13px;cursor:pointer;font-family:Inter,sans-serif;">TROUVER QUELQUE CHOSE</button>
+    </div>
 </div>
 <div id="settingsView" class="view">
     <h3 class="section-title">Paramètres</h3>
@@ -2425,44 +2457,12 @@ async function loadEpThumbs(max){
 
 function downloadEpN(ep){
     var s=cSn||1;
-    // URL directe de téléchargement
     var streamUrl=cTId?
-        'https://vidsrc.cc/v2/embed/tv/'+cTId+'/'+s+'/'+ep:
-        'https://vidsrc.cc/v2/embed/tv/'+encodeURIComponent(cTitle)+'/'+s+'/'+ep;
-
-    // Créer un lien de téléchargement direct
-    var fileName=cTitle.replace(/[^a-zA-Z0-9]/g,'_')+'_S'+s+'E'+ep+'.mp4';
-
-    // Tentative de téléchargement direct
-    var a=document.createElement('a');
-    a.href=streamUrl;
-    a.download=fileName;
-    a.target='_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    // Sauvegarder dans la liste des téléchargements
-    var dls=JSON.parse(localStorage.getItem('otaku_downloads')||'[]');
-    var exists=dls.some(function(d){return d.malId==cMalId&&d.ep==ep&&d.sn==s;});
-    if(!exists){
-        var cover=document.getElementById('playerBannerImg')?document.getElementById('playerBannerImg').src:'';
-        dls.unshift({
-            title:cTitle,
-            malId:cMalId,
-            ep:ep,
-            sn:s,
-            cover:cover,
-            streamUrl:streamUrl,
-            fileName:fileName,
-            date:Date.now()
-        });
-        if(dls.length>50)dls=dls.slice(0,50);
-        localStorage.setItem('otaku_downloads',JSON.stringify(dls));
-    }
-    showToast('Téléchargement lancé — S'+s+' E'+ep);
+        'https://vidsrc.cc/v2/embed/tv/'+cTId+'/'+s+'/'+ep+'?autoPlay=1':
+        'https://vidsrc.cc/v2/embed/tv/'+encodeURIComponent(cTitle)+'/'+s+'/'+ep+'?autoPlay=1';
+    var cover=document.getElementById('playerBannerImg')?document.getElementById('playerBannerImg').src:'';
+    realDownloadEp(cTitle, cMalId, ep, s, cover, streamUrl);
 }
-
 function downloadEp(){downloadEpN(cEp);}
 
 // ── DAVIDEO LECTEUR NATIF INTÉGRÉ ──
@@ -3068,32 +3068,100 @@ function loadDownloads(){
     var empty=document.getElementById('downloadsEmpty');
     if(!dls.length){list.innerHTML='';empty.style.display='block';return;}
     empty.style.display='none';
+
     list.innerHTML=dls.map(function(d,i){
-        return '<div style="background:var(--card);border-radius:10px;padding:12px;display:flex;gap:12px;align-items:center;border:1px solid rgba(255,255,255,0.06);">'+
-            '<div style="width:48px;height:68px;border-radius:6px;background:#1e293b;flex-shrink:0;overflow:hidden;">'+
-                '<img src="'+d.cover+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">'+
+        // Vérifier si vraiment téléchargé (blob disponible)
+        var isOffline=d.blobUrl||d.cached;
+        return '<div style="display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.06);">'+
+            '<div style="width:60px;height:90px;border-radius:6px;background:#1e293b;flex-shrink:0;overflow:hidden;position:relative;">'+
+                '<img src="'+(d.cover||'')+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">'+
+                (isOffline?'<div style="position:absolute;bottom:3px;right:3px;background:rgba(34,197,94,0.9);border-radius:3px;padding:1px 4px;font-size:7px;font-weight:900;color:white;">HORS LIGNE</div>':'')+
             '</div>'+
             '<div style="flex:1;min-width:0;">'+
-                '<div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+d.title+'</div>'+
-                '<div style="font-size:10px;color:var(--primary);margin-top:2px;">S'+d.sn+' — Épisode '+d.ep+'</div>'+
+                '<div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+d.title+'</div>'+
+                '<div style="font-size:11px;color:var(--primary);margin-top:3px;font-weight:700;">Saison '+d.sn+' — Épisode '+d.ep+'</div>'+
                 '<div style="font-size:10px;color:#64748b;margin-top:2px;">'+new Date(d.date).toLocaleDateString('fr-FR')+'</div>'+
+                (isOffline?
+                    '<div style="font-size:10px;color:#22c55e;margin-top:3px;font-weight:700;">Disponible hors connexion</div>':
+                    '<div style="font-size:10px;color:#f59e0b;margin-top:3px;">En attente de téléchargement</div>'
+                )+
             '</div>'+
-            '<div style="display:flex;flex-direction:column;gap:6px;">'+
-                '<button onclick="playDownload(\''+d.title+'\','+d.malId+','+d.ep+','+d.sn+')" style="background:var(--primary);border:none;color:white;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">▶</button>'+
-                '<button onclick="removeDownload('+i+')" style="background:#334155;border:none;color:#94a3b8;padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;">✕</button>'+
+            '<div style="display:flex;flex-direction:column;gap:6px;align-items:center;">'+
+                '<button onclick="playDownload(\''+d.title.replace(/'/g,"\\'")+'\','+d.malId+','+d.ep+','+d.sn+')" style="background:white;border:none;color:black;padding:8px 14px;border-radius:4px;font-size:11px;font-weight:900;cursor:pointer;font-family:Inter,sans-serif;">▶ LIRE</button>'+
+                '<button onclick="removeDownload('+i+')" style="background:none;border:none;color:#64748b;font-size:10px;cursor:pointer;font-family:Inter,sans-serif;text-decoration:underline;">Supprimer</button>'+
             '</div>'+
         '</div>';
     }).join('');
 }
 
-function playDownload(title,malId,ep,sn){pA(title,malId).then(function(){lS(ep,sn);});}
+// Téléchargement réel via Service Worker cache
+async function realDownloadEp(title, malId, ep, sn, cover, streamUrl){
+    showToast('Téléchargement en cours...');
+    var dlKey='otaku-dl-'+malId+'-s'+sn+'e'+ep;
+
+    // Sauvegarder les métadonnées
+    var dls=JSON.parse(localStorage.getItem('otaku_downloads')||'[]');
+    var exists=dls.some(function(d){return d.malId==malId&&d.ep==ep&&d.sn==sn;});
+    if(!exists){
+        dls.unshift({title:title,malId:malId,ep:ep,sn:sn,cover:cover,streamUrl:streamUrl,date:Date.now(),cached:false,dlKey:dlKey});
+        localStorage.setItem('otaku_downloads',JSON.stringify(dls));
+    }
+
+    // Tenter de cacher via Service Worker
+    if('serviceWorker' in navigator && navigator.serviceWorker.controller){
+        var mc=new MessageChannel();
+        mc.port1.onmessage=function(e){
+            if(e.data.success){
+                // Marquer comme cached
+                var dls2=JSON.parse(localStorage.getItem('otaku_downloads')||'[]');
+                var item=dls2.find(function(d){return d.malId==malId&&d.ep==ep&&d.sn==sn;});
+                if(item){item.cached=true;localStorage.setItem('otaku_downloads',JSON.stringify(dls2));}
+                showToast('Téléchargement terminé ! Disponible hors ligne.');
+            } else {
+                showToast('Téléchargement sauvegardé localement.');
+            }
+        };
+        navigator.serviceWorker.controller.postMessage({type:'CACHE_VIDEO',key:dlKey,url:streamUrl},[mc.port2]);
+    } else {
+        showToast('Episode sauvegardé ! Reconnecte-toi pour le mettre en cache.');
+    }
+}
+
+function playDownload(title,malId,ep,sn){
+    var dls=JSON.parse(localStorage.getItem('otaku_downloads')||'[]');
+    var item=dls.find(function(d){return d.malId==malId&&d.ep==ep&&d.sn==sn;});
+    if(item&&item.cached){
+        // Lire depuis le cache
+        caches.open('otakuplus-v3').then(function(cache){
+            cache.match(item.dlKey).then(function(resp){
+                if(resp){
+                    resp.blob().then(function(blob){
+                        var blobUrl=URL.createObjectURL(blob);
+                        var fr=document.getElementById('vidFrame');
+                        if(fr){fr.src=blobUrl;fr.style.display='block';}
+                        sV('playerView');
+                    });
+                } else {
+                    pA(title,malId).then(function(){lS(ep,sn);});
+                }
+            });
+        });
+    } else {
+        pA(title,malId).then(function(){lS(ep,sn);});
+    }
+}
 
 function removeDownload(idx){
     var dls=JSON.parse(localStorage.getItem('otaku_downloads')||'[]');
+    var item=dls[idx];
+    // Supprimer du cache SW
+    if(item&&item.dlKey&&'caches' in window){
+        caches.open('otakuplus-v3').then(function(c){c.delete(item.dlKey);});
+    }
     dls.splice(idx,1);
     localStorage.setItem('otaku_downloads',JSON.stringify(dls));
     loadDownloads();
-    showToast('Téléchargement supprimé');
+    showToast('Supprimé');
 }
 
 function updateHeroProfil(){
@@ -3113,13 +3181,60 @@ function updateHeroProfil(){
 var agPage=1;var agQuery='';var agSelected=null;var agTarget='main';var agLoading=false;
 var agSearchTimer;
 
+// Catalogue avatars par séries manga/anime
+var AVATAR_CATALOG=[
+    {serie:'Jujutsu Kaisen',chars:[
+        {name:'Gojo Satoru',id:163636},{name:'Yuji Itadori',id:163631},{name:'Megumi Fushiguro',id:163633},
+        {name:'Nobara Kugisaki',id:163634},{name:'Sukuna',id:163638},{name:'Nanami Kento',id:163647}
+    ]},
+    {serie:'Demon Slayer',chars:[
+        {name:'Tanjiro Kamado',id:146157},{name:'Nezuko Kamado',id:146158},{name:'Zenitsu',id:146159},
+        {name:'Inosuke',id:146160},{name:'Giyu Tomioka',id:146162},{name:'Shinobu Kocho',id:146163}
+    ]},
+    {serie:'Attack on Titan',chars:[
+        {name:'Eren Yeager',id:40881},{name:'Mikasa Ackerman',id:40882},{name:'Levi Ackerman',id:40885},
+        {name:'Armin Arlert',id:40883},{name:'Historia Reiss',id:76308},{name:'Erwin Smith',id:40890}
+    ]},
+    {serie:'Naruto',chars:[
+        {name:'Naruto Uzumaki',id:17},{name:'Sasuke Uchiha',id:13},{name:'Kakashi Hatake',id:85},
+        {name:'Itachi Uchiha',id:86},{name:'Hinata Hyuga',id:94},{name:'Sakura Haruno',id:15}
+    ]},
+    {serie:'One Piece',chars:[
+        {name:'Monkey D. Luffy',id:62},{name:'Roronoa Zoro',id:63},{name:'Nami',id:64},
+        {name:'Sanji',id:66},{name:'Boa Hancock',id:1381},{name:'Trafalgar Law',id:2673}
+    ]},
+    {serie:'Hunter x Hunter',chars:[
+        {name:'Gon Freecss',id:30},{name:'Killua Zoldyck',id:31},{name:'Kurapika',id:32},
+        {name:'Leorio',id:33},{name:'Hisoka',id:36},{name:'Neferpitou',id:103}
+    ]},
+    {serie:'Fullmetal Alchemist',chars:[
+        {name:'Edward Elric',id:11},{name:'Alphonse Elric',id:12},{name:'Roy Mustang',id:14},
+        {name:'Riza Hawkeye',id:82},{name:'Winry Rockbell',id:16},{name:'Olivier Armstrong',id:429}
+    ]},
+    {serie:'Death Note',chars:[
+        {name:'Light Yagami',id:80},{name:'L Lawliet',id:71},{name:'Misa Amane',id:91}
+    ]},
+    {serie:'Sousou no Frieren',chars:[
+        {name:'Frieren',id:202611},{name:'Fern',id:202613},{name:'Stark',id:202614}
+    ]},
+    {serie:'Solo Leveling',chars:[
+        {name:'Sung Jinwoo',id:209042},{name:'Cha Hae-In',id:209044}
+    ]},
+];
+var agCatalogImgs={};
+var agTarget='main',agSelected=null,agSelectedName='',agTimer2=null;
+
 function openAvatarGallery(target){
-    agTarget=target||'main';
-    agPage=1;agQuery='';agSelected=null;
-    document.getElementById('agSearch').value='';
-    document.getElementById('agConfirm').classList.remove('show');
+    agTarget=target||'main';agSelected=null;agSelectedName='';
+    var s=document.getElementById('agSearch');if(s)s.value='';
+    var c=document.getElementById('agConfirm');if(c)c.classList.remove('show');
     document.getElementById('avatarGalleryModal').classList.add('open');
-    fetchAvatars(true);
+    renderAvatarCatalog('');
+    var si=document.getElementById('agSearch');
+    if(si)si.oninput=function(){
+        clearTimeout(agTimer2);
+        agTimer2=setTimeout(function(){renderAvatarCatalog(si.value.trim().toLowerCase());},400);
+    };
 }
 
 function closeAvatarGallery(){
@@ -3127,73 +3242,141 @@ function closeAvatarGallery(){
     agSelected=null;
 }
 
-async function fetchAvatars(reset){
-    if(agLoading)return;
-    agLoading=true;
-    var grid=document.getElementById('agGrid');
-    if(reset){grid.innerHTML='<div class="ag-load">🔍 Chargement...</div>';agPage=1;}
-    try{
-        var url='https://api.jikan.moe/v4/characters?page='+agPage+'&limit=24&order_by=favorites&sort=desc';
-        if(agQuery)url='https://api.jikan.moe/v4/characters?q='+encodeURIComponent(agQuery)+'&limit=24';
-        var r=await fetch(url);var d=await r.json();
-        if(!d.data||!d.data.length){if(reset)grid.innerHTML='<div class="ag-load">Aucun résultat.</div>';agLoading=false;return;}
-        var cards=d.data.filter(function(c){return c.images&&c.images.jpg&&c.images.jpg.image_url&&!c.images.jpg.image_url.includes('questionmark');}).map(function(c){
-            var img=c.images.jpg.image_url;
-            var name=c.name||'';
-            return '<div class="ag-card focusable" tabindex="0" onclick="selectAgCard(this,\''+img.replace(/'/g,"\\'")+'\')" onkeydown="if(event.key===\'Enter\')selectAgCard(this,\''+img.replace(/'/g,"\\'")+'\')">'+
-                '<img src="'+img+'" loading="lazy" onerror="this.parentElement.style.display=\'none\'">'+
-                '<p>'+name+'</p></div>';
-        }).join('');
-        if(reset)grid.innerHTML=cards;else grid.innerHTML+=cards;
-        // Bouton charger plus
-        if(!agQuery){
-            var more=document.createElement('div');
-            more.className='ag-load';more.style.cursor='pointer';more.style.color='var(--primary)';more.style.fontWeight='700';
-            more.textContent='▼ Charger plus';
-            more.onclick=function(){agPage++;grid.removeChild(more);fetchAvatars(false);};
-            grid.appendChild(more);
+async function renderAvatarCatalog(query){
+    var grid=document.getElementById('agGrid');if(!grid)return;
+    if(query){
+        grid.innerHTML='<div style="padding:20px;text-align:center;color:#94a3b8;">Recherche en cours...</div>';
+        try{
+            var r=await fetch('https://api.jikan.moe/v4/characters?q='+encodeURIComponent(query)+'&limit=20&order_by=favorites&sort=desc');
+            var d=await r.json();
+            if(!d.data||!d.data.length){grid.innerHTML='<div style="padding:20px;text-align:center;color:#64748b;">Aucun résultat.</div>';return;}
+            var filtered=d.data.filter(function(c){return c.images&&c.images.jpg&&c.images.jpg.image_url&&!c.images.jpg.image_url.includes('questionmark');});
+            grid.innerHTML='<div style="margin-bottom:16px;"><div style="font-size:12px;font-weight:900;color:#94a3b8;letter-spacing:1px;margin-bottom:10px;">RESULTATS</div>'+
+                '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">'+
+                filtered.map(function(c){
+                    var img=c.images.jpg.image_url;
+                    var cname=c.name.replace(/'/g,"\'");
+                    return '<div class="ag-search-card" data-img="'+img+'" data-name="'+cname+'" style="cursor:pointer;">'+
+                        '<div style="width:100%;aspect-ratio:1/1;border-radius:6px;overflow:hidden;border:3px solid transparent;transition:border-color 0.15s;background:#1e293b;">'+
+                            '<img src="'+img+'" style="width:100%;height:100%;object-fit:cover;object-position:top;" loading="lazy" onerror="this.parentElement.parentElement.style.display=\'none\'">'+
+                        '</div>'+
+                        '<div style="font-size:8px;color:#94a3b8;text-align:center;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+c.name+'</div>'+
+                    '</div>';
+                }).join('')+'</div></div>';
+        }catch(e){grid.innerHTML='<div style="padding:20px;text-align:center;color:#ef4444;">Erreur réseau</div>';}
+        return;
+    }
+    // Catalogue par séries
+    var html='';
+    for(var s=0;s<AVATAR_CATALOG.length;s++){
+        var serie=AVATAR_CATALOG[s];
+        html+='<div style="margin-bottom:24px;">'+
+            '<div style="font-size:13px;font-weight:900;margin-bottom:10px;letter-spacing:0.5px;">'+serie.serie+'</div>'+
+            '<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;">';
+        for(var c=0;c<serie.chars.length;c++){
+            var ch=serie.chars[c];
+            var imgSrc=agCatalogImgs[ch.id]||'';
+            html+='<div class="ag-catalog-card" style="flex-shrink:0;width:80px;" data-charid="'+ch.id+'" data-name="'+ch.name.replace(/['"]/g,'')+'">'+
+                '<div style="width:80px;height:80px;border-radius:6px;overflow:hidden;border:3px solid transparent;transition:border-color 0.15s;background:#1e293b;display:flex;align-items:center;justify-content:center;">'+
+                    (imgSrc?'<img src="'+imgSrc+'" style="width:100%;height:100%;object-fit:cover;object-position:top;">':'<div class="vid-spinner" style="width:18px;height:18px;border-width:2px;"></div>')+
+                '</div>'+
+                '<div style="font-size:8px;color:#94a3b8;text-align:center;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:80px;">'+ch.name+'</div>'+
+            '</div>';
         }
-    }catch(e){grid.innerHTML='<div class="ag-load">Erreur de chargement.</div>';}
-    agLoading=false;
+        html+='</div></div>';
+    }
+    grid.innerHTML=html;
+    loadAllAvatarImgs();
 }
 
-function selectAgCard(el,imgUrl){
-    document.querySelectorAll('.ag-card').forEach(function(c){c.classList.remove('selected');});
-    el.classList.add('selected');
-    agSelected=imgUrl;
-    document.getElementById('agConfirm').classList.add('show');
+async function loadAllAvatarImgs(){
+    for(var s=0;s<AVATAR_CATALOG.length;s++){
+        for(var c=0;c<AVATAR_CATALOG[s].chars.length;c++){
+            var ch=AVATAR_CATALOG[s].chars[c];
+            if(agCatalogImgs[ch.id])continue;
+            try{
+                await new Promise(function(r){setTimeout(r,80);});
+                var res=await fetch('https://api.jikan.moe/v4/characters/'+ch.id);
+                var d=await res.json();
+                if(d.data&&d.data.images&&d.data.images.jpg){
+                    var img=d.data.images.jpg.image_url||d.data.images.jpg.small_image_url;
+                    agCatalogImgs[ch.id]=img;
+                    var el=document.querySelector('[data-charid="'+ch.id+'"]');
+                    if(el){
+                        var wrapper=el.querySelector('div');
+                        if(wrapper)wrapper.innerHTML='<img src="'+img+'" style="width:100%;height:100%;object-fit:cover;object-position:top;">';
+                    }
+                }
+            }catch(e){}
+        }
+    }
 }
+
+function pickAvatarFromCard(el,name){
+    var img=agCatalogImgs[el.dataset.charid]||'';
+    var imgEl=el.querySelector('img');
+    if(imgEl)img=imgEl.src;
+    pickAvatar(el,img,name);
+}
+
+
+// Listeners délégués pour les cartes avatar
+document.addEventListener('click', function(e){
+    var card = e.target.closest('.ag-search-card');
+    if(card){
+        var img = card.getAttribute('data-img');
+        var name = card.getAttribute('data-name');
+        pickAvatar(card, img, name);
+        return;
+    }
+    var ccard = e.target.closest('.ag-catalog-card');
+    if(ccard){
+        pickAvatarFromCard(ccard, ccard.getAttribute('data-name'));
+    }
+});
+
+function pickAvatarSearch(el, name){ pickAvatar(el, '', name); }
+
+function pickAvatar(el,imgUrl,name){
+    document.querySelectorAll('[data-charid] div,[data-charid]>div').forEach(function(c){
+        if(c.style)c.style.borderColor='transparent';
+    });
+    var wrapper=el.querySelector('div');
+    if(wrapper)wrapper.style.borderColor='white';
+    agSelected=imgUrl;agSelectedName=name||'';
+    var conf=document.getElementById('agConfirm');if(conf)conf.classList.add('show');
+}
+
+function selectAgCard(el,imgUrl){pickAvatar(el,imgUrl,'');}
+function fetchAvatars(){renderAvatarCatalog('');}
 
 function confirmAvatar(){
     if(!agSelected)return;
     if(agTarget==='main'){
-        // Mettre à jour avatar principal
         document.getElementById('avatarImg').src=agSelected;
         document.getElementById('avatarImg').style.display='block';
         document.getElementById('avatarLetter').style.display='none';
         localStorage.setItem('otaku_avatar',agSelected);
         if(currentProfile)currentProfile.avatarImg=agSelected;
-        showToast('✅ Avatar mis à jour !');
+        showToast('Avatar mis a jour !');
     } else if(agTarget==='newprofile'){
-        // Mettre à jour l'avatar sélectionné dans le nouveau profil
         selAvatar='IMG:'+agSelected;
-        // Afficher un aperçu
-        document.getElementById('npmAvatars').innerHTML='<img src="'+agSelected+'" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--primary);">'+
-            '<span style="font-size:11px;color:#22c55e;align-self:center;">✅ Avatar sélectionné</span>';
-        showToast('🎭 Avatar choisi !');
+        document.getElementById('npmAvatars').innerHTML=
+            '<img src="'+agSelected+'" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--primary);">'+
+            '<span style="font-size:11px;color:#22c55e;align-self:center;">Avatar selectionne !</span>';
+        showToast('Avatar choisi !');
+    } else if(agTarget==='profile'){
+        // Mise à jour profil courant
+        if(currentUser&&currentProfile){
+            currentProfile.avatarImg=agSelected;
+            saveUser(currentUser);
+            renderProfiles();
+        }
     }
     closeAvatarGallery();
 }
 
-// Recherche dans la galerie
-document.addEventListener('DOMContentLoaded',function(){
-    var agS=document.getElementById('agSearch');
-    if(agS)agS.addEventListener('input',function(){
-        clearTimeout(agSearchTimer);
-        agQuery=agS.value.trim();
-        agSearchTimer=setTimeout(function(){fetchAvatars(true);},500);
-    });
-});
+// Pas de listener agSearch en DOMContentLoaded — géré dans openAvatarGallery
 
 // ── SPLASH SCREEN ──
 function showSplash(){
