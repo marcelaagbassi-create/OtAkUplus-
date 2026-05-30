@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#f97316">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="OtAkU+">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Bebas+Neue&family=Montserrat:wght@900&family=Orbitron:wght@900&display=swap" rel="stylesheet">
 <script>if('serviceWorker'in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js');});</script>
 <style>
 :root{--bg:#020617;--card:#0f172a;--card2:#141e33;--primary:#f97316;--text:#f8fafc;--nav-bg:rgba(2,6,23,0.92);--border:rgba(255,255,255,0.08);}
@@ -743,6 +743,50 @@ img[src*="mangadex.org"]{
 .ai-key-banner{background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.3);border-radius:10px;padding:12px;margin:12px 16px;font-size:11px;color:#94a3b8;display:flex;gap:10px;align-items:center;}
 .ai-key-input{flex:1;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:7px 10px;color:white;font-family:Inter,sans-serif;font-size:11px;outline:none;}
 .ai-key-btn{background:var(--primary);border:none;color:white;padding:7px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;}
+
+/* SPINNER INTRO — Style Netflix rubber */
+#otakuSpinner{
+    position:fixed;inset:0;background:#0a0a0a;
+    z-index:99998;
+    display:none;
+    align-items:center;justify-content:center;
+    flex-direction:column;
+}
+#otakuSpinner.active{display:flex;}
+.sp-word{display:flex;align-items:center;position:relative;}
+.sp-ltr{
+    font-family:'Orbitron',sans-serif;
+    font-size:56px;
+    font-weight:900;
+    color:#FF6B1A;
+    display:inline-block;
+    opacity:0;
+    transform-origin:center center;
+    animation:rubberArrive 0.9s cubic-bezier(0.34,2.2,0.54,0.9) forwards;
+}
+.sp-ltr:nth-child(1){animation-delay:0s;    --tx:-300px;--ty:-200px;--rot:-180deg;}
+.sp-ltr:nth-child(2){animation-delay:0.08s; --tx:0px;   --ty:-350px;--rot:90deg;}
+.sp-ltr:nth-child(3){animation-delay:0.16s; --tx:300px; --ty:-150px;--rot:200deg;}
+.sp-ltr:nth-child(4){animation-delay:0.24s; --tx:350px; --ty:200px; --rot:-120deg;}
+.sp-ltr:nth-child(5){animation-delay:0.32s; --tx:-100px;--ty:350px; --rot:150deg;}
+.sp-ltr:nth-child(6){animation-delay:0.40s; --tx:-350px;--ty:100px; --rot:-200deg;}
+@keyframes rubberArrive{
+    0%  {opacity:1;transform:translate(var(--tx),var(--ty)) rotate(var(--rot)) scale(0.2);}
+    55% {transform:translate(0,0) rotate(0deg) scale(1.35) skewX(15deg);}
+    70% {transform:translate(0,0) rotate(0deg) scale(0.85) skewX(-10deg);}
+    82% {transform:translate(0,0) rotate(0deg) scale(1.12) skewX(5deg);}
+    91% {transform:translate(0,0) rotate(0deg) scale(0.95) skewX(-2deg);}
+    100%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1) skewX(0deg);}
+}
+.sp-ltr.sp-breathe{
+    animation:rubberArrive 0.9s cubic-bezier(0.34,2.2,0.54,0.9) forwards,
+              spBreathe 2.5s ease-in-out 1s infinite;
+}
+@keyframes spBreathe{
+    0%,100%{transform:scaleX(1)   scaleY(1);}
+    30%    {transform:scaleX(0.9) scaleY(1.12);}
+    60%    {transform:scaleX(1.08)scaleY(0.92);}
+}
 </style>
 </head>
 <body>
@@ -2803,8 +2847,135 @@ function lS(ep,sn){
     if(existing)existing.remove();
 
     // Montrer intro OtAkU+ puis lancer la video
-    showPlayerIntro(function(){_doLoadStream(ep,s,tab);});
+    // Lancer directement le stream - le spinner s'active quand la vidéo est prete
+    _doLoadStream(ep,s,tab);
 }
+
+
+// -- SPINNER INTRO RUBBER OTAKU+ --
+
+// Son cinematique style Netflix (Web Audio API - pas de fichier externe)
+function playOtakuSound(){
+    try{
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // -- Coup de basse grave (ta) --
+        var osc1 = ctx.createOscillator();
+        var gain1 = ctx.createGain();
+        osc1.connect(gain1); gain1.connect(ctx.destination);
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(80, ctx.currentTime);
+        osc1.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.4);
+        gain1.gain.setValueAtTime(0, ctx.currentTime);
+        gain1.gain.linearRampToValueAtTime(1.0, ctx.currentTime + 0.02);
+        gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+        osc1.start(ctx.currentTime);
+        osc1.stop(ctx.currentTime + 0.5);
+
+        // -- Montee dramatique (dum) --
+        var osc2 = ctx.createOscillator();
+        var gain2 = ctx.createGain();
+        osc2.connect(gain2); gain2.connect(ctx.destination);
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(120, ctx.currentTime + 0.3);
+        osc2.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.7);
+        osc2.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 1.2);
+        gain2.gain.setValueAtTime(0, ctx.currentTime + 0.3);
+        gain2.gain.linearRampToValueAtTime(0.85, ctx.currentTime + 0.45);
+        gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.4);
+        osc2.start(ctx.currentTime + 0.3);
+        osc2.stop(ctx.currentTime + 1.4);
+
+        // -- Resonance metalique OtAkU+ --
+        var osc3 = ctx.createOscillator();
+        var gain3 = ctx.createGain();
+        osc3.connect(gain3); gain3.connect(ctx.destination);
+        osc3.type = 'triangle';
+        osc3.frequency.setValueAtTime(440, ctx.currentTime + 0.6);
+        osc3.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.8);
+        gain3.gain.setValueAtTime(0, ctx.currentTime + 0.6);
+        gain3.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.65);
+        gain3.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+        osc3.start(ctx.currentTime + 0.6);
+        osc3.stop(ctx.currentTime + 1.2);
+
+        // -- Basse finale profonde --
+        var osc4 = ctx.createOscillator();
+        var gain4 = ctx.createGain();
+        osc4.connect(gain4); gain4.connect(ctx.destination);
+        osc4.type = 'sine';
+        osc4.frequency.setValueAtTime(55, ctx.currentTime + 0.8);
+        osc4.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 1.6);
+        gain4.gain.setValueAtTime(0, ctx.currentTime + 0.8);
+        gain4.gain.linearRampToValueAtTime(0.9, ctx.currentTime + 0.85);
+        gain4.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.8);
+        osc4.start(ctx.currentTime + 0.8);
+        osc4.stop(ctx.currentTime + 1.8);
+
+    }catch(e){ /* Audio non supporte */ }
+}
+
+function showOtakuSpinner(onDone){
+    var spinner = document.getElementById('otakuSpinner');
+    if(!spinner){if(onDone)onDone();return;}
+
+    // Reset + afficher
+    var letters = spinner.querySelectorAll('.sp-ltr');
+    letters.forEach(function(l){
+        l.classList.remove('sp-breathe');
+        l.style.animation = 'none';
+        l.style.opacity = '0';
+    });
+    spinner.classList.add('active');
+
+    // Relancer l'animation rubber
+    requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+            letters.forEach(function(l){
+                l.style.animation = '';
+            });
+        });
+    });
+
+    // Ajouter breathe après arrivée
+    setTimeout(function(){
+        letters.forEach(function(l){
+            l.classList.add('sp-breathe');
+        });
+    }, 1000);
+
+    // Clic ou tap pour passer immédiatement
+    function skip(){
+        spinner.removeEventListener('click', skip);
+        spinner.removeEventListener('touchstart', skip);
+        finishSpinner(spinner, onDone);
+    }
+    spinner.addEventListener('click', skip);
+    spinner.addEventListener('touchstart', skip);
+
+    // Auto-dismiss après 1.8s (durée animation complète)
+    setTimeout(function(){
+        spinner.removeEventListener('click', skip);
+        spinner.removeEventListener('touchstart', skip);
+        finishSpinner(spinner, onDone);
+    }, 1800);
+}
+
+function finishSpinner(spinner, onDone){
+    // Fade out
+    spinner.style.transition = 'opacity 0.35s ease';
+    spinner.style.opacity = '0';
+    setTimeout(function(){
+        spinner.classList.remove('active');
+        spinner.style.opacity = '';
+        spinner.style.transition = '';
+        if(onDone) onDone();
+    }, 350);
+}
+
+window.replayPlayerIntro = function(){
+    showOtakuSpinner(null);
+};
 
 function _doLoadStream(ep,s,tab){
     var urlVidsrc,urlVidsrc2,urlDavideo;
@@ -2834,7 +3005,12 @@ function _doLoadStream(ep,s,tab){
         if(ld)ld.style.display='flex';
         if(fr){
             fr.style.display='none';
-            fr.onload=function(){if(ld)ld.style.display='none';fr.style.display='block';};
+            fr.onload=function(){
+                if(ld)ld.style.display='none';
+                // Spinner + son quand flux pret
+                playOtakuSound();
+                showOtakuSpinner(function(){fr.style.display='block';});
+            };
             fr.src=urlVidsrc;
         }
     }else if(tab==='davideo'){
@@ -2845,7 +3021,11 @@ function _doLoadStream(ep,s,tab){
         if(ld2)ld2.style.display='flex';
         if(fr2){
             fr2.style.display='none';
-            fr2.onload=function(){if(ld2)ld2.style.display='none';fr2.style.display='block';};
+            fr2.onload=function(){
+                if(ld2)ld2.style.display='none';
+                playOtakuSound();
+                showOtakuSpinner(function(){fr2.style.display='block';});
+            };
             fr2.src=urlVidsrc2;
         }
     }
@@ -4921,6 +5101,19 @@ window.onload=function(){
         <button class="ai-send" id="aiSendBtn" onclick="sendAIMessage()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
         </button>
+    </div>
+</div>
+
+
+<!-- SPINNER INTRO OTAKU+ -->
+<div id="otakuSpinner">
+    <div class="sp-word">
+        <span class="sp-ltr">O</span>
+        <span class="sp-ltr">t</span>
+        <span class="sp-ltr">A</span>
+        <span class="sp-ltr">k</span>
+        <span class="sp-ltr">U</span>
+        <span class="sp-ltr">+</span>
     </div>
 </div>
 
