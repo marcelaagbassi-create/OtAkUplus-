@@ -766,17 +766,40 @@ img[src*="mangadex.org"]{
     </div>
 </div>
 
-<!-- MODE VEILLE -->
+<!-- MODE VEILLE — Style Netflix -->
 <div id="sleepScreen" onclick="wakeUp()" ontouchstart="wakeUp()">
+    <!-- Image anime plein écran -->
     <div class="sleep-bg" id="sleepBg"></div>
-    <div class="sleep-content">
+    <!-- Dégradé bas fort pour les infos -->
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.1) 40%,rgba(0,0,0,0.75) 70%,rgba(0,0,0,0.95) 100%);z-index:1;"></div>
+
+    <!-- CONTENU BAS -->
+    <div style="position:absolute;bottom:0;left:0;right:0;z-index:2;padding:0 28px 40px;">
+        <!-- Titre de l'anime en cours -->
+        <div id="sleepAnimeTitle" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;"></div>
+
+        <!-- HEURE LARGE -->
         <div class="sleep-time" id="sleepTime">00:00</div>
-        <div class="sleep-date" id="sleepDate"></div>
-        <div class="sleep-title" id="sleepTitle">OtAkU+</div>
-        <div class="sleep-genres" id="sleepGenres"></div>
+        <div class="sleep-date" id="sleepDate" style="font-size:13px;color:rgba(255,255,255,0.65);margin-top:6px;letter-spacing:1px;"></div>
+
+        <!-- LOGOS OtAkU+ et DAVIESLAY côte à côte -->
+        <div style="display:flex;align-items:center;gap:20px;margin-top:22px;">
+            <div style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:22px;color:var(--primary);letter-spacing:-0.5px;">OtAkU+</div>
+            <div style="width:1px;height:22px;background:rgba(255,255,255,0.2);"></div>
+            <!-- Logo DAVIESLAY avec effet brillance -->
+            <div style="position:relative;display:inline-block;">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#808080;-webkit-text-stroke:1px #000;">DAVIESLAY</div>
+                <div class="davieslay-shine" style="position:absolute;inset:0;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:transparent;background:linear-gradient(105deg,transparent 20%,rgba(255,255,255,0) 35%,rgba(255,255,255,0.85) 48%,rgba(255,255,255,1) 50%,rgba(255,255,255,0.85) 52%,rgba(255,255,255,0) 65%,transparent 80%);background-size:300% 100%;background-clip:text;-webkit-background-clip:text;animation:mirrorSweep 4s ease-in-out infinite;"></div>
+                <span style="font-family:monospace;font-size:7px;letter-spacing:2px;color:rgba(255,255,255,0.2);display:block;margin-top:-2px;">studio</span>
+            </div>
+        </div>
     </div>
-    <div class="sleep-recs" id="sleepRecs"></div>
-    <div class="sleep-hint">Appuie pour continuer</div>
+
+    <!-- Mini vignettes d'animes en bas (style Netflix) -->
+    <div id="sleepRecs" style="position:absolute;bottom:160px;right:16px;display:flex;flex-direction:column;gap:6px;z-index:2;"></div>
+
+    <!-- Touch hint -->
+    <div class="sleep-hint" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:2px;text-transform:uppercase;">Appuie pour continuer</div>
 </div>
 
 <!-- GALERIE AVATARS MANGA -->
@@ -3066,21 +3089,27 @@ function closeReader(){document.getElementById('readerView').style.display='none
         if(!sleepAnimes.length)return;
         var a=sleepAnimes[sleepIdx];
         var bg=document.getElementById('sleepBg');
-        // Toujours utiliser large_image_url pour images nettes
         var imgUrl=a.images.jpg.large_image_url||a.images.jpg.image_url;
         if(bg){
             bg.style.backgroundImage='url('+imgUrl+')';
             bg.style.backgroundSize='cover';
             bg.style.backgroundPosition='center top';
+            bg.style.transition='background-image 1.2s ease';
         }
-        var st=document.getElementById('sleepTitle');
-        if(st)st.textContent=a.title||'OtAkU+';
-        var sg=document.getElementById('sleepGenres');
-        if(sg){
-            var picked=GENRES.slice().sort(function(){return Math.random()-0.5;}).slice(0,3);
-            sg.innerHTML=picked.map(function(g){return '<span class="sleep-genre">'+g+'</span>';}).join('');
+        // Mettre à jour le titre de l'anime
+        var at=document.getElementById('sleepAnimeTitle');
+        if(at) at.textContent=a.title||'';
+
+        // Mini vignettes des autres animes (style Netflix)
+        var recs=document.getElementById('sleepRecs');
+        if(recs){
+            var others=sleepAnimes.filter(function(_,i){return i!==sleepIdx;}).slice(0,4);
+            recs.innerHTML=others.map(function(o){
+                return '<div style="width:46px;height:68px;border-radius:4px;overflow:hidden;opacity:0.65;border:1px solid rgba(255,255,255,0.15);">'+
+                    '<img src="'+o.images.jpg.image_url+'" style="width:100%;height:100%;object-fit:cover;object-position:top;" loading="lazy">'+
+                '</div>';
+            }).join('');
         }
-        // Appliquer le style choisi
         applySleepSettings();
     }
 
@@ -4499,7 +4528,22 @@ var MISTRAL_API='https://api.mistral.ai/v1/chat/completions';
 var MISTRAL_MODEL='mistral-large-latest';
 var OTAKU_AI_SERVER='https://otakuplus-serveur.onrender.com';
 var aiHistory=[];var aiTyping=false;
-var AI_SYSTEM='Tu es un assistant expert en anime et manga pour OtAkU+. Tu connais tous les animes, mangas, personnages, studios. Tu recommandes des contenus, donnes des infos, fais des comparaisons. Reponds toujours en francais, de facon concise et enthousiaste. Quand tu recommandes un anime, donne le titre exact.';
+var AI_SYSTEM='Tu es l\'assistant IA officiel de l\'application OtAkU+. ' +
+    'INFORMATIONS SUR L\'APPLICATION: OtAkU+ est une plateforme de streaming anime et manga gratuite, ' +
+    'creee par David Laurens Kokoura alias DAVIESLAY, developpeur passionne base a Abidjan, Cote d\'Ivoire. ' +
+    'L\'app est disponible sur mobile (Android APK), web (GitHub Pages: marcelaagbassi-create.github.io/OtAkUplus-/) et Smart TV. ' +
+    'FONCTIONNALITES: streaming anime (VOSTFR/VF/VO) via 3 lecteurs (Lecteur 1, Davideo, Lecteur 2), ' +
+    'lecture de manga (MangaDex), systeme de profils multi-utilisateurs style Netflix, ' +
+    'mode veille avec couvertures d\'animes, systeme XP et rangs (Passant->Genin->Chunin->Jonin->Anbu->Hokage->Kage->Legende), ' +
+    'themes dynamiques debloquables par rang, Watch Party (regarder en groupe), ' +
+    'telechargements hors ligne, quiz hebdomadaire, statistiques, PWA installable. ' +
+    'CREATEUR: David Laurens Kokoura, alias DAVIESLAY, developpeur full-stack, ' +
+    'studio DAVIESLAY, Abidjan Cote d\'Ivoire, contact: davidlaurens090@gmail.com, Discord OtAkU+. ' +
+    'VERSION: 2.0, technologies: HTML5/CSS3/JS, Firebase, Jikan API, MangaDex API, TMDB, Mistral AI. ' +
+    'Tu connais parfaitement tous les animes, mangas, personnages, studios, saisons. ' +
+    'Tu recommandes des contenus, donnes des infos, fais des comparaisons. ' +
+    'Reponds toujours en francais, de facon concise et enthousiaste. ' +
+    'Quand tu recommandes un anime, donne le titre exact.';
 
 
 function setAIServer(url){
