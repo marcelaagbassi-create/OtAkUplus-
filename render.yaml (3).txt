@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: otakuplus-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: TMDB_API_KEY
+        value: 4f5f43495afcc67e9553f6c684a82f84
+      - key: FRONTEND_URL
+        value: https://marcelaagbassi-create.github.io
+      - key: CORS_ORIGIN
+        value: https://marcelaagbassi-create.github.io
+      - key: JIKAN_BASE
+        value: https://api.jikan.moe/v4
+      - key: MANGADEX_BASE
+        value: https://api.mangadex.org
+      - key: SESSION_SECRET
+        sync: false
