@@ -787,7 +787,68 @@ img[src*="mangadex.org"]{
     30%    {transform:scaleX(0.9) scaleY(1.12);}
     60%    {transform:scaleX(1.08)scaleY(0.92);}
 }
+
+/* BOUTONS CONNEXION SOCIALE */
+.auth-btn-social{
+    width:100%;padding:12px 16px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:10px;
+    color:white;font-family:'Inter',sans-serif;
+    font-size:13px;font-weight:700;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    margin-bottom:10px;
+    transition:all 0.2s;
+}
+.auth-btn-social:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.25);}
+.auth-btn-social:active{transform:scale(0.98);}
+.auth-btn-social.loading{opacity:0.6;pointer-events:none;}
 </style>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+var fbAuth = null;
+var firebaseReady = false;
+// Init Firebase de façon defensive (peut être bloque par AdBlock)
+(function tryInitFirebase(){
+    try {
+        if(typeof firebase === 'undefined') {
+            // Réessayer après chargement
+            window.addEventListener('load', function(){
+                try {
+                    var cfg = {
+                        apiKey:"AIzaSyAOjvWRnE_rkxvOq89f33MrKBflTpQTXqw",
+                        authDomain:"otakuplus-dcf57.firebaseapp.com",
+                        projectId:"otakuplus-dcf57",
+                        storageBucket:"otakuplus-dcf57.firebasestorage.app",
+                        messagingSenderId:"308151428700",
+                        appId:"1:308151428700:web:281ade0378869d5b25e899"
+                    };
+                    if(!firebase.apps.length) firebase.initializeApp(cfg);
+                    fbAuth = firebase.auth();
+                    firebaseReady = true;
+                    initFirebaseAuth();
+                } catch(e){ console.warn('[OtAkU+] Firebase non disponible:', e.message); }
+            });
+            return;
+        }
+        var cfg = {
+            apiKey:"AIzaSyAOjvWRnE_rkxvOq89f33MrKBflTpQTXqw",
+            authDomain:"otakuplus-dcf57.firebaseapp.com",
+            projectId:"otakuplus-dcf57",
+            storageBucket:"otakuplus-dcf57.firebasestorage.app",
+            messagingSenderId:"308151428700",
+            appId:"1:308151428700:web:281ade0378869d5b25e899"
+        };
+        if(!firebase.apps.length) firebase.initializeApp(cfg);
+        fbAuth = firebase.auth();
+        firebaseReady = true;
+    } catch(e){ console.warn('[OtAkU+] Firebase init:', e.message); }
+})();
+</script>
 </head>
 <body>
 
@@ -860,7 +921,7 @@ img[src*="mangadex.org"]{
 <!-- AUTH SCREEN -->
 <div id="authScreen">
     <div class="auth-logo">OtAkU<span>+</span></div>
-    <div class="auth-sub">🔥 Streaming Manga & Anime — Gratuit</div>
+    <div class="auth-sub">Streaming Manga & Anime — Gratuit</div>
     <div class="auth-tabs">
         <div class="auth-tab active focusable" tabindex="0" id="tabLogin" onclick="switchAuth('login')">CONNEXION</div>
         <div class="auth-tab focusable" tabindex="0" id="tabRegister" onclick="switchAuth('register')">INSCRIPTION</div>
@@ -870,16 +931,47 @@ img[src*="mangadex.org"]{
         <input class="auth-input focusable" id="loginPass" type="password" placeholder="Mot de passe" tabindex="0">
         <div class="auth-err" id="loginErr"></div>
         <button class="auth-btn focusable" tabindex="0" onclick="doLogin()">SE CONNECTER</button>
-        <div style="text-align:center;font-size:11px;color:#94a3b8;margin-top:4px;">Pas encore de compte ? <span style="color:var(--primary);cursor:pointer;" onclick="switchAuth('register')">S'inscrire</span></div>
+        <!-- Séparateur -->
+        <div style="display:flex;align-items:center;gap:10px;margin:12px 0;">
+            <div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>
+            <span style="font-size:10px;color:#64748b;font-weight:700;letter-spacing:1px;">OU</span>
+            <div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>
+        </div>
+        <!-- Bouton Google -->
+        <button class="auth-btn-social focusable" tabindex="0" onclick="loginWithGoogle()" id="btnGoogle">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Continuer avec Google
+        </button>
+        <!-- Bouton Microsoft -->
+        <button class="auth-btn-social focusable" tabindex="0" onclick="loginWithMicrosoft()" id="btnMicrosoft">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#F25022" d="M1 1h10v10H1z"/><path fill="#00A4EF" d="M13 1h10v10H13z"/><path fill="#7FBA00" d="M1 13h10v10H1z"/><path fill="#FFB900" d="M13 13h10v10H13z"/></svg>
+            Continuer avec Microsoft
+        </button>
+        <div style="text-align:center;font-size:11px;color:#94a3b8;margin-top:8px;">Pas encore de compte ? <span style="color:var(--primary);cursor:pointer;" onclick="switchAuth('register')">S'inscrire</span></div>
     </div>
     <div class="auth-form" id="registerForm" style="display:none;">
         <input class="auth-input focusable" id="regName" type="text" placeholder="Ton nom" tabindex="0">
         <input class="auth-input focusable" id="regEmail" type="email" placeholder="Email" tabindex="0">
         <input class="auth-input focusable" id="regPass" type="password" placeholder="Mot de passe (min. 6 car.)" tabindex="0">
         <div class="auth-err" id="regErr"></div>
-        <button class="auth-btn focusable" tabindex="0" onclick="doRegister()">CRÉER MON COMPTE</button>
-        <div style="text-align:center;font-size:11px;color:#94a3b8;margin-top:4px;">Déjà un compte ? <span style="color:var(--primary);cursor:pointer;" onclick="switchAuth('login')">Se connecter</span></div>
+        <button class="auth-btn focusable" tabindex="0" onclick="doRegister()">CREER MON COMPTE</button>
+        <!-- Séparateur -->
+        <div style="display:flex;align-items:center;gap:10px;margin:12px 0;">
+            <div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>
+            <span style="font-size:10px;color:#64748b;font-weight:700;letter-spacing:1px;">OU</span>
+            <div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>
+        </div>
+        <button class="auth-btn-social focusable" tabindex="0" onclick="loginWithGoogle()">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            S'inscrire avec Google
+        </button>
+        <button class="auth-btn-social focusable" tabindex="0" onclick="loginWithMicrosoft()">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#F25022" d="M1 1h10v10H1z"/><path fill="#00A4EF" d="M13 1h10v10H13z"/><path fill="#7FBA00" d="M1 13h10v10H1z"/><path fill="#FFB900" d="M13 13h10v10H13z"/></svg>
+            S'inscrire avec Microsoft
+        </button>
+        <div style="text-align:center;font-size:11px;color:#94a3b8;margin-top:8px;">Deja un compte ? <span style="color:var(--primary);cursor:pointer;" onclick="switchAuth('login')">Se connecter</span></div>
     </div>
+    <div class="auth-err" id="socialAuthErr" style="margin-top:8px;text-align:center;"></div>
 </div>
 
 <!-- PROFILE SELECTOR -->
@@ -3080,8 +3172,84 @@ async function fB(reset){
 function loadMoreBiblio(){fB(false);}
 
 // -- FAVORIS --
+// Helper: headers avec token JWT
+function authHeaders(){
+    var h = {'Content-Type':'application/json'};
+    if(RAILWAY_TOKEN) h['Authorization'] = 'Bearer '+RAILWAY_TOKEN;
+    return h;
+}
+
 function gFI(){return JSON.parse(localStorage.getItem('otaku_favs_data')||'[]').map(function(f){return f.id;});}
-function tFav(id,title,cover){var favs=JSON.parse(localStorage.getItem('otaku_favs_data')||'[]');var ids=favs.map(function(f){return f.id;});if(ids.indexOf(id)>-1){favs=favs.filter(function(f){return f.id!==id;});var b=document.getElementById('fav-'+id);if(b)b.textContent='';showToast('Retire des favoris');}else{favs.push({id:id,title:title,cover:cover});var b=document.getElementById('fav-'+id);if(b)b.textContent='';showToast(' Ajoute aux favoris !');}localStorage.setItem('otaku_favs_data',JSON.stringify(favs));}
+
+function tFav(id,title,cover){
+    var favs=JSON.parse(localStorage.getItem('otaku_favs_data')||'[]');
+    var ids=favs.map(function(f){return f.id;});
+    var isAdding = ids.indexOf(id) === -1;
+
+    if(!isAdding){
+        // Retirer
+        favs=favs.filter(function(f){return f.id!==id;});
+        localStorage.setItem('otaku_favs_data',JSON.stringify(favs));
+        var b=document.getElementById('fav-'+id);if(b)b.textContent='';
+        showToast('Retire des favoris');
+        // Sync serveur
+        if(RAILWAY_SERVER&&RAILWAY_TOKEN){
+            fetch(RAILWAY_SERVER+'/favorites/'+encodeURIComponent(id),{
+                method:'DELETE', headers:authHeaders()
+            }).catch(function(){});
+        }
+    } else {
+        // Ajouter
+        favs.push({id:id,title:title,cover:cover,type:'manga'});
+        localStorage.setItem('otaku_favs_data',JSON.stringify(favs));
+        var b=document.getElementById('fav-'+id);if(b)b.textContent='';
+        showToast('Ajoute aux favoris !');
+        // Sync serveur
+        if(RAILWAY_SERVER&&RAILWAY_TOKEN){
+            fetch(RAILWAY_SERVER+'/favorites',{
+                method:'POST', headers:authHeaders(),
+                body:JSON.stringify({item_id:id,title:title,cover:cover,type:'manga'})
+            }).catch(function(){});
+        }
+    }
+}
+
+function tFavAnimeSync(id,title,cover){
+    var favs=JSON.parse(localStorage.getItem('otaku_favs_anime')||'[]');
+    var ids=favs.map(function(f){return f.id;});
+    var isAdding = ids.indexOf(id) === -1;
+    if(!isAdding){
+        favs=favs.filter(function(f){return f.id!==id;});
+        showToast('Retire des favoris');
+    } else {
+        favs.push({id:id,title:title,cover:cover,type:'anime'});
+        showToast('Ajoute aux favoris !');
+    }
+    localStorage.setItem('otaku_favs_anime',JSON.stringify(favs));
+    if(RAILWAY_SERVER&&RAILWAY_TOKEN){
+        fetch(RAILWAY_SERVER+(isAdding?'/favorites':'/favorites/'+encodeURIComponent(id)),{
+            method:isAdding?'POST':'DELETE', headers:authHeaders(),
+            body:isAdding?JSON.stringify({item_id:id,title:title,cover:cover,type:'anime'}):undefined
+        }).catch(function(){});
+    }
+}
+
+// Charger les favoris depuis le serveur au démarrage
+async function syncFavsFromServer(){
+    if(!RAILWAY_SERVER||!RAILWAY_TOKEN) return;
+    try{
+        var r=await fetch(RAILWAY_SERVER+'/favorites',{headers:authHeaders()});
+        if(!r.ok) return;
+        var d=await r.json();
+        if(d&&Array.isArray(d)){
+            var manga=d.filter(function(f){return f.type==='manga';});
+            var anime=d.filter(function(f){return f.type==='anime';});
+            if(manga.length) localStorage.setItem('otaku_favs_data',JSON.stringify(manga));
+            if(anime.length) localStorage.setItem('otaku_favs_anime',JSON.stringify(anime));
+            console.log('[OtAkU+] Favoris synchronises depuis serveur: '+d.length);
+        }
+    }catch(e){}
+}
 function loadFavoris(){
     sV('favorisView');
     var favsManga=JSON.parse(localStorage.getItem('otaku_favs_data')||'[]');
@@ -3679,11 +3847,50 @@ function switchAuth(tab){
     document.getElementById('regErr').textContent='';
 }
 
-function doLogin(){
+async function doLogin(){
     var email=document.getElementById('loginEmail').value.trim();
     var pass=document.getElementById('loginPass').value;
     var err=document.getElementById('loginErr');
     if(!email||!pass){err.textContent='Remplis tous les champs.';return;}
+    err.textContent='Connexion...';
+
+    // Essayer le serveur backend d'abord
+    if(RAILWAY_SERVER){
+        try{
+            var r=await fetch(RAILWAY_SERVER+'/auth/login',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({email:email,password:pass})
+            });
+            var d=await r.json();
+            if(r.ok&&d.token){
+                RAILWAY_TOKEN=d.token;
+                localStorage.setItem('otaku_railway_token',d.token);
+                // Construire user depuis réponse serveur
+                var serverUser={
+                    id:d.user.id||Date.now(),
+                    name:d.user.username||d.user.name||email.split('@')[0],
+                    email:email,
+                    provider:'server',
+                    profiles:d.user.profiles||[{id:1,name:d.user.username||'Profil',avatar:AVATARS[0],color:'#f97316'}]
+                };
+                currentUser=serverUser;
+                localStorage.setItem('otaku_current_user',JSON.stringify(serverUser));
+                err.textContent='';
+                document.getElementById('authScreen').classList.add('hidden');
+                showProfileSelector();
+                showToast('Bienvenue '+serverUser.name+' !');
+                return;
+            } else {
+                err.textContent=d.message||d.error||'Email ou mot de passe incorrect.';
+                return;
+            }
+        }catch(e){
+            console.warn('Serveur indisponible, mode local');
+        }
+    }
+
+    // Fallback localStorage
     var users=JSON.parse(localStorage.getItem('otaku_users')||'[]');
     var user=users.find(function(u){return u.email===email&&u.pass===btoa(pass);});
     if(!user){err.textContent='Email ou mot de passe incorrect.';return;}
@@ -3694,13 +3901,52 @@ function doLogin(){
     showProfileSelector();
 }
 
-function doRegister(){
+async function doRegister(){
     var name=document.getElementById('regName').value.trim();
     var email=document.getElementById('regEmail').value.trim();
     var pass=document.getElementById('regPass').value;
     var err=document.getElementById('regErr');
     if(!name||!email||!pass){err.textContent='Remplis tous les champs.';return;}
     if(pass.length<6){err.textContent='Mot de passe trop court (min. 6 car.).';return;}
+    err.textContent='Création du compte...';
+
+    // Essayer le serveur backend d'abord
+    if(RAILWAY_SERVER){
+        try{
+            var r=await fetch(RAILWAY_SERVER+'/auth/register',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({username:name,email:email,password:pass})
+            });
+            var d=await r.json();
+            if(r.ok&&(d.token||d.user)){
+                if(d.token){
+                    RAILWAY_TOKEN=d.token;
+                    localStorage.setItem('otaku_railway_token',d.token);
+                }
+                var newUser={
+                    id:d.user?d.user.id:Date.now(),
+                    name:name,email:email,
+                    provider:'server',
+                    profiles:[{id:1,name:name,avatar:AVATARS[0],color:'#f97316'}]
+                };
+                currentUser=newUser;
+                localStorage.setItem('otaku_current_user',JSON.stringify(newUser));
+                err.textContent='';
+                document.getElementById('authScreen').classList.add('hidden');
+                showToast('Compte cree ! Bienvenue '+name+' !');
+                showProfileSelector();
+                return;
+            } else {
+                err.textContent=d.message||d.error||'Erreur inscription.';
+                return;
+            }
+        }catch(e){
+            console.warn('Serveur indisponible, mode local');
+        }
+    }
+
+    // Fallback localStorage
     var users=JSON.parse(localStorage.getItem('otaku_users')||'[]');
     if(users.find(function(u){return u.email===email;})){err.textContent='Email deja utilise.';return;}
     var newUser={id:Date.now(),name:name,email:email,pass:btoa(pass),profiles:[{id:1,name:name,avatar:AVATARS[0],color:'#f97316'}]};
@@ -3710,13 +3956,19 @@ function doRegister(){
     currentUser=newUser;
     localStorage.setItem('otaku_current_user',JSON.stringify(newUser));
     document.getElementById('authScreen').classList.add('hidden');
-    showToast(' Compte cree ! Bienvenue '+name+' ');
+    showToast('Compte cree ! Bienvenue '+name+' !');
     showProfileSelector();
 }
 
 function logoutAuth(){
+    RAILWAY_TOKEN='';
+    localStorage.removeItem('otaku_railway_token');
     localStorage.removeItem('otaku_current_user');
     currentUser=null;currentProfile=null;
+    // Déconnexion Firebase aussi
+    if(typeof fbAuth!=='undefined'&&fbAuth){
+        fbAuth.signOut().catch(function(){});
+    }
     document.getElementById('profileSelector').classList.remove('open');
     document.getElementById('authScreen').classList.remove('hidden');
 }
@@ -3846,11 +4098,24 @@ function editProfile(i){
 function selectProfile(idx){
     currentProfile=currentUser.profiles[idx];
     document.getElementById('profileSelector').classList.remove('open');
-    document.getElementById('profileNameDisplay').textContent=currentProfile.name+' '+currentProfile.avatar;
-    document.getElementById('avatarLetter').textContent=currentProfile.avatar;
-    showToast('Bonjour '+currentProfile.name+' !');
+    var dispName = currentProfile.name || 'Profil';
+    document.getElementById('profileNameDisplay').textContent=dispName;
+    if(document.getElementById('avatarLetter'))
+        document.getElementById('avatarLetter').textContent=currentProfile.avatar||dispName[0];
+    showToast('Bonjour '+dispName+' !');
+    // Sauvegarder profil courant sur serveur
+    if(RAILWAY_SERVER&&RAILWAY_TOKEN){
+        fetch(RAILWAY_SERVER+'/profiles/select',{
+            method:'POST', headers:authHeaders(),
+            body:JSON.stringify({profileId:currentProfile.id||idx})
+        }).catch(function(){});
+    }
+    // Synchroniser favoris depuis serveur
+    syncFavsFromServer();
     updateHeroProfil();
     loadHome();
+    xpDailyLogin();
+    setTimeout(xpInjectMenu,600);
 }
 
 function deleteProfile(idx){
@@ -4739,13 +5004,11 @@ function setAIServer(url){
 
 function loadAIServer(){
     var saved = localStorage.getItem('otaku_ai_server');
-    // Si pas de valeur custom, garder le serveur Render par defaut
     if(saved) OTAKU_AI_SERVER = saved;
-    // Tester la connexion au serveur
+    // Test connexion serveur IA
     fetch(OTAKU_AI_SERVER+'/health').then(function(r){
         if(r.ok){
             console.log('[OtAkU+ IA] Serveur connecte');
-            // Cacher le banner cle API - serveur gere la cle
             var b=document.getElementById('aiKeyBanner');
             if(b) b.style.display='none';
         }
@@ -4753,6 +5016,35 @@ function loadAIServer(){
         console.warn('[OtAkU+ IA] Serveur hors ligne - mode local');
     });
 }
+
+// -- KEEP-ALIVE — Empêcher les serveurs Render de dormir --
+(function startKeepAlive(){
+    var PING_INTERVAL = 14 * 60 * 1000; // 14 minutes
+
+    function pingServers(){
+        // Ping serveur IA Mistral
+        if(OTAKU_AI_SERVER){
+            fetch(OTAKU_AI_SERVER + '/health', {method:'GET'})
+                .then(function(r){ console.log('[OtAkU+ Keep-Alive] IA: ' + r.status); })
+                .catch(function(){ /* serveur dors, reveille au prochain appel */ });
+        }
+        // Ping serveur Backend si configuré
+        var backendUrl = localStorage.getItem('otaku_railway_url') || '';
+        if(backendUrl){
+            fetch(backendUrl + '/health', {method:'GET'})
+                .then(function(r){ console.log('[OtAkU+ Keep-Alive] Backend: ' + r.status); })
+                .catch(function(){});
+        }
+    }
+
+    // Premier ping apres 30 secondes (laisser l'app charger)
+    setTimeout(function(){
+        pingServers();
+        // Puis toutes les 14 minutes
+        setInterval(pingServers, PING_INTERVAL);
+        console.log('[OtAkU+ Keep-Alive] Demarre — ping toutes les 14 min');
+    }, 30000);
+})();
 function getMistralKey(){return localStorage.getItem('otaku_mistral_key')||'';}
 
 function saveAIKey(){
@@ -4871,6 +5163,212 @@ window.addEventListener('DOMContentLoaded',function(){
     var ai=document.getElementById('aiInput');
     if(ai)ai.addEventListener('keydown',function(e){if(e.key==='Enter')sendAIMessage();});
 });
+
+
+// == FIREBASE AUTH — Google + Microsoft ==
+
+// Gérer le résultat du redirect (mobile)
+// Firebase getRedirectResult - protege contre fbAuth null (AdBlock)
+if(fbAuth){
+    fbAuth.getRedirectResult().then(function(result){
+        if(result && result.user){
+            handleSocialAuthSuccess(result.user);
+        }
+    }).catch(function(err){
+        if(err.code && err.code !== 'auth/no-current-user'){
+            var el = document.getElementById('socialAuthErr');
+            if(el) el.textContent = getSocialAuthError(err.code);
+        }
+    });
+} else {
+    // Firebase non disponible (AdBlock) - mode local uniquement
+    console.warn('[OtAkU+] Firebase bloque - connexion Google/Microsoft indisponible');
+}
+
+// Connexion Google
+function loginWithGoogle(){
+    var btn = document.getElementById('btnGoogle');
+    if(btn) btn.classList.add('loading');
+    var errEl = document.getElementById('socialAuthErr');
+    if(errEl) errEl.textContent = '';
+    var provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({prompt:'select_account'});
+    // Popup sur desktop, redirect sur mobile
+    var isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+    var authMethod = isMobile ? fbAuth.signInWithRedirect(provider) : fbAuth.signInWithPopup(provider);
+    if(!isMobile){
+        fbAuth.signInWithPopup(provider).then(function(result){
+            handleSocialAuthSuccess(result.user);
+        }).catch(function(err){
+            if(btn) btn.classList.remove('loading');
+            var el = document.getElementById('socialAuthErr');
+            if(el) el.textContent = getSocialAuthError(err.code);
+        });
+    } else {
+        fbAuth.signInWithRedirect(provider);
+    }
+}
+
+// Connexion Microsoft
+function loginWithMicrosoft(){
+    var btn = document.getElementById('btnMicrosoft');
+    if(btn) btn.classList.add('loading');
+    var errEl = document.getElementById('socialAuthErr');
+    if(errEl) errEl.textContent = '';
+    var provider = new firebase.auth.OAuthProvider('microsoft.com');
+    provider.setCustomParameters({prompt:'select_account', tenant:'common'});
+    provider.addScope('email');
+    provider.addScope('profile');
+    var isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+    if(!isMobile){
+        fbAuth.signInWithPopup(provider).then(function(result){
+            handleSocialAuthSuccess(result.user);
+        }).catch(function(err){
+            if(btn) btn.classList.remove('loading');
+            var el = document.getElementById('socialAuthErr');
+            if(el) el.textContent = getSocialAuthError(err.code);
+        });
+    } else {
+        fbAuth.signInWithRedirect(provider);
+    }
+}
+
+// Traiter la connexion sociale réussie
+function handleSocialAuthSuccess(fbUser){
+    if(!fbUser) return;
+    var name = fbUser.displayName || fbUser.email.split('@')[0];
+    var email = fbUser.email;
+    var photoURL = fbUser.photoURL || '';
+    var uid = fbUser.uid;
+
+    // Vérifier si l'utilisateur existe déjà en localStorage
+    var users = JSON.parse(localStorage.getItem('otaku_users') || '[]');
+    var existing = users.find(function(u){ return u.email === email || u.uid === uid; });
+
+    if(existing){
+        // Connexion existante
+        currentUser = existing;
+        // Mettre à jour la photo si Google/Microsoft en a une
+        if(photoURL && existing.profiles && existing.profiles[0]){
+            existing.profiles[0].avatarImg = photoURL;
+        }
+        existing.uid = uid;
+        saveUser(existing);
+        localStorage.setItem('otaku_current_user', JSON.stringify(existing));
+        document.getElementById('authScreen').classList.add('hidden');
+        openProfileSelector();
+        showToast('Bienvenue ' + (existing.profiles[0] ? existing.profiles[0].name : name) + ' !');
+    } else {
+        // Nouvel utilisateur — créer automatiquement un profil
+        var newUser = {
+            uid: uid,
+            email: email,
+            password: '',
+            provider: fbUser.providerData[0] ? fbUser.providerData[0].providerId : 'social',
+            profiles: [{
+                name: name.split(' ')[0],
+                avatar: '',
+                avatarImg: photoURL,
+                color: '#f97316',
+                xp: 0
+            }],
+            created: Date.now()
+        };
+        users.push(newUser);
+        localStorage.setItem('otaku_users', JSON.stringify(users));
+        localStorage.setItem('otaku_current_user', JSON.stringify(newUser));
+        currentUser = newUser;
+        document.getElementById('authScreen').classList.add('hidden');
+        openProfileSelector();
+        showToast('Compte cree avec ' + (fbUser.providerData[0] ? fbUser.providerData[0].providerId : 'social') + ' !');
+    }
+}
+
+// Messages d'erreur lisibles
+function getSocialAuthError(code){
+    var errors = {
+        'auth/popup-closed-by-user': 'Connexion annulee.',
+        'auth/cancelled-popup-request': 'Connexion annulee.',
+        'auth/popup-blocked': 'Popup bloque. Autorise les popups pour ce site.',
+        'auth/account-exists-with-different-credential': 'Un compte existe deja avec cet email.',
+        'auth/network-request-failed': 'Erreur reseau. Verifie ta connexion.',
+        'auth/too-many-requests': 'Trop de tentatives. Reessaie plus tard.',
+        'auth/user-disabled': 'Compte desactive.',
+    };
+    return errors[code] || 'Erreur de connexion (' + code + ')';
+}
+
+// Déconnexion Firebase aussi
+var _origLogout = typeof logoutAuth === 'function' ? logoutAuth : null;
+window.logoutAuth = function(){
+    fbAuth.signOut().catch(function(){});
+    if(_origLogout) _origLogout();
+    else {
+        currentUser = null;
+        localStorage.removeItem('otaku_current_user');
+        document.getElementById('profileSelector').classList.remove('open');
+        document.getElementById('authScreen').classList.remove('hidden');
+    }
+};
+
+
+// == CONFIG SERVEUR OTAKU+ (Railway) ==
+// Remplace par ton URL Railway apres deploiement
+var RAILWAY_SERVER = localStorage.getItem('otaku_railway_url') || 'https://otakuplus.onrender.com';
+
+function setRailwayServer(url){
+    RAILWAY_SERVER = url ? url.replace(/\/+$/, '') : '';
+    localStorage.setItem('otaku_railway_url', RAILWAY_SERVER);
+    if(RAILWAY_SERVER){
+        showToast('Serveur Railway connecte !');
+        // Tester la connexion
+        fetch(RAILWAY_SERVER + '/health').then(function(r){
+            if(r.ok) showToast('Serveur en ligne !');
+        }).catch(function(){ showToast('Erreur connexion serveur'); });
+    }
+}
+
+// API calls vers le serveur Railway (auth, profils, favoris)
+var API = {
+    // Auth
+    register: async function(name, email, pass){
+        if(!RAILWAY_SERVER) return null;
+        var r = await fetch(RAILWAY_SERVER+'/auth/register', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({username:name, email:email, password:pass})
+        });
+        return r.json();
+    },
+    login: async function(email, pass){
+        if(!RAILWAY_SERVER) return null;
+        var r = await fetch(RAILWAY_SERVER+'/auth/login', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({email:email, password:pass})
+        });
+        return r.json();
+    },
+    // Favoris
+    getFavs: async function(token){
+        if(!RAILWAY_SERVER||!token) return null;
+        var r = await fetch(RAILWAY_SERVER+'/favorites', {
+            headers:{'Authorization':'Bearer '+token}
+        });
+        return r.json();
+    },
+    addFav: async function(token, animeId, title){
+        if(!RAILWAY_SERVER||!token) return null;
+        var r = await fetch(RAILWAY_SERVER+'/favorites', {
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+            body: JSON.stringify({anime_id:animeId, title:title})
+        });
+        return r.json();
+    }
+};
+
+var RAILWAY_TOKEN = localStorage.getItem('otaku_railway_token') || '';
 
 window.onload=function(){
     checkAuth();
