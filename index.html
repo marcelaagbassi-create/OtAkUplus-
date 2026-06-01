@@ -804,6 +804,140 @@ img[src*="mangadex.org"]{
 .auth-btn-social:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.25);}
 .auth-btn-social:active{transform:scale(0.98);}
 .auth-btn-social.loading{opacity:0.6;pointer-events:none;}
+
+/* ================================================
+   SYSTÈME RESPONSIVE AUTOMATIQUE — OtAkU+
+   Modes: mobile | tablet | desktop | tv
+   ================================================ */
+
+/* Variables par mode */
+body.mode-mobile  { --cols:4; --card-size:85px; --font-base:13px; --nav-h:62px; }
+body.mode-tablet  { --cols:5; --card-size:110px; --font-base:14px; --nav-h:68px; }
+body.mode-desktop { --cols:6; --card-size:140px; --font-base:14px; --nav-h:70px; }
+body.mode-tv      { --cols:5; --card-size:160px; --font-base:18px; --nav-h:80px; }
+
+/* Badge mode actif */
+#deviceBadge{
+    position:fixed;top:70px;right:10px;
+    background:rgba(249,115,22,0.9);
+    color:white;font-size:9px;font-weight:900;
+    padding:3px 8px;border-radius:20px;
+    z-index:9000;letter-spacing:1px;
+    opacity:0;transition:opacity 0.3s;
+    pointer-events:none;
+}
+#deviceBadge.show{opacity:1;}
+
+/* ======= MODE MOBILE (< 768px) ======= */
+body.mode-mobile .grid{grid-template-columns:repeat(4,1fr);gap:6px;padding:0 8px 12px;}
+body.mode-mobile .ep-grid{grid-template-columns:repeat(5,1fr);}
+body.mode-mobile footer{width:calc(100% - 20px);}
+
+/* ======= MODE TABLETTE (768px - 1199px) ======= */
+body.mode-tablet{padding-bottom:100px;}
+body.mode-tablet nav{padding:14px 24px;}
+body.mode-tablet .logo-txt{font-size:26px;}
+body.mode-tablet .search-box{width:50%;}
+body.mode-tablet .grid{
+    grid-template-columns:repeat(5,1fr);
+    gap:10px;padding:0 16px 16px;
+}
+body.mode-tablet .manga-dex-card img,
+body.mode-tablet .manga-card img{aspect-ratio:2/3;}
+body.mode-tablet .manga-card p,
+body.mode-tablet .manga-dex-card p{font-size:10px;padding:4px 6px;}
+body.mode-tablet .ep-grid{grid-template-columns:repeat(7,1fr);gap:8px;}
+body.mode-tablet .ep-btn{font-size:12px;padding:11px;}
+body.mode-tablet .hero-banner{height:300px;}
+body.mode-tablet .hero-title{font-size:24px;}
+body.mode-tablet .section-title{font-size:15px;margin:16px 20px;}
+body.mode-tablet footer{
+    width:calc(100% - 40px);
+    height:72px;
+    max-width:600px;
+}
+body.mode-tablet .tab-label{font-size:9px;}
+body.mode-tablet .tab-icon{width:24px;height:24px;}
+body.mode-tablet .vid-container{aspect-ratio:16/9;}
+body.mode-tablet #playerView{padding:68px 0 120px;}
+body.mode-tablet .synopsis-box{margin:10px 20px;}
+body.mode-tablet .player-selectors{padding:10px 20px 6px;}
+body.mode-tablet .fav-grid{grid-template-columns:repeat(5,1fr);gap:9px;padding:0 16px 16px;}
+body.mode-tablet .side-menu{width:320px;}
+body.mode-tablet .filter-row{padding:0 16px 10px;}
+body.mode-tablet .biblio-bar{padding:0 16px 12px;}
+
+/* ======= MODE DESKTOP (>= 1200px) ======= */
+body.mode-desktop{
+    max-width:1400px;
+    margin:0 auto;
+    padding-bottom:0;
+}
+body.mode-desktop nav{
+    padding:14px 40px;
+    position:sticky;
+}
+body.mode-desktop .logo-txt{font-size:28px;}
+body.mode-desktop .search-box{width:40%;max-width:500px;}
+body.mode-desktop .view{padding:80px 0 40px;}
+body.mode-desktop .grid{
+    grid-template-columns:repeat(6,1fr);
+    gap:12px;padding:0 24px 16px;
+}
+body.mode-desktop .fav-grid{grid-template-columns:repeat(6,1fr);gap:12px;padding:0 24px 16px;}
+body.mode-desktop .ep-grid{grid-template-columns:repeat(10,1fr);gap:8px;padding:10px 24px;}
+body.mode-desktop .ep-btn{font-size:12px;}
+body.mode-desktop .hero-banner{height:420px;}
+body.mode-desktop .hero-title{font-size:32px;}
+body.mode-desktop .hero-btns{gap:12px;margin-top:14px;}
+body.mode-desktop .hero-btn{padding:10px 24px;font-size:13px;}
+body.mode-desktop .section-title{font-size:16px;margin:18px 24px;}
+body.mode-desktop footer{display:none !important;}
+body.mode-desktop #desktopSidebar{display:flex;}
+body.mode-desktop body{padding-left:240px;}
+body.mode-desktop .side-menu{
+    position:fixed;left:0;top:0;
+    width:240px;height:100%;
+    display:flex;flex-direction:column;
+    background:#0a1020;
+    border-right:1px solid rgba(249,115,22,0.1);
+    z-index:999;
+    transform:none !important;
+    overflow-y:auto;
+}
+body.mode-desktop .vid-container{aspect-ratio:16/9;max-height:70vh;}
+body.mode-desktop .synopsis-box{margin:12px 24px;}
+body.mode-desktop .player-selectors{padding:12px 24px 8px;}
+body.mode-desktop .biblio-bar{padding:0 24px 12px;}
+body.mode-desktop #aiChatBtn{bottom:20px;right:24px;}
+body.mode-desktop #pipWindow{width:320px;height:180px;}
+
+/* ======= MODE TV (>= 1200px + TV) ======= */
+body.mode-tv{font-size:18px;}
+body.mode-tv nav{padding:16px 48px;}
+body.mode-tv .logo-txt{font-size:32px;}
+body.mode-tv .search-box{display:none;}
+body.mode-tv .grid{
+    grid-template-columns:repeat(5,1fr);
+    gap:16px;padding:0 32px 20px;
+}
+body.mode-tv .manga-card p,
+body.mode-tv .manga-dex-card p{font-size:11px;padding:5px 8px;}
+body.mode-tv .hero-banner{height:500px;}
+body.mode-tv .hero-title{font-size:38px;}
+body.mode-tv .hero-btn{padding:14px 32px;font-size:14px;border-radius:6px;}
+body.mode-tv .section-title{font-size:20px;margin:20px 32px;}
+body.mode-tv .ep-grid{grid-template-columns:repeat(8,1fr);gap:10px;padding:12px 32px;}
+body.mode-tv .ep-btn{font-size:14px;padding:14px;}
+body.mode-tv footer{display:none !important;}
+body.mode-tv .side-menu{width:360px;font-size:16px;}
+body.mode-tv .menu-link{font-size:16px;padding:18px 0;}
+body.mode-tv .view{padding:90px 0 40px;}
+body.mode-tv .focusable:focus{
+    outline:5px solid var(--primary);
+    transform:scale(1.08);
+}
+body.mode-tv #aiChatBtn{display:none;}
 </style>
 
 <!-- Firebase SDK -->
@@ -5370,6 +5504,124 @@ var API = {
 
 var RAILWAY_TOKEN = localStorage.getItem('otaku_railway_token') || '';
 
+
+// ================================================
+// DETECTION AUTOMATIQUE D'APPAREIL — OtAkU+
+// Modes: mobile | tablet | desktop | tv
+// ================================================
+
+var currentDeviceMode = '';
+
+function detectDevice(){
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    var ua = navigator.userAgent.toLowerCase();
+    var isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+    // Détection TV
+    var isTV = /smart-tv|tv|tizen|webos|vidaa|hbbtv|netcast|nettv|philips|panasonic|sony\s*tv|samsung|viera/.test(ua)
+        || (w >= 1920 && !isTouch)
+        || window.navigator.userAgent.indexOf('TV') > -1;
+
+    var mode;
+    if(isTV){
+        mode = 'tv';
+    } else if(w >= 1200 && !isTouch){
+        mode = 'desktop';
+    } else if(w >= 768 || (isTouch && w >= 600)){
+        mode = 'tablet';
+    } else {
+        mode = 'mobile';
+    }
+
+    // Appliquer si changement
+    if(mode !== currentDeviceMode){
+        // Supprimer tous les modes précédents
+        document.body.classList.remove('mode-mobile','mode-tablet','mode-desktop','mode-tv');
+        document.body.classList.add('mode-'+mode);
+        currentDeviceMode = mode;
+
+        // Ajustements spécifiques par mode
+        applyModeAdjustments(mode);
+
+        // Afficher badge
+        showDeviceBadge(mode);
+
+        console.log('[OtAkU+] Mode detecte:', mode, '('+w+'x'+h+')');
+    }
+}
+
+function applyModeAdjustments(mode){
+    var footer = document.getElementById('mainFooter');
+    var menuBtn = document.querySelector('.menu-btn');
+    var sideMenu = document.getElementById('sideMenu');
+
+    if(mode === 'desktop'){
+        // Desktop: menu latéral permanent, pas de footer pill
+        if(sideMenu){
+            sideMenu.classList.add('open');
+            sideMenu.style.left = '0';
+            sideMenu.style.transform = 'none';
+        }
+        document.body.style.paddingLeft = '240px';
+        if(menuBtn) menuBtn.style.display = 'none';
+
+    } else if(mode === 'tv'){
+        // TV: focus D-pad, pas de footer
+        document.body.style.paddingLeft = '';
+        if(sideMenu) sideMenu.style.left = '';
+        if(menuBtn) menuBtn.style.display = '';
+        // Auto-focus premier élément
+        setTimeout(function(){
+            var first = document.querySelector('.focusable');
+            if(first) first.focus();
+        }, 500);
+
+    } else if(mode === 'tablet'){
+        // Tablette: layout élargi
+        document.body.style.paddingLeft = '';
+        if(sideMenu){ sideMenu.classList.remove('open'); }
+        if(menuBtn) menuBtn.style.display = '';
+
+    } else {
+        // Mobile: layout standard
+        document.body.style.paddingLeft = '';
+        if(sideMenu){ sideMenu.classList.remove('open'); }
+        if(menuBtn) menuBtn.style.display = '';
+    }
+}
+
+function showDeviceBadge(mode){
+    var badge = document.getElementById('deviceBadge');
+    if(!badge) return;
+    var labels = {
+        mobile: 'MOBILE',
+        tablet: 'TABLETTE',
+        desktop: 'DESKTOP',
+        tv: 'SMART TV'
+    };
+    var icons = {mobile:'📱', tablet:'📟', desktop:'💻', tv:'📺'};
+    badge.textContent = (icons[mode]||'') + ' ' + (labels[mode]||mode.toUpperCase());
+    badge.classList.add('show');
+    // Cacher après 3 secondes
+    setTimeout(function(){ badge.classList.remove('show'); }, 3000);
+}
+
+// Lancer la détection au chargement
+detectDevice();
+
+// Re-détecter au redimensionnement (rotation tablette, etc.)
+var resizeTimer;
+window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(detectDevice, 300);
+});
+
+// Re-détecter au changement d'orientation
+window.addEventListener('orientationchange', function(){
+    setTimeout(detectDevice, 500);
+});
+
 window.onload=function(){
     checkAuth();
     loadProfile();
@@ -5614,6 +5866,10 @@ window.onload=function(){
         <span class="sp-ltr">+</span>
     </div>
 </div>
+
+
+<!-- Badge mode appareil -->
+<div id="deviceBadge"></div>
 
 </body>
 </html>
