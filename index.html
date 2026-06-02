@@ -216,8 +216,9 @@ nav{background:rgba(2,6,23,0.92);backdrop-filter:blur(14px);padding:11px 16px;di
 .suggestion-item:hover,.suggestion-item:focus{background:rgba(249,115,22,0.12);}
 
 /* SIDE MENU */
-.side-menu{position:fixed;top:0;left:-300px;width:280px;height:100%;background:#08102a;z-index:2000;transition:0.35s cubic-bezier(.16,1,.3,1);padding:26px 18px;border-right:2px solid rgba(249,115,22,0.15);overflow-y:auto;}
-.side-menu.open{left:0;}
+.side-menu{position:fixed;top:0;left:-310px;width:280px;height:100%;background:#08102a;z-index:2000;transition:0.35s cubic-bezier(.16,1,.3,1);padding:26px 18px;border-right:2px solid rgba(249,115,22,0.15);overflow-y:auto;visibility:hidden;}
+.side-menu.open{left:0;visibility:visible;}
+body{overflow-x:hidden;}
 .profile-section{display:flex;align-items:center;gap:12px;margin-bottom:26px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.07);}
 .profile-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(45deg,var(--primary),#fbbf24);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;cursor:pointer;position:relative;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,0.15);}
 .profile-avatar img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;}
@@ -938,6 +939,151 @@ body.mode-tv .focusable:focus{
     transform:scale(1.08);
 }
 body.mode-tv #aiChatBtn{display:none;}
+
+/* ================================================
+   EFFET MIROIR DEFILANT GLOBAL — OtAkU+
+   S'applique partout : cartes, profils, nav, sidebar,
+   boutons, paramètres, tout
+   ================================================ */
+
+/* Keyframe du sweep miroir */
+@keyframes globalMirrorSweep {
+    0%   { transform: translateX(-150%) skewX(-20deg); opacity:0; }
+    5%   { opacity:1; }
+    50%  { transform: translateX(250%) skewX(-20deg); opacity:0.7; }
+    100% { transform: translateX(250%) skewX(-20deg); opacity:0; }
+}
+
+/* Appliquer sur TOUT ce qui est visible */
+.manga-card::after,
+.manga-dex-card::after,
+.fav-card::after,
+.history-item::after,
+.chapter-item::after,
+.ep-btn::after,
+.ps-card::after,
+.ps-avatar::after,
+.about-card::after,
+nav::after,
+.side-menu::after,
+.hero-banner::after,
+.synopsis-box::after,
+.vid-container::after,
+.filter-chip::after,
+.sort-btn::after,
+.selector-btn::after,
+.auth-form::after,
+.auth-btn::after,
+.auth-btn-social::after,
+.modal-box::after,
+#sleepScreen::after,
+footer::after,
+.tab::after,
+#aiChatPanel::after,
+.ai-msg::after,
+.davieslay-card::after,
+#otakuSpinner::after,
+.menu-link::after,
+[style*="background:var(--card)"]::after,
+[style*="background:#0f172a"]::after,
+[style*="background:#1e293b"]::after,
+[style*="border-radius"]::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(
+        105deg,
+        transparent 0%,
+        transparent 30%,
+        rgba(255,255,255,0.04) 40%,
+        rgba(255,255,255,0.12) 50%,
+        rgba(255,255,255,0.04) 60%,
+        transparent 70%,
+        transparent 100%
+    );
+    pointer-events: none;
+    z-index: 999;
+    border-radius: inherit;
+    animation: globalMirrorSweep var(--sweep-dur, 4s) ease-in-out var(--sweep-delay, 0s) infinite;
+}
+
+/* Délais variés pour que chaque élément brille à un moment différent */
+.manga-card::after         { --sweep-dur:5s;  --sweep-delay:0s; }
+.manga-dex-card::after     { --sweep-dur:5s;  --sweep-delay:0.4s; }
+.fav-card::after           { --sweep-dur:6s;  --sweep-delay:0.8s; }
+.ep-btn::after             { --sweep-dur:4s;  --sweep-delay:0.2s; }
+.ps-card::after            { --sweep-dur:7s;  --sweep-delay:0.6s; }
+.ps-avatar::after          { --sweep-dur:6s;  --sweep-delay:1.2s; }
+nav::after                 { --sweep-dur:8s;  --sweep-delay:1s; }
+.side-menu::after          { --sweep-dur:9s;  --sweep-delay:2s; }
+footer::after              { --sweep-dur:7s;  --sweep-delay:0.5s; }
+.tab::after                { --sweep-dur:5s;  --sweep-delay:0.3s; }
+.hero-banner::after        { --sweep-dur:10s; --sweep-delay:3s; }
+.about-card::after         { --sweep-dur:6s;  --sweep-delay:1.5s; }
+.synopsis-box::after       { --sweep-dur:7s;  --sweep-delay:0.7s; }
+.vid-container::after      { --sweep-dur:12s; --sweep-delay:4s; }
+.filter-chip::after        { --sweep-dur:4s;  --sweep-delay:0.1s; }
+.selector-btn::after       { --sweep-dur:5s;  --sweep-delay:1.1s; }
+.auth-form::after          { --sweep-dur:8s;  --sweep-delay:2s; }
+.auth-btn::after           { --sweep-dur:4s;  --sweep-delay:0.3s; }
+.auth-btn-social::after    { --sweep-dur:5s;  --sweep-delay:0.6s; }
+.modal-box::after          { --sweep-dur:6s;  --sweep-delay:1.8s; }
+.history-item::after       { --sweep-dur:6s;  --sweep-delay:0.9s; }
+.chapter-item::after       { --sweep-dur:5s;  --sweep-delay:0.4s; }
+.menu-link::after          { --sweep-dur:7s;  --sweep-delay:0.2s; }
+.ai-msg::after             { --sweep-dur:5s;  --sweep-delay:0.5s; }
+#aiChatPanel::after        { --sweep-dur:9s;  --sweep-delay:1.5s; }
+#otakuSpinner::after       { --sweep-dur:3s;  --sweep-delay:0.1s; }
+#sleepScreen::after        { --sweep-dur:15s; --sweep-delay:5s; }
+
+/* Tous les elements doivent avoir position relative pour ::after */
+.manga-card,
+.manga-dex-card,
+.fav-card,
+.history-item,
+.chapter-item,
+.ep-btn,
+.ps-avatar,
+.about-card,
+.synopsis-box,
+.vid-container,
+.filter-chip,
+.sort-btn,
+.selector-btn,
+.auth-btn,
+.auth-btn-social,
+.ai-msg,
+.menu-link {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Réduire l'effet en mode économie données */
+body.data-saver .manga-card::after,
+body.data-saver .manga-dex-card::after,
+body.data-saver *::after {
+    animation: none !important;
+}
+
+/* QR CODE LOGIN */
+#qrLoginModal{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:12000;display:none;align-items:center;justify-content:center;}
+#qrLoginModal.open{display:flex;}
+.qr-box{background:#0f172a;border:2px solid var(--primary);border-radius:20px;padding:28px 24px;width:88%;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.qr-title{font-size:15px;font-weight:900;color:white;}
+.qr-sub{font-size:11px;color:#94a3b8;text-align:center;line-height:1.6;}
+.qr-img-wrap{width:180px;height:180px;background:white;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:8px;}
+.qr-img-wrap img{width:100%;height:100%;object-fit:contain;}
+.qr-link-box{background:#1e293b;border-radius:10px;padding:10px 14px;width:100%;display:flex;align-items:center;gap:8px;}
+.qr-link-txt{flex:1;font-size:10px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.qr-copy-btn{background:var(--primary);border:none;color:white;padding:5px 12px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;white-space:nowrap;}
+.qr-divider{width:100%;display:flex;align-items:center;gap:8px;}
+.qr-divider::before,.qr-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.1);}
+.qr-divider span{font-size:10px;color:#64748b;font-weight:700;}
+.qr-status{font-size:11px;font-weight:700;padding:6px 14px;border-radius:20px;background:rgba(249,115,22,0.15);color:var(--primary);}
+.qr-close-btn{background:#334155;border:none;color:#94a3b8;padding:10px;border-radius:10px;width:100%;font-family:Inter,sans-serif;font-weight:700;font-size:12px;cursor:pointer;}
 </style>
 
 <!-- Firebase SDK -->
@@ -1082,6 +1228,17 @@ var firebaseReady = false;
             Continuer avec Microsoft
         </button>
         <div style="text-align:center;font-size:11px;color:#94a3b8;margin-top:8px;">Pas encore de compte ? <span style="color:var(--primary);cursor:pointer;" onclick="switchAuth('register')">S'inscrire</span></div>
+
+        <!-- Connexion QR -->
+        <div style="display:flex;align-items:center;gap:10px;margin:10px 0 0;">
+            <div style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></div>
+            <span style="font-size:10px;color:#64748b;font-weight:700;letter-spacing:1px;">RAPIDE</span>
+            <div style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></div>
+        </div>
+        <button onclick="openQRLogin()" style="width:100%;padding:11px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#94a3b8;font-family:Inter,sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13 0h-3v2h2v2h-2v2h3v-3h2v-3h-2v2zm-5-2h2v2h-2zm0 4h2v2h-2zm-2-4v8h2v-6h-2z"/></svg>
+            Connexion par QR code ou lien
+        </button>
     </div>
     <div class="auth-form" id="registerForm" style="display:none;">
         <input class="auth-input focusable" id="regName" type="text" placeholder="Ton nom" tabindex="0">
@@ -5622,6 +5779,158 @@ window.addEventListener('orientationchange', function(){
     setTimeout(detectDevice, 500);
 });
 
+
+// ================================================
+// QR CODE LOGIN & CONNEXION PAR LIEN — OtAkU+
+// ================================================
+var qrToken = '';
+var qrPollTimer = null;
+var APP_URL = 'https://marcelaagbassi-create.github.io/OtAkUplus-/';
+
+// Vérifier au démarrage si on arrive via un lien QR
+(function checkQRToken(){
+    var params = new URLSearchParams(window.location.search);
+    var token = params.get('qr') || params.get('token');
+    if(token){
+        // Stocker et appliquer
+        localStorage.setItem('otaku_qr_session', token);
+        // Chercher le user associé à ce token
+        var sessions = JSON.parse(localStorage.getItem('otaku_qr_sessions')||'{}');
+        var userData = sessions[token];
+        if(userData){
+            // Connexion automatique
+            currentUser = userData;
+            localStorage.setItem('otaku_current_user', JSON.stringify(userData));
+            if(RAILWAY_TOKEN) localStorage.setItem('otaku_railway_token', RAILWAY_TOKEN);
+            // Nettoyer l'URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+            showToast('Connexion par lien reussie !');
+            // Marquer le token comme utilise (pour notifier l'appareil source)
+            var used = JSON.parse(localStorage.getItem('otaku_qr_used')||'{}');
+            used[token] = Date.now();
+            localStorage.setItem('otaku_qr_used', JSON.stringify(used));
+        } else {
+            // Token inconnu - essayer via serveur backend
+            if(RAILWAY_SERVER){
+                fetch(RAILWAY_SERVER+'/auth/qr/verify?token='+token)
+                .then(function(r){return r.json();})
+                .then(function(d){
+                    if(d.user){
+                        currentUser = d.user;
+                        if(d.token) localStorage.setItem('otaku_railway_token', d.token);
+                        localStorage.setItem('otaku_current_user', JSON.stringify(d.user));
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                        showToast('Connexion par lien reussie !');
+                    }
+                }).catch(function(){});
+            }
+        }
+    }
+})();
+
+function generateQRToken(){
+    // Générer un token unique
+    var chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    var token = '';
+    for(var i=0;i<16;i++) token += chars[Math.floor(Math.random()*chars.length)];
+    return token;
+}
+
+function openQRLogin(){
+    qrToken = generateQRToken();
+    var loginUrl = APP_URL + '?qr=' + qrToken;
+
+    // Sauvegarder la session QR avec les infos user si connecté
+    if(currentUser){
+        var sessions = JSON.parse(localStorage.getItem('otaku_qr_sessions')||'{}');
+        sessions[qrToken] = currentUser;
+        localStorage.setItem('otaku_qr_sessions', JSON.stringify(sessions));
+    }
+
+    // Afficher le modal
+    document.getElementById('qrLoginModal').classList.add('open');
+
+    // Générer le QR code via API gratuite
+    var qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=png&ecc=M&data=' + encodeURIComponent(loginUrl);
+    var qrImg = document.getElementById('qrCodeImg');
+    if(qrImg) qrImg.src = qrApiUrl;
+
+    // Afficher le lien
+    var linkEl = document.getElementById('qrLinkTxt');
+    if(linkEl) linkEl.textContent = loginUrl;
+
+    // Polling pour détecter quand le QR est scanné
+    clearInterval(qrPollTimer);
+    qrPollTimer = setInterval(function(){
+        var used = JSON.parse(localStorage.getItem('otaku_qr_used')||'{}');
+        if(used[qrToken]){
+            var statusEl = document.getElementById('qrStatus');
+            if(statusEl){ statusEl.textContent = 'QR scan OK !'; statusEl.style.background = 'rgba(34,197,94,0.15)'; statusEl.style.color = '#22c55e'; }
+            clearInterval(qrPollTimer);
+            setTimeout(closeQRLogin, 2000);
+        }
+        // Essayer aussi le serveur
+        if(RAILWAY_SERVER){
+            fetch(RAILWAY_SERVER+'/auth/qr/status?token='+qrToken)
+            .then(function(r){return r.json();})
+            .then(function(d){
+                if(d.scanned&&d.user){
+                    currentUser=d.user;
+                    if(d.jwt) localStorage.setItem('otaku_railway_token',d.jwt);
+                    localStorage.setItem('otaku_current_user',JSON.stringify(d.user));
+                    var s=document.getElementById('qrStatus');
+                    if(s){s.textContent='Connexion reussie !';s.style.background='rgba(34,197,94,0.15)';s.style.color='#22c55e';}
+                    clearInterval(qrPollTimer);
+                    setTimeout(function(){closeQRLogin();document.getElementById('authScreen').classList.add('hidden');showProfileSelector();},1500);
+                }
+            }).catch(function(){});
+        }
+    }, 2000);
+
+    // Enregistrer le token sur le serveur si dispo
+    if(RAILWAY_SERVER){
+        fetch(RAILWAY_SERVER+'/auth/qr/create',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({token:qrToken,url:loginUrl})
+        }).catch(function(){});
+    }
+}
+
+function closeQRLogin(){
+    clearInterval(qrPollTimer);
+    document.getElementById('qrLoginModal').classList.remove('open');
+    var statusEl=document.getElementById('qrStatus');
+    if(statusEl){statusEl.textContent='En attente de scan...';statusEl.style.background='rgba(249,115,22,0.15)';statusEl.style.color='var(--primary)';}
+}
+
+function copyQRLink(){
+    var link = APP_URL + '?qr=' + qrToken;
+    if(navigator.clipboard){
+        navigator.clipboard.writeText(link).then(function(){showToast('Lien copie !');});
+    } else {
+        // Fallback
+        var ta=document.createElement('textarea');
+        ta.value=link;document.body.appendChild(ta);ta.select();
+        document.execCommand('copy');document.body.removeChild(ta);
+        showToast('Lien copie !');
+    }
+}
+
+function shareQRLink(platform){
+    var link = APP_URL + '?qr=' + qrToken;
+    var msg = 'Rejoins-moi sur OtAkU+ !  ' + link;
+    if(platform==='whatsapp'){
+        window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+    } else if(platform==='native'){
+        if(navigator.share){
+            navigator.share({title:'OtAkU+',text:'Connexion rapide OtAkU+',url:link}).catch(function(){});
+        } else {
+            copyQRLink();
+        }
+    }
+}
+
 window.onload=function(){
     checkAuth();
     loadProfile();
@@ -5870,6 +6179,38 @@ window.onload=function(){
 
 <!-- Badge mode appareil -->
 <div id="deviceBadge"></div>
+
+
+<!-- MODAL QR CODE LOGIN -->
+<div id="qrLoginModal">
+    <div class="qr-box">
+        <div class="qr-title">Connexion rapide</div>
+        <div class="qr-sub">Scanne ce QR code avec un autre appareil<br>ou partage le lien pour te connecter</div>
+
+        <!-- QR Code -->
+        <div class="qr-img-wrap">
+            <img id="qrCodeImg" src="" alt="QR Code">
+        </div>
+
+        <!-- Statut -->
+        <div class="qr-status" id="qrStatus">En attente de scan...</div>
+
+        <!-- Lien partageable -->
+        <div class="qr-divider"><span>OU PARTAGE CE LIEN</span></div>
+        <div class="qr-link-box">
+            <div class="qr-link-txt" id="qrLinkTxt"></div>
+            <button class="qr-copy-btn" onclick="copyQRLink()">COPIER</button>
+        </div>
+
+        <!-- Partager via apps -->
+        <div style="display:flex;gap:8px;width:100%;">
+            <button onclick="shareQRLink('whatsapp')" style="flex:1;background:#25D366;border:none;color:white;padding:9px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">WhatsApp</button>
+            <button onclick="shareQRLink('native')" style="flex:1;background:#3b82f6;border:none;color:white;padding:9px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">Partager</button>
+        </div>
+
+        <button class="qr-close-btn" onclick="closeQRLogin()">FERMER</button>
+    </div>
+</div>
 
 </body>
 </html>
