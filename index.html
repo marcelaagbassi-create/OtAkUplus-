@@ -941,132 +941,82 @@ body.mode-tv .focusable:focus{
 body.mode-tv #aiChatBtn{display:none;}
 
 /* ================================================
-   EFFET MIROIR DEFILANT GLOBAL — OtAkU+
-   S'applique partout : cartes, profils, nav, sidebar,
-   boutons, paramètres, tout
+   EFFET MIROIR — Uniquement cartes + assistant IA
    ================================================ */
 
-/* Keyframe du sweep miroir */
-@keyframes globalMirrorSweep {
-    0%   { transform: translateX(-150%) skewX(-20deg); opacity:0; }
-    5%   { opacity:1; }
-    50%  { transform: translateX(250%) skewX(-20deg); opacity:0.7; }
-    100% { transform: translateX(250%) skewX(-20deg); opacity:0; }
+@keyframes cardMirrorSweep {
+    0%   { left:-60%; opacity:0; }
+    10%  { opacity:1; }
+    80%  { left:140%; opacity:0.6; }
+    100% { left:140%; opacity:0; }
 }
 
-/* Appliquer sur TOUT ce qui est visible */
-.manga-card::after,
-.manga-dex-card::after,
-.fav-card::after,
-.history-item::after,
-.chapter-item::after,
-.ep-btn::after,
-.ps-card::after,
-.ps-avatar::after,
-.about-card::after,
-nav::after,
-.side-menu::after,
-.hero-banner::after,
-.synopsis-box::after,
-.vid-container::after,
-.filter-chip::after,
-.sort-btn::after,
-.selector-btn::after,
-.auth-form::after,
-.auth-btn::after,
-.auth-btn-social::after,
-.modal-box::after,
-#sleepScreen::after,
-footer::after,
-.tab::after,
-#aiChatPanel::after,
-.ai-msg::after,
-.davieslay-card::after,
-#otakuSpinner::after,
-.menu-link::after,
-[style*="background:var(--card)"]::after,
-[style*="background:#0f172a"]::after,
-[style*="background:#1e293b"]::after,
-[style*="border-radius"]::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 40%;
-    height: 100%;
-    background: linear-gradient(
-        105deg,
-        transparent 0%,
-        transparent 30%,
-        rgba(255,255,255,0.04) 40%,
-        rgba(255,255,255,0.12) 50%,
-        rgba(255,255,255,0.04) 60%,
-        transparent 70%,
-        transparent 100%
-    );
-    pointer-events: none;
-    z-index: 999;
-    border-radius: inherit;
-    animation: globalMirrorSweep var(--sweep-dur, 4s) ease-in-out var(--sweep-delay, 0s) infinite;
-}
-
-/* Délais variés pour que chaque élément brille à un moment différent */
-.manga-card::after         { --sweep-dur:5s;  --sweep-delay:0s; }
-.manga-dex-card::after     { --sweep-dur:5s;  --sweep-delay:0.4s; }
-.fav-card::after           { --sweep-dur:6s;  --sweep-delay:0.8s; }
-.ep-btn::after             { --sweep-dur:4s;  --sweep-delay:0.2s; }
-.ps-card::after            { --sweep-dur:7s;  --sweep-delay:0.6s; }
-.ps-avatar::after          { --sweep-dur:6s;  --sweep-delay:1.2s; }
-nav::after                 { --sweep-dur:8s;  --sweep-delay:1s; }
-.side-menu::after          { --sweep-dur:9s;  --sweep-delay:2s; }
-footer::after              { --sweep-dur:7s;  --sweep-delay:0.5s; }
-.tab::after                { --sweep-dur:5s;  --sweep-delay:0.3s; }
-.hero-banner::after        { --sweep-dur:10s; --sweep-delay:3s; }
-.about-card::after         { --sweep-dur:6s;  --sweep-delay:1.5s; }
-.synopsis-box::after       { --sweep-dur:7s;  --sweep-delay:0.7s; }
-.vid-container::after      { --sweep-dur:12s; --sweep-delay:4s; }
-.filter-chip::after        { --sweep-dur:4s;  --sweep-delay:0.1s; }
-.selector-btn::after       { --sweep-dur:5s;  --sweep-delay:1.1s; }
-.auth-form::after          { --sweep-dur:8s;  --sweep-delay:2s; }
-.auth-btn::after           { --sweep-dur:4s;  --sweep-delay:0.3s; }
-.auth-btn-social::after    { --sweep-dur:5s;  --sweep-delay:0.6s; }
-.modal-box::after          { --sweep-dur:6s;  --sweep-delay:1.8s; }
-.history-item::after       { --sweep-dur:6s;  --sweep-delay:0.9s; }
-.chapter-item::after       { --sweep-dur:5s;  --sweep-delay:0.4s; }
-.menu-link::after          { --sweep-dur:7s;  --sweep-delay:0.2s; }
-.ai-msg::after             { --sweep-dur:5s;  --sweep-delay:0.5s; }
-#aiChatPanel::after        { --sweep-dur:9s;  --sweep-delay:1.5s; }
-#otakuSpinner::after       { --sweep-dur:3s;  --sweep-delay:0.1s; }
-#sleepScreen::after        { --sweep-dur:15s; --sweep-delay:5s; }
-
-/* Tous les elements doivent avoir position relative pour ::after */
+/* Effet miroir subtil sur les CARTES uniquement */
 .manga-card,
 .manga-dex-card,
 .fav-card,
-.history-item,
-.chapter-item,
-.ep-btn,
-.ps-avatar,
-.about-card,
-.synopsis-box,
-.vid-container,
-.filter-chip,
-.sort-btn,
-.selector-btn,
-.auth-btn,
-.auth-btn-social,
-.ai-msg,
-.menu-link {
-    position: relative;
-    overflow: hidden;
+.history-item {
+    position:relative;
+    overflow:hidden;
 }
 
-/* Réduire l'effet en mode économie données */
+.manga-card::after,
+.manga-dex-card::after,
+.fav-card::after {
+    content:'';
+    position:absolute;
+    top:0;
+    left:-60%;
+    width:30%;
+    height:100%;
+    background:linear-gradient(
+        105deg,
+        transparent 0%,
+        rgba(255,255,255,0.08) 40%,
+        rgba(255,255,255,0.18) 50%,
+        rgba(255,255,255,0.08) 60%,
+        transparent 100%
+    );
+    transform:skewX(-15deg);
+    pointer-events:none;
+    z-index:5;
+    animation:cardMirrorSweep var(--sweep-dur,6s) ease-in-out var(--sweep-delay,0s) infinite;
+}
+
+/* Délais variés par type de carte */
+.manga-card::after      { --sweep-dur:7s;  --sweep-delay:0s; }
+.manga-dex-card::after  { --sweep-dur:8s;  --sweep-delay:1.5s; }
+.fav-card::after        { --sweep-dur:9s;  --sweep-delay:0.8s; }
+
+/* Effet miroir dans le panel IA */
+.ai-msg.bot {
+    position:relative;
+    overflow:hidden;
+}
+.ai-msg.bot::after {
+    content:'';
+    position:absolute;
+    top:0;left:-60%;
+    width:25%;
+    height:100%;
+    background:linear-gradient(
+        105deg,
+        transparent,
+        rgba(249,115,22,0.06) 40%,
+        rgba(249,115,22,0.12) 50%,
+        rgba(249,115,22,0.06) 60%,
+        transparent
+    );
+    transform:skewX(-15deg);
+    pointer-events:none;
+    animation:cardMirrorSweep 10s ease-in-out 2s infinite;
+}
+
+/* Désactiver en mode économie données */
 body.data-saver .manga-card::after,
 body.data-saver .manga-dex-card::after,
-body.data-saver *::after {
-    animation: none !important;
-}
+body.data-saver .fav-card::after,
+body.data-saver .ai-msg.bot::after { animation:none !important; }
 
 /* QR CODE LOGIN */
 #qrLoginModal{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:12000;display:none;align-items:center;justify-content:center;}
