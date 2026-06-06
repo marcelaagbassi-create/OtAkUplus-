@@ -5356,43 +5356,75 @@ async function sendAIMessage(){
     try{
         var answer;
         if(OTAKU_AI_SERVER){
-            // Via serveur Render securise (cle cachee)
-            var resp=await fetch(OTAKU_AI_SERVER+'/api/chat',{
-                method:'POST',
-                headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({messages:aiHistory.slice(-10),context:userCtx,max_tokens:600})
-            });
-            if(!resp.ok){var err=await resp.json().catch(function(){return {};});throw new Error(err.message||'Erreur '+resp.status);}
-            var data=await resp.json();
-            answer=data.answer||'Impossible de repondre.';
+            // Essayer plusieurs routes en cas de 404
+            var tried=false;
+            var tryRoutes=['/api/chat','/chat','/ask'];
+            for(var ri=0;ri<tryRoutes.length;ri++){
+                try{
+                    var resp=await fetch(OTAKU_AI_SERVER+tryRoutes[ri],{
+                        method:'POST',
+                        headers:{'Content-Type':'application/json'},
+                        body:JSON.stringify({messages:aiHistory.slice(-10),context:userCtx,max_tokens:600})
+                    });
+                    if(resp.status===404){continue;}
+                    if(!resp.ok){
+                        var errD=await resp.json().catch(function(){return{};});
+                        throw new Error(errD.message||errD.error||'Erreur serveur '+resp.status);
+                    }
+                    var data=await resp.json();
+                    answer=data.answer||data.response||data.message||(data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'Impossible de repondre.';
+                    tried=true;
+                    break;
+                }catch(routeErr){
+                    if(routeErr.message&&routeErr.message.includes('Erreur serveur')) throw routeErr;
+                }
+            }
+            // Si aucune route n'a marche → fallback Mistral direct
+            if(!tried){
+                if(!key){ answer='Le serveur IA ne repond pas (404 sur toutes les routes). Contacte DAVIESLAY.'; }
+                else {
+                    var r2=await fetch(MISTRAL_API,{
+                        method:'POST',
+                        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+                        body:JSON.stringify({model:MISTRAL_MODEL,messages:messages,max_tokens:600,temperature:0.7})
+                    });
+                    if(!r2.ok){var e2=await r2.json().catch(function(){return{};});throw new Error(e2.message||'Erreur Mistral '+r2.status);}
+                    var d2=await r2.json();
+                    answer=d2.choices&&d2.choices[0]&&d2.choices[0].message?d2.choices[0].message.content:'Impossible de repondre.';
+                }
+            }
         } else {
-            // Fallback direct Mistral (cle locale)
+            // Pas de serveur → Mistral direct
             var resp=await fetch(MISTRAL_API,{
                 method:'POST',
                 headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
                 body:JSON.stringify({model:MISTRAL_MODEL,messages:messages,max_tokens:600,temperature:0.7})
             });
-            if(!resp.ok){var err=await resp.json().catch(function(){return {};});throw new Error(err.message||'Erreur '+resp.status);}
+            if(!resp.ok){var err=await resp.json().catch(function(){return{};});throw new Error(err.message||'Erreur '+resp.status);}
             var data=await resp.json();
             answer=data.choices&&data.choices[0]&&data.choices[0].message?data.choices[0].message.content:'Impossible de repondre.';
         }
         removeAITyping();addAIMsg('bot',answer);
         aiHistory.push({role:'assistant',content:answer});
-        // Bouton action contextuel
-        var msgs=document.getElementById('aiMsgs');
-        if(msgs&&answer.length>80){
+        var msgs2=document.getElementById('aiMsgs');
+        if(msgs2&&answer.length>80){
             var ad=document.createElement('div');
             ad.style.cssText='padding:4px 0 0 4px;';
             ad.innerHTML='<button onclick="toggleAIChat();loadDiscover();" style="background:rgba(249,115,22,0.15);border:1px solid var(--primary);color:var(--primary);padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">Decouvrir dans OtAkU+</button>';
-            msgs.appendChild(ad);msgs.scrollTop=msgs.scrollHeight;
+            msgs2.appendChild(ad);msgs2.scrollTop=msgs2.scrollHeight;
         }
     }catch(e){
         removeAITyping();
-        if(e.message&&e.message.includes('401')){
-            addAIMsg('bot','Cle API invalide. Verifie ta cle Mistral dans platform.mistral.ai');
+        var em=e.message||'';
+        if(em.includes('401')){
+            addAIMsg('bot','Cle API invalide. Verifie ta cle sur platform.mistral.ai');
             var b=document.getElementById('aiKeyBanner');if(b)b.style.display='block';
-        }else{
-            addAIMsg('bot','Erreur: '+(e.message||'Connexion impossible.'));
+        } else if(em.includes('Failed to fetch')||em.includes('NetworkError')){
+            addAIMsg('bot','Pas de connexion. Verifie ta connexion internet.');
+        } else if(em.includes('404')){
+            addAIMsg('bot','Serveur IA introuvable. Le serveur Render est peut-etre en train de demarrer (50s). Reessaie dans un instant.');
+        } else {
+            addAIMsg('bot','Erreur: '+em);
         }
     }
     aiTyping=false;if(btn)btn.style.opacity='1';
