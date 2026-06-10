@@ -6338,250 +6338,272 @@ var _origSV = window.sV || null;
     };
 })();
 
-// ================================================
-// ZONE PUB SÉPARÉE — Gestion bannière pub
-// ================================================
-var _adPendingEp   = null;
-var _adPendingSn   = null;
-var _adCountdownTm = null;
-var _adSecondsLeft = 15;
-var _adSkippable   = false;
-var _adDone        = false;
-
-// Sources pub légères (iframes inoffensives, pas de redirect)
-var _adSources = [
-    'https://www.googletagservices.com/tag/js/gpt.js', // placeholder
-];
-
-// Intercepter lS() pour afficher la pub d'abord
-var _origLS = window.lS;
-window.lS = function(ep, sn){
-    // Si la pub a déjà été vue dans cette session → lancer direct
-    if(sessionStorage.getItem('otaku_ad_done') === '1'){
-        _origLS(ep, sn);
-        return;
-    }
-    // Sinon : mémoriser l'épisode et afficher la pub
-    _adPendingEp = ep;
-    _adPendingSn = sn || cSn || 1;
-    _adDone = false;
-    showAdZone();
-};
-
-function showAdZone(){
-    var wrap = document.getElementById('adZoneWrap');
-    var watchBtn = document.getElementById('watchWithAdBtn');
-    var skipBtn  = document.getElementById('adZoneSkipBtn');
-    var closeBtn = document.getElementById('adZoneCloseBtn');
-    var overlay  = document.getElementById('adZoneOverlay');
-    var countdown= document.getElementById('adZoneCountdown');
-    if(!wrap) return;
-
-    // Reset état
-    _adSecondsLeft = 15;
-    _adSkippable   = false;
-    skipBtn.style.display  = 'none';
-    closeBtn.style.display = 'none';
-    if(watchBtn) watchBtn.classList.remove('ready');
-    if(overlay)  overlay.classList.remove('hidden');
-
-    // Afficher la zone
-    wrap.style.display = 'block';
-    // Scroll jusqu'à la zone pub
-    setTimeout(function(){
-        wrap.scrollIntoView({behavior:'smooth', block:'center'});
-    }, 100);
-
-    // Charger une pub neutre dans l'iframe
-    var adFrame = document.getElementById('adZoneFrame');
-    if(adFrame){
-        // Page pub simple et neutre — on utilise une page HTML inline
-        // qui simule une pub sans redirection
-        var adContent = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
-            '<style>body{margin:0;background:#0a1020;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Inter,sans-serif;color:white;overflow:hidden;}' +
-            '.ad-box{text-align:center;padding:16px;}.ad-logo{font-size:28px;font-weight:900;color:#f97316;letter-spacing:-1px;margin-bottom:6px;}' +
-            '.ad-txt{font-size:11px;color:#64748b;margin-bottom:10px;}' +
-            '.ad-badge{background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.3);border-radius:6px;padding:6px 14px;font-size:12px;color:#f97316;font-weight:700;}' +
-            '</style></head><body>' +
-            '<div class="ad-box">' +
-            '<div class="ad-logo">OtAkU+</div>' +
-            '<div class="ad-txt">Regarde cette publicité pour accéder à l\'épisode gratuitement</div>' +
-            '<div class="ad-badge">📺 Publicité partenaire</div>' +
-            '</div></body></html>';
-        var blob = new Blob([adContent], {type:'text/html'});
-        adFrame.src = URL.createObjectURL(blob);
-        // Cacher overlay après chargement
-        adFrame.onload = function(){
-            setTimeout(function(){
-                if(overlay) overlay.classList.add('hidden');
-            }, 500);
-        };
-    }
-
-    // Countdown
-    clearInterval(_adCountdownTm);
-    if(countdown) countdown.textContent = _adSecondsLeft;
-
-    _adCountdownTm = setInterval(function(){
-        _adSecondsLeft--;
-        if(countdown) countdown.textContent = _adSecondsLeft;
-
-        // Après 5s → bouton ignorer
-        if(_adSecondsLeft <= 10 && !_adSkippable){
-            _adSkippable = true;
-            skipBtn.style.display = 'inline-flex';
-        }
-
-        // Fin du compte à rebours
-        if(_adSecondsLeft <= 0){
-            clearInterval(_adCountdownTm);
-            _adDone = true;
-            skipBtn.style.display  = 'none';
-            closeBtn.style.display = 'block';
-            if(countdown) countdown.textContent = '✓';
-            // Activer le bouton Regarder
-            if(watchBtn) watchBtn.classList.add('ready');
-            watchBtn.scrollIntoView({behavior:'smooth', block:'center'});
-        }
-    }, 1000);
-}
-
-function skipAdZone(){
-    if(!_adSkippable) return;
-    clearInterval(_adCountdownTm);
-    _adDone = true;
-    document.getElementById('adZoneSkipBtn').style.display  = 'none';
-    document.getElementById('adZoneCloseBtn').style.display = 'block';
-    var countdown = document.getElementById('adZoneCountdown');
-    if(countdown) countdown.textContent = '✓';
-    var watchBtn = document.getElementById('watchWithAdBtn');
-    if(watchBtn){
-        watchBtn.classList.add('ready');
-        watchBtn.scrollIntoView({behavior:'smooth', block:'center'});
-    }
-}
-
-function closeAdZone(){
-    var wrap = document.getElementById('adZoneWrap');
-    if(wrap) wrap.style.display = 'none';
-    var watchBtn = document.getElementById('watchWithAdBtn');
-    if(watchBtn) watchBtn.classList.remove('ready');
-    clearInterval(_adCountdownTm);
-}
-
-function watchAfterAd(){
-    if(!_adDone) return;
-    // Marquer pub vue pour cette session
-    sessionStorage.setItem('otaku_ad_done','1');
-    closeAdZone();
-    // Lancer la vraie vidéo
-    if(_adPendingEp !== null){
-        _origLS(_adPendingEp, _adPendingSn);
-        _adPendingEp = null;
-        _adPendingSn = null;
-    }
-}
-
-// Réinitialiser la session pub quand on change d'anime
-var _origLoadAnime = window.loadAnime;
-if(_origLoadAnime){
-    window.loadAnime = function(){
-        sessionStorage.removeItem('otaku_ad_done');
-        _origLoadAnime.apply(this, arguments);
-    };
-}
 
 // ================================================
-// BLOQUEUR DE PUBS / POPUPS / REDIRECTIONS
+// BANNIÈRE PUB PERMANENTE — OtAkU+
+// Toute pub / popup / nouvelle fenêtre → capturée dans la bannière
 // ================================================
 (function(){
-    // 1. Bloquer window.open (popunders/popups)
-    var _origOpen = window.open;
-    window.open = function(url, name, features){
-        // Autoriser seulement les ouvertures légitimes OtAkU+
-        if(url && (
-            url.indexOf('vidsrc') > -1 ||
-            url.indexOf('davideo') > -1 ||
-            url.indexOf('youtube') > -1 ||
-            url.indexOf('github') > -1
-        )){
-            return _origOpen.apply(window, arguments);
-        }
-        console.warn('[OtAkU+] Popup bloqué:', url);
-        return null;
-    };
 
-    // 2. Bloquer les redirections de la page principale
-    var _adDomains = [
-        'ads','advert','doubleclick','googlesyndication','adsystem',
+    // ── État global ──
+    var _adCountdownTm  = null;
+    var _adSecondsLeft  = 15;
+    var _adSkippable    = false;
+    var _adDone         = false;
+    var _pendingEp      = null;
+    var _pendingSn      = null;
+
+    // ── Domaines / patterns pub ──
+    var AD_PATTERNS = [
         'popads','popcash','exoclick','trafficjunky','juicyads',
         'hilltopads','adsterra','propellerads','richpush','pushprofit',
         'adcash','clickadu','revcontent','mgid','outbrain','taboola',
         'coinzilla','a-ads','yllix','bidvertiser','adfly','shorte.st',
-        'adf.ly','shrinkearn','linkvertise','exe.io','fc.lc'
+        'adf.ly','shrinkearn','linkvertise','exe.io','fc.lc',
+        'doubleclick','googlesyndication','adsystem','popunder','popunder'
     ];
 
-    // Intercepter les navigations via location.href
-    var _origAssign   = window.location.assign.bind(window.location);
-    var _origReplace  = window.location.replace.bind(window.location);
+    // URLs légitimes à ne jamais bloquer
+    var SAFE_PATTERNS = [
+        'vidsrc','youtube','youtu.be','davideo','github','jikan',
+        'mangadex','myanimelist','onrender.com','qrserver','wa.me',
+        'blob:','about:blank','data:'
+    ];
 
     function isAdUrl(url){
-        if(!url) return false;
+        if(!url || url === '' || url === 'about:blank') return false;
         var u = url.toLowerCase();
-        return _adDomains.some(function(d){ return u.indexOf(d) > -1; });
+        if(SAFE_PATTERNS.some(function(s){ return u.indexOf(s) > -1; })) return false;
+        return AD_PATTERNS.some(function(p){ return u.indexOf(p) > -1; });
     }
 
+    // ════════════════════════════════════════════
+    // 1. window.open → CAPTURER dans bannière
+    // ════════════════════════════════════════════
+    var _origOpen = window.open;
+    window.open = function(url, name, features){
+        if(!url) return null;
+        if(!isAdUrl(url)) return _origOpen.apply(window, arguments);
+        console.warn('[OtAkU+] Popup capturé → bannière:', url);
+        loadUrlInBanner(url);
+        return { closed:false, focus:function(){}, close:function(){} };
+    };
+
+    // ════════════════════════════════════════════
+    // 2. location.assign / replace → CAPTURER
+    // ════════════════════════════════════════════
+    var _origAssign  = window.location.assign.bind(window.location);
+    var _origReplace = window.location.replace.bind(window.location);
     window.location.assign = function(url){
-        if(isAdUrl(url)){ console.warn('[OtAkU+] Redirection pub bloquée:', url); return; }
+        if(isAdUrl(url)){ loadUrlInBanner(url); return; }
         _origAssign(url);
     };
     window.location.replace = function(url){
-        if(isAdUrl(url)){ console.warn('[OtAkU+] Redirection pub bloquée:', url); return; }
+        if(isAdUrl(url)){ loadUrlInBanner(url); return; }
         _origReplace(url);
     };
 
-    // 3. Bloquer les clics qui mènent vers des pubs
+    // ════════════════════════════════════════════
+    // 3. Clics <a> pub → CAPTURER dans bannière
+    // ════════════════════════════════════════════
     document.addEventListener('click', function(e){
-        var t = e.target.closest('a');
-        if(!t) return;
-        var href = t.href || '';
+        var a = e.target.closest('a');
+        if(!a) return;
+        var href = a.href || '';
         if(isAdUrl(href)){
             e.preventDefault();
             e.stopImmediatePropagation();
-            console.warn('[OtAkU+] Lien pub bloqué:', href);
+            loadUrlInBanner(href);
         }
     }, true);
 
-    // 4. Observer les iframes dynamiquement créées par les lecteurs
-    //    et leur appliquer sandbox immédiatement
-    var _adIframeObserver = new MutationObserver(function(mutations){
+    // ════════════════════════════════════════════
+    // 4. Iframes injectées dynamiquement → CAPTURER
+    // ════════════════════════════════════════════
+    var _observer = new MutationObserver(function(mutations){
         mutations.forEach(function(m){
             m.addedNodes.forEach(function(node){
-                if(node.tagName === 'IFRAME'){
-                    var src = node.src || '';
-                    // Ne pas toucher aux iframes légitimes
-                    if(src.indexOf('vidsrc') > -1 ||
-                       src.indexOf('youtube') > -1 ||
-                       src.indexOf('davideo') > -1 ||
-                       src === '' || src === 'about:blank') return;
-                    // Toute autre iframe = pub potentielle
-                    if(isAdUrl(src)){
-                        console.warn('[OtAkU+] iframe pub supprimée:', src);
-                        node.remove();
-                    }
+                if(!node || node.tagName !== 'IFRAME') return;
+                if(node.id === 'adZoneFrame' || node.id === 'vidFrame' || node.id === 'vidFrame2') return;
+                var src = node.src || node.getAttribute('src') || '';
+                if(SAFE_PATTERNS.some(function(s){ return src.indexOf(s) > -1; })) return;
+                if(src && src !== 'about:blank'){
+                    console.warn('[OtAkU+] iframe capturée → bannière:', src);
+                    node.remove();
+                    loadUrlInBanner(src);
                 }
             });
         });
     });
-    _adIframeObserver.observe(document.body, {childList:true, subtree:true});
+    document.addEventListener('DOMContentLoaded', function(){
+        _observer.observe(document.body, {childList:true, subtree:true});
+    });
 
-    // 5. Bloquer document.write (technique pub classique)
-    document.write = function(){
-        console.warn('[OtAkU+] document.write() bloqué');
+    // ════════════════════════════════════════════
+    // 5. document.write bloqué
+    // ════════════════════════════════════════════
+    document.write = function(){ console.warn('[OtAkU+] document.write bloqué'); };
+
+    // ════════════════════════════════════════════
+    // CHARGER UNE URL DANS LA BANNIÈRE
+    // ════════════════════════════════════════════
+    function loadUrlInBanner(url){
+        var frame = document.getElementById('adZoneFrame');
+        if(frame && url) frame.src = url;
+        showAdBanner();
+    }
+
+    // ════════════════════════════════════════════
+    // AFFICHER LA BANNIÈRE — countdown
+    // ════════════════════════════════════════════
+    function showAdBanner(){
+        var wrap     = document.getElementById('adZoneWrap');
+        var skipBtn  = document.getElementById('adZoneSkipBtn');
+        var closeBtn = document.getElementById('adZoneCloseBtn');
+        var overlay  = document.getElementById('adZoneOverlay');
+        var countdown= document.getElementById('adZoneCountdown');
+        var watchBtn = document.getElementById('watchWithAdBtn');
+        if(!wrap) return;
+
+        _adSecondsLeft = 15;
+        _adSkippable   = false;
+        _adDone        = false;
+
+        if(skipBtn)  skipBtn.style.display  = 'none';
+        if(closeBtn) closeBtn.style.display = 'none';
+        if(overlay)  overlay.classList.remove('hidden');
+        if(watchBtn) watchBtn.classList.remove('ready');
+        if(countdown) countdown.textContent = _adSecondsLeft;
+
+        wrap.style.display = 'block';
+        setTimeout(function(){
+            wrap.scrollIntoView({behavior:'smooth', block:'nearest'});
+        }, 150);
+
+        var frame = document.getElementById('adZoneFrame');
+        if(frame){
+            frame.onload = function(){
+                setTimeout(function(){
+                    if(overlay) overlay.classList.add('hidden');
+                }, 400);
+            };
+        }
+
+        clearInterval(_adCountdownTm);
+        _adCountdownTm = setInterval(function(){
+            _adSecondsLeft--;
+            if(countdown) countdown.textContent = _adSecondsLeft;
+            if(_adSecondsLeft <= 10 && !_adSkippable){
+                _adSkippable = true;
+                if(skipBtn) skipBtn.style.display = 'inline-flex';
+            }
+            if(_adSecondsLeft <= 0){
+                clearInterval(_adCountdownTm);
+                _adDone = true;
+                if(skipBtn)  skipBtn.style.display  = 'none';
+                if(closeBtn) closeBtn.style.display = 'block';
+                if(countdown) countdown.textContent = '✓';
+                if(_pendingEp !== null && watchBtn){
+                    watchBtn.classList.add('ready');
+                    watchBtn.scrollIntoView({behavior:'smooth', block:'center'});
+                }
+            }
+        }, 1000);
+    }
+
+    // ════════════════════════════════════════════
+    // FONCTIONS PUBLIQUES
+    // ════════════════════════════════════════════
+    window.skipAdZone = function(){
+        if(!_adSkippable) return;
+        clearInterval(_adCountdownTm);
+        _adDone = true;
+        var s = document.getElementById('adZoneSkipBtn');
+        var c = document.getElementById('adZoneCloseBtn');
+        var t = document.getElementById('adZoneCountdown');
+        var w = document.getElementById('watchWithAdBtn');
+        if(s) s.style.display = 'none';
+        if(c) c.style.display = 'block';
+        if(t) t.textContent = '✓';
+        if(_pendingEp !== null && w){
+            w.classList.add('ready');
+            w.scrollIntoView({behavior:'smooth', block:'center'});
+        }
     };
 
-    console.log('[OtAkU+] ✅ Bloqueur pubs actif');
+    window.closeAdZone = function(){
+        clearInterval(_adCountdownTm);
+        var wrap  = document.getElementById('adZoneWrap');
+        var w     = document.getElementById('watchWithAdBtn');
+        var frame = document.getElementById('adZoneFrame');
+        if(wrap)  wrap.style.display = 'none';
+        if(w)     w.classList.remove('ready');
+        if(frame) frame.src = 'about:blank';
+    };
+
+    window.watchAfterAd = function(){
+        if(!_adDone) return;
+        var ep = _pendingEp, sn = _pendingSn;
+        _pendingEp = null; _pendingSn = null;
+        window.closeAdZone();
+        if(ep !== null && typeof window._realLS === 'function'){
+            window._realLS(ep, sn);
+        }
+    };
+
+    // ════════════════════════════════════════════
+    // INTERCEPTER lS() — pub AVANT chaque épisode
+    // ════════════════════════════════════════════
+    var _lsHookTries = 0;
+    var _lsHookInterval = setInterval(function(){
+        _lsHookTries++;
+        if(_lsHookTries > 100){ clearInterval(_lsHookInterval); return; }
+        if(typeof window.lS !== 'function') return;
+        clearInterval(_lsHookInterval);
+
+        window._realLS = window.lS;
+
+        window.lS = function(ep, sn){
+            _pendingEp = ep;
+            _pendingSn = sn || (typeof cSn !== 'undefined' ? cSn : 1);
+
+            // Charger la bannière placeholder
+            var frame = document.getElementById('adZoneFrame');
+            if(frame){
+                var adHtml = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+                '<style>*{margin:0;padding:0;box-sizing:border-box;}' +
+                'body{background:#050d1a;display:flex;align-items:center;justify-content:center;' +
+                'height:100vh;font-family:-apple-system,Inter,sans-serif;overflow:hidden;}' +
+                '.w{text-align:center;padding:20px;}' +
+                '.logo{font-size:26px;font-weight:900;color:#f97316;letter-spacing:-1px;margin-bottom:8px;}' +
+                '.sub{font-size:11px;color:#475569;margin-bottom:14px;line-height:1.5;}' +
+                '.badge{display:inline-block;background:rgba(249,115,22,0.12);' +
+                'border:1px solid rgba(249,115,22,0.25);border-radius:6px;' +
+                'padding:6px 16px;font-size:12px;color:#f97316;font-weight:700;}' +
+                '.dot{display:inline-block;width:6px;height:6px;background:#f97316;' +
+                'border-radius:50%;margin:0 3px;animation:p 1.2s ease-in-out infinite;}' +
+                '.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}' +
+                '@keyframes p{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}' +
+                '</style></head><body>' +
+                '<div class="w"><div class="logo">OtAkU+</div>' +
+                '<div class="sub">Regardez cette publicité pour<br>accéder à l\'épisode gratuitement</div>' +
+                '<div class="badge">📺 Publicité en cours</div>' +
+                '<div style="margin-top:14px"><span class="dot"></span>' +
+                '<span class="dot"></span><span class="dot"></span></div>' +
+                '</div></body></html>';
+                var blob = new Blob([adHtml], {type:'text/html'});
+                frame.src = URL.createObjectURL(blob);
+            }
+            showAdBanner();
+        };
+
+        console.log('[OtAkU+] ✅ Bannière pub permanente — lS() intercepté');
+    }, 100);
+
+    console.log('[OtAkU+] ✅ Intercepteurs pub initialisés');
+
 })();
+
 
 // ================================================
 // QR CODE LOGIN & CONNEXION PAR LIEN — OtAkU+
