@@ -5905,21 +5905,21 @@ function detectDevice(){
         mode = 'mobile';
     }
 
-    // Appliquer si changement
-    if(mode !== currentDeviceMode){
-        // Supprimer tous les modes précédents
-        document.body.classList.remove('mode-mobile','mode-tablet','mode-desktop','mode-tv');
-        document.body.classList.add('mode-'+mode);
-        currentDeviceMode = mode;
+    // Toujours appliquer (pas seulement au changement)
+    document.body.classList.remove('mode-mobile','mode-tablet','mode-desktop','mode-tv');
+    document.body.classList.add('mode-'+mode);
+    currentDeviceMode = mode;
 
-        // Ajustements spécifiques par mode
-        applyModeAdjustments(mode);
+    // Ajustements spécifiques par mode
+    applyModeAdjustments(mode);
 
-        // Afficher badge
+    // Afficher badge seulement au premier appel
+    if(!detectDevice._badgeShown){
         showDeviceBadge(mode);
-
-        console.log('[OtAkU+] Mode detecte:', mode, '('+w+'x'+h+')');
+        detectDevice._badgeShown = true;
     }
+
+    console.log('[OtAkU+] Mode detecte:', mode, '('+w+'x'+h+')');
 }
 
 function applyModeAdjustments(mode){
@@ -5997,8 +5997,15 @@ function showDeviceBadge(mode){
     setTimeout(function(){ badge.classList.remove('show'); }, 3000);
 }
 
-// Lancer la détection au chargement
-detectDevice();
+// Lancer la détection au chargement — APRES que le DOM soit prêt
+if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+        detectDevice();
+    });
+} else {
+    // DOM déjà prêt
+    detectDevice();
+}
 
 // Re-détecter au redimensionnement (rotation tablette, etc.)
 var resizeTimer;
