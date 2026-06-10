@@ -923,6 +923,121 @@ body.mode-desktop .biblio-bar{padding:0 24px 12px;}
 body.mode-desktop #aiChatBtn{bottom:20px;right:24px;}
 body.mode-desktop #pipWindow{width:320px;height:180px;}
 
+/* ===== ZONE PUB SÉPARÉE ===== */
+#adZoneWrap{
+    background:#08102a;
+    border-top:2px solid rgba(249,115,22,0.3);
+    border-bottom:2px solid rgba(249,115,22,0.3);
+    margin:0;
+    position:relative;
+}
+#adZoneHeader{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 14px;
+    background:rgba(249,115,22,0.08);
+    border-bottom:1px solid rgba(249,115,22,0.15);
+}
+#adZoneLabel{
+    font-size:11px;
+    font-weight:900;
+    color:var(--primary);
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+#adZoneTimer{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:11px;
+    color:#94a3b8;
+}
+#adZoneCountdown{
+    font-weight:900;
+    color:var(--primary);
+    font-size:14px;
+    min-width:20px;
+    text-align:center;
+}
+#adZoneSkipBtn{
+    background:var(--primary);
+    color:#000;
+    border:none;
+    border-radius:5px;
+    padding:5px 12px;
+    font-size:11px;
+    font-weight:900;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    transition:opacity 0.2s;
+}
+#adZoneSkipBtn:hover{opacity:0.85;}
+#adZoneCloseBtn{
+    background:rgba(255,255,255,0.08);
+    color:#94a3b8;
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:5px;
+    padding:4px 10px;
+    font-size:12px;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    transition:all 0.2s;
+}
+#adZoneCloseBtn:hover{color:white;border-color:white;}
+#adZoneContainer{
+    position:relative;
+    width:100%;
+    height:120px;
+    background:#000;
+    overflow:hidden;
+}
+#adZoneOverlay{
+    position:absolute;
+    inset:0;
+    background:rgba(2,6,23,0.7);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none;
+    transition:opacity 0.4s;
+}
+#adZoneOverlay.hidden{opacity:0;}
+#adZoneOverlayTxt{
+    font-size:11px;
+    color:#64748b;
+}
+#adZoneNote{
+    font-size:10px;
+    color:#334155;
+    text-align:center;
+    padding:5px 14px;
+    font-style:italic;
+}
+
+/* BOUTON REGARDER — style actif quand pub en cours */
+#watchWithAdBtn{
+    width:calc(100% - 28px);
+    margin:10px 14px 0;
+    padding:13px;
+    background:linear-gradient(135deg,var(--primary),#f97316);
+    color:#000;
+    border:none;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:900;
+    font-family:'Inter',sans-serif;
+    cursor:pointer;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    transition:opacity 0.2s;
+    box-shadow:0 4px 20px rgba(249,115,22,0.3);
+}
+#watchWithAdBtn:hover{opacity:0.9;}
+#watchWithAdBtn.ready{display:flex;}
+
 /* ======= MODE TV (>= 1200px + TV) ======= */
 body.mode-tv{font-size:18px;}
 body.mode-tv nav{display:none !important;}
@@ -2180,7 +2295,7 @@ var firebaseReady = false;
                         </div>
                         <span id="vidLoadingTxt">Recherche...</span>
                     </div>
-                    <iframe id="vidFrame" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="display:none;" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-popups-to-escape-sandbox"></iframe>
+                    <iframe id="vidFrame" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="display:none;" referrerpolicy="no-referrer"></iframe>
                 </div>
             </div>
         </div>
@@ -2294,7 +2409,7 @@ var firebaseReady = false;
                         </div>
                         <span>Chargement...</span>
                     </div>
-                    <iframe id="vidFrame2" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="display:none;" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-popups-to-escape-sandbox"></iframe>
+                    <iframe id="vidFrame2" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="display:none;" referrerpolicy="no-referrer"></iframe>
                 </div>
             </div>
         </div>
@@ -2305,6 +2420,37 @@ var firebaseReady = false;
             <div style="font-size:11px;color:#94a3b8;" id="epCountLabel"></div>
         </div>
     </div>
+
+    <!-- ===== ZONE PUB SEPAREE ===== -->
+    <div id="adZoneWrap" style="display:none;">
+        <div id="adZoneHeader">
+            <span id="adZoneLabel">📢 Publicité</span>
+            <div id="adZoneTimer">
+                <span id="adZoneCountdown">15</span>s
+                <button id="adZoneSkipBtn" onclick="skipAdZone()" style="display:none;">
+                    Ignorer ▶
+                </button>
+            </div>
+            <button id="adZoneCloseBtn" onclick="closeAdZone()" style="display:none;" title="Fermer">✕</button>
+        </div>
+        <div id="adZoneContainer">
+            <iframe id="adZoneFrame" scrolling="no" frameborder="0" allowfullscreen
+                allow="autoplay;encrypted-media"
+                referrerpolicy="no-referrer"
+                style="width:100%;height:100%;border:none;display:block;">
+            </iframe>
+            <div id="adZoneOverlay">
+                <div id="adZoneOverlayTxt">Chargement de la publicité...</div>
+            </div>
+        </div>
+        <div id="adZoneNote">La publicité soutient l'accès gratuit aux épisodes</div>
+    </div>
+
+    <!-- Bouton REGARDER qui s'active après la pub -->
+    <button id="watchWithAdBtn" onclick="watchAfterAd()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        REGARDER L'ÉPISODE
+    </button>
 
     <!-- PARTIE BASSE SCROLLABLE (épisodes uniquement) -->
     <div id="playerEpScroll">
@@ -6191,6 +6337,159 @@ var _origSV = window.sV || null;
         syncTvNavAvatar();
     };
 })();
+
+// ================================================
+// ZONE PUB SÉPARÉE — Gestion bannière pub
+// ================================================
+var _adPendingEp   = null;
+var _adPendingSn   = null;
+var _adCountdownTm = null;
+var _adSecondsLeft = 15;
+var _adSkippable   = false;
+var _adDone        = false;
+
+// Sources pub légères (iframes inoffensives, pas de redirect)
+var _adSources = [
+    'https://www.googletagservices.com/tag/js/gpt.js', // placeholder
+];
+
+// Intercepter lS() pour afficher la pub d'abord
+var _origLS = window.lS;
+window.lS = function(ep, sn){
+    // Si la pub a déjà été vue dans cette session → lancer direct
+    if(sessionStorage.getItem('otaku_ad_done') === '1'){
+        _origLS(ep, sn);
+        return;
+    }
+    // Sinon : mémoriser l'épisode et afficher la pub
+    _adPendingEp = ep;
+    _adPendingSn = sn || cSn || 1;
+    _adDone = false;
+    showAdZone();
+};
+
+function showAdZone(){
+    var wrap = document.getElementById('adZoneWrap');
+    var watchBtn = document.getElementById('watchWithAdBtn');
+    var skipBtn  = document.getElementById('adZoneSkipBtn');
+    var closeBtn = document.getElementById('adZoneCloseBtn');
+    var overlay  = document.getElementById('adZoneOverlay');
+    var countdown= document.getElementById('adZoneCountdown');
+    if(!wrap) return;
+
+    // Reset état
+    _adSecondsLeft = 15;
+    _adSkippable   = false;
+    skipBtn.style.display  = 'none';
+    closeBtn.style.display = 'none';
+    if(watchBtn) watchBtn.classList.remove('ready');
+    if(overlay)  overlay.classList.remove('hidden');
+
+    // Afficher la zone
+    wrap.style.display = 'block';
+    // Scroll jusqu'à la zone pub
+    setTimeout(function(){
+        wrap.scrollIntoView({behavior:'smooth', block:'center'});
+    }, 100);
+
+    // Charger une pub neutre dans l'iframe
+    var adFrame = document.getElementById('adZoneFrame');
+    if(adFrame){
+        // Page pub simple et neutre — on utilise une page HTML inline
+        // qui simule une pub sans redirection
+        var adContent = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+            '<style>body{margin:0;background:#0a1020;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Inter,sans-serif;color:white;overflow:hidden;}' +
+            '.ad-box{text-align:center;padding:16px;}.ad-logo{font-size:28px;font-weight:900;color:#f97316;letter-spacing:-1px;margin-bottom:6px;}' +
+            '.ad-txt{font-size:11px;color:#64748b;margin-bottom:10px;}' +
+            '.ad-badge{background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.3);border-radius:6px;padding:6px 14px;font-size:12px;color:#f97316;font-weight:700;}' +
+            '</style></head><body>' +
+            '<div class="ad-box">' +
+            '<div class="ad-logo">OtAkU+</div>' +
+            '<div class="ad-txt">Regarde cette publicité pour accéder à l\'épisode gratuitement</div>' +
+            '<div class="ad-badge">📺 Publicité partenaire</div>' +
+            '</div></body></html>';
+        var blob = new Blob([adContent], {type:'text/html'});
+        adFrame.src = URL.createObjectURL(blob);
+        // Cacher overlay après chargement
+        adFrame.onload = function(){
+            setTimeout(function(){
+                if(overlay) overlay.classList.add('hidden');
+            }, 500);
+        };
+    }
+
+    // Countdown
+    clearInterval(_adCountdownTm);
+    if(countdown) countdown.textContent = _adSecondsLeft;
+
+    _adCountdownTm = setInterval(function(){
+        _adSecondsLeft--;
+        if(countdown) countdown.textContent = _adSecondsLeft;
+
+        // Après 5s → bouton ignorer
+        if(_adSecondsLeft <= 10 && !_adSkippable){
+            _adSkippable = true;
+            skipBtn.style.display = 'inline-flex';
+        }
+
+        // Fin du compte à rebours
+        if(_adSecondsLeft <= 0){
+            clearInterval(_adCountdownTm);
+            _adDone = true;
+            skipBtn.style.display  = 'none';
+            closeBtn.style.display = 'block';
+            if(countdown) countdown.textContent = '✓';
+            // Activer le bouton Regarder
+            if(watchBtn) watchBtn.classList.add('ready');
+            watchBtn.scrollIntoView({behavior:'smooth', block:'center'});
+        }
+    }, 1000);
+}
+
+function skipAdZone(){
+    if(!_adSkippable) return;
+    clearInterval(_adCountdownTm);
+    _adDone = true;
+    document.getElementById('adZoneSkipBtn').style.display  = 'none';
+    document.getElementById('adZoneCloseBtn').style.display = 'block';
+    var countdown = document.getElementById('adZoneCountdown');
+    if(countdown) countdown.textContent = '✓';
+    var watchBtn = document.getElementById('watchWithAdBtn');
+    if(watchBtn){
+        watchBtn.classList.add('ready');
+        watchBtn.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+}
+
+function closeAdZone(){
+    var wrap = document.getElementById('adZoneWrap');
+    if(wrap) wrap.style.display = 'none';
+    var watchBtn = document.getElementById('watchWithAdBtn');
+    if(watchBtn) watchBtn.classList.remove('ready');
+    clearInterval(_adCountdownTm);
+}
+
+function watchAfterAd(){
+    if(!_adDone) return;
+    // Marquer pub vue pour cette session
+    sessionStorage.setItem('otaku_ad_done','1');
+    closeAdZone();
+    // Lancer la vraie vidéo
+    if(_adPendingEp !== null){
+        _origLS(_adPendingEp, _adPendingSn);
+        _adPendingEp = null;
+        _adPendingSn = null;
+    }
+}
+
+// Réinitialiser la session pub quand on change d'anime
+var _origLoadAnime = window.loadAnime;
+if(_origLoadAnime){
+    window.loadAnime = function(){
+        sessionStorage.removeItem('otaku_ad_done');
+        _origLoadAnime.apply(this, arguments);
+    };
+}
 
 // ================================================
 // BLOQUEUR DE PUBS / POPUPS / REDIRECTIONS
