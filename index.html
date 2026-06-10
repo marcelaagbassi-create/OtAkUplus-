@@ -2180,7 +2180,7 @@ var firebaseReady = false;
                         </div>
                         <span id="vidLoadingTxt">Recherche...</span>
                     </div>
-                    <iframe id="vidFrame" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="display:none;" referrerpolicy="no-referrer"></iframe>
+                    <iframe id="vidFrame" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="display:none;" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-popups-to-escape-sandbox"></iframe>
                 </div>
             </div>
         </div>
@@ -2294,7 +2294,7 @@ var firebaseReady = false;
                         </div>
                         <span>Chargement...</span>
                     </div>
-                    <iframe id="vidFrame2" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="display:none;" referrerpolicy="no-referrer"></iframe>
+                    <iframe id="vidFrame2" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture;fullscreen" style="display:none;" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-popups-to-escape-sandbox"></iframe>
                 </div>
             </div>
         </div>
@@ -6190,6 +6190,98 @@ var _origSV = window.sV || null;
         // Sync avatar à chaque changement de vue
         syncTvNavAvatar();
     };
+})();
+
+// ================================================
+// BLOQUEUR DE PUBS / POPUPS / REDIRECTIONS
+// ================================================
+(function(){
+    // 1. Bloquer window.open (popunders/popups)
+    var _origOpen = window.open;
+    window.open = function(url, name, features){
+        // Autoriser seulement les ouvertures légitimes OtAkU+
+        if(url && (
+            url.indexOf('vidsrc') > -1 ||
+            url.indexOf('davideo') > -1 ||
+            url.indexOf('youtube') > -1 ||
+            url.indexOf('github') > -1
+        )){
+            return _origOpen.apply(window, arguments);
+        }
+        console.warn('[OtAkU+] Popup bloqué:', url);
+        return null;
+    };
+
+    // 2. Bloquer les redirections de la page principale
+    var _adDomains = [
+        'ads','advert','doubleclick','googlesyndication','adsystem',
+        'popads','popcash','exoclick','trafficjunky','juicyads',
+        'hilltopads','adsterra','propellerads','richpush','pushprofit',
+        'adcash','clickadu','revcontent','mgid','outbrain','taboola',
+        'coinzilla','a-ads','yllix','bidvertiser','adfly','shorte.st',
+        'adf.ly','shrinkearn','linkvertise','exe.io','fc.lc'
+    ];
+
+    // Intercepter les navigations via location.href
+    var _origAssign   = window.location.assign.bind(window.location);
+    var _origReplace  = window.location.replace.bind(window.location);
+
+    function isAdUrl(url){
+        if(!url) return false;
+        var u = url.toLowerCase();
+        return _adDomains.some(function(d){ return u.indexOf(d) > -1; });
+    }
+
+    window.location.assign = function(url){
+        if(isAdUrl(url)){ console.warn('[OtAkU+] Redirection pub bloquée:', url); return; }
+        _origAssign(url);
+    };
+    window.location.replace = function(url){
+        if(isAdUrl(url)){ console.warn('[OtAkU+] Redirection pub bloquée:', url); return; }
+        _origReplace(url);
+    };
+
+    // 3. Bloquer les clics qui mènent vers des pubs
+    document.addEventListener('click', function(e){
+        var t = e.target.closest('a');
+        if(!t) return;
+        var href = t.href || '';
+        if(isAdUrl(href)){
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            console.warn('[OtAkU+] Lien pub bloqué:', href);
+        }
+    }, true);
+
+    // 4. Observer les iframes dynamiquement créées par les lecteurs
+    //    et leur appliquer sandbox immédiatement
+    var _adIframeObserver = new MutationObserver(function(mutations){
+        mutations.forEach(function(m){
+            m.addedNodes.forEach(function(node){
+                if(node.tagName === 'IFRAME'){
+                    var src = node.src || '';
+                    // Ne pas toucher aux iframes légitimes
+                    if(src.indexOf('vidsrc') > -1 ||
+                       src.indexOf('youtube') > -1 ||
+                       src.indexOf('davideo') > -1 ||
+                       src === '' || src === 'about:blank') return;
+                    // Toute autre iframe = pub potentielle
+                    if(isAdUrl(src)){
+                        console.warn('[OtAkU+] iframe pub supprimée:', src);
+                        node.remove();
+                    }
+                }
+            });
+        });
+    });
+    _adIframeObserver.observe(document.body, {childList:true, subtree:true});
+
+    // 5. Bloquer document.write (technique pub classique)
+    document.write = function(){
+        console.warn('[OtAkU+] document.write() bloqué');
+    };
+
+    console.log('[OtAkU+] ✅ Bloqueur pubs actif');
 })();
 
 // ================================================
