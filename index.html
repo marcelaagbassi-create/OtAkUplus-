@@ -67,6 +67,99 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;margi
 .ps-avatar img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:4px;}
 .ps-name{font-size:11px;font-weight:700;text-align:center;color:rgba(255,255,255,0.85);width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
+/* ── Ken Burns sur l'image hero du sélecteur ── */
+@keyframes kenBurns{
+    0%  {transform:scale(1)    translateX(0)    translateY(0);}
+    33% {transform:scale(1.06) translateX(-1%)  translateY(-1%);}
+    66% {transform:scale(1.1)  translateX(1%)   translateY(-0.5%);}
+    100%{transform:scale(1)    translateX(0)    translateY(0);}
+}
+#ps-hero-img{
+    position:absolute;inset:0;
+    background-size:cover;
+    background-position:center top;
+    animation:kenBurns 12s ease-in-out infinite;
+    transition:background-image 1.5s ease;
+}
+
+/* ── MODE TV — profils verticaux à gauche ── */
+body.mode-tv #profileSelector .ps-content{
+    position:absolute !important;
+    top:0; bottom:0; left:0;
+    width:280px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:0 32px;
+    background:linear-gradient(to right,rgba(0,0,0,0.92) 70%,transparent 100%);
+    z-index:3;
+}
+body.mode-tv #profileSelector .ps-content > div:first-child{
+    text-align:left !important;
+    font-size:15px !important;
+    margin-bottom:24px !important;
+}
+body.mode-tv #profileSelector #psGrid{
+    flex-direction:column !important;
+    align-items:flex-start !important;
+    justify-content:flex-start !important;
+    gap:12px !important;
+    margin-bottom:28px !important;
+    flex-wrap:nowrap !important;
+}
+body.mode-tv #profileSelector .ps-card{
+    flex-direction:row !important;
+    width:auto !important;
+    gap:12px !important;
+    padding:6px 10px !important;
+    border-radius:8px !important;
+    width:200px !important;
+}
+body.mode-tv #profileSelector .ps-avatar{
+    width:52px !important;
+    height:52px !important;
+    font-size:22px !important;
+    flex-shrink:0 !important;
+}
+body.mode-tv #profileSelector .ps-name{
+    font-size:14px !important;
+    width:auto !important;
+    text-align:left !important;
+    flex:1;
+}
+body.mode-tv #profileSelector .ps-card:hover,
+body.mode-tv #profileSelector .ps-card:focus{
+    background:rgba(255,255,255,0.12) !important;
+    border-color:white !important;
+    transform:scale(1.03) !important;
+}
+body.mode-tv #profileSelector #btnModifierProfil,
+body.mode-tv #profileSelector button:last-child{
+    width:200px !important;
+    text-align:left !important;
+}
+
+/* Dégradé TV sur l'image plein écran du sélecteur */
+body.mode-tv #profileSelector > div:nth-child(2){
+    background:linear-gradient(
+        to right,
+        rgba(0,0,0,0.85) 0%,
+        rgba(0,0,0,0.4) 40%,
+        transparent 70%
+    ) !important;
+}
+
+/* Titre anime TV — centré à droite */
+body.mode-tv #profileSelector #ps-anime-title{
+    font-size:32px !important;
+    text-align:right !important;
+    padding-right:5% !important;
+}
+body.mode-tv #profileSelector #ps-anime-badge{
+    text-align:right !important;
+    padding-right:5% !important;
+}
+
 /* GALERIE AVATARS MANGA */
 #avatarGalleryModal{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10002;display:none;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:60px;}
 #avatarGalleryModal.open{display:flex;}
@@ -1038,202 +1131,348 @@ body.mode-desktop #pipWindow{width:320px;height:180px;}
 #watchWithAdBtn:hover{opacity:0.9;}
 #watchWithAdBtn.ready{display:flex;}
 
-/* ======= MODE TV (>= 1200px + TV) ======= */
-body.mode-tv{font-size:18px;}
-body.mode-tv nav{display:none !important;}
+/* ═══════════════════════════════════════════════════
+   MODE TV — REDESIGN COMPLET STYLE NETFLIX
+   ═══════════════════════════════════════════════════ */
+
+/* Cacher tout ce qui est mobile */
+body.mode-tv nav,
+body.mode-tv footer,
+body.mode-tv .side-menu,
+body.mode-tv #menuOverlay,
+body.mode-tv .menu-btn,
+body.mode-tv #aiChatBtn,
+body.mode-tv #helpPopup,
+body.mode-tv .hero-profile-btn,
+body.mode-tv #helpBtn{ display:none !important; }
+
+/* Layout global TV */
+body.mode-tv{ font-size:16px; background:#141414; }
+body.mode-tv .view{ padding:0 !important; }
+body.mode-tv #searchSuggestions{ top:72px !important; left:160px; right:160px; }
+
+/* Hero plein écran TV */
+body.mode-tv .hero-banner{
+    height:56vw; max-height:620px;
+    margin:0; border-radius:0; width:100%;
+    position:relative;
+}
+body.mode-tv .hero-banner::after{
+    content:'';
+    position:absolute; inset:0;
+    background:linear-gradient(
+        to right,
+        rgba(20,20,20,0.9) 0%,
+        rgba(20,20,20,0.5) 40%,
+        transparent 70%
+    ),linear-gradient(
+        to top,
+        rgba(20,20,20,1) 0%,
+        transparent 40%
+    );
+    pointer-events:none;
+}
+body.mode-tv .hero-content{
+    position:absolute;
+    bottom:14%;
+    left:5%;
+    z-index:2;
+    max-width:40%;
+}
+body.mode-tv .hero-title{
+    font-size:clamp(28px,3.5vw,52px);
+    font-weight:900;
+    line-height:1.1;
+    margin-bottom:14px;
+    text-shadow:2px 2px 8px rgba(0,0,0,0.8);
+}
+body.mode-tv .hero-meta{
+    font-size:14px;
+    color:rgba(255,255,255,0.8);
+    margin-bottom:16px;
+    display:flex; gap:10px; align-items:center;
+}
+body.mode-tv .hero-btn{
+    padding:13px 28px;
+    font-size:15px;
+    border-radius:5px;
+    font-weight:700;
+    margin-right:10px;
+}
+
+/* Sections de cartes TV — style Netflix */
+body.mode-tv .section-title{
+    font-size:17px;
+    font-weight:700;
+    margin:0 5% 10px;
+    color:#e5e5e5;
+    letter-spacing:0;
+}
 body.mode-tv .grid{
-    grid-template-columns:repeat(5,1fr);
-    gap:16px;padding:0 32px 20px;
+    grid-template-columns:repeat(6,1fr);
+    gap:6px;
+    padding:0 5% 32px;
+}
+body.mode-tv .manga-card,
+body.mode-tv .manga-dex-card{
+    border-radius:4px;
+    transition:transform 0.25s ease, z-index 0s 0.25s;
+    cursor:pointer;
+    position:relative;
+}
+body.mode-tv .manga-card:hover,
+body.mode-tv .manga-dex-card:hover,
+body.mode-tv .manga-card:focus,
+body.mode-tv .manga-dex-card:focus{
+    transform:scale(1.18);
+    z-index:10;
+    outline:none;
+    box-shadow:0 8px 40px rgba(0,0,0,0.8);
+    transition:transform 0.25s ease, z-index 0s;
+}
+body.mode-tv .manga-card img,
+body.mode-tv .manga-dex-card img{
+    border-radius:4px;
 }
 body.mode-tv .manga-card p,
-body.mode-tv .manga-dex-card p{font-size:11px;padding:5px 8px;}
-body.mode-tv .hero-banner{height:500px;margin:0;border-radius:0;width:100%;}
-body.mode-tv .hero-title{font-size:38px;}
-body.mode-tv .hero-btn{padding:14px 32px;font-size:14px;border-radius:6px;}
-body.mode-tv .section-title{font-size:20px;margin:20px 32px;}
-body.mode-tv .ep-grid{grid-template-columns:repeat(8,1fr);gap:10px;padding:12px 32px;}
-body.mode-tv .ep-btn{font-size:14px;padding:14px;}
-body.mode-tv footer{display:none !important;}
-body.mode-tv .side-menu{display:none !important;}
-body.mode-tv #menuOverlay{display:none !important;}
-body.mode-tv .view{padding:80px 0 40px;}
-body.mode-tv .focusable:focus{
-    outline:5px solid var(--primary);
-    transform:scale(1.08);
+body.mode-tv .manga-dex-card p{
+    font-size:10px;
+    padding:5px 6px;
+    background:rgba(20,20,20,0.9);
 }
-body.mode-tv #aiChatBtn{display:none !important;}
-body.mode-tv #helpPopup{display:none !important;}
-body.mode-tv #searchSuggestions{top:80px !important;}
-body.mode-tv .hero-profile-btn{display:none !important;}
-body.mode-tv .view{padding:68px 0 40px !important;}
 
-/* ===== TV NAV NETFLIX STYLE ===== */
+/* Focus D-pad TV */
+body.mode-tv .focusable:focus{
+    outline:3px solid white;
+    outline-offset:2px;
+    border-radius:4px;
+}
+body.mode-tv .manga-card:focus,
+body.mode-tv .manga-dex-card:focus{
+    outline:3px solid white;
+    transform:scale(1.18);
+}
+
+/* ══════════════════════════════════════
+   TV NAV — IDENTIQUE À NETFLIX
+   ══════════════════════════════════════ */
 #tvNav{
     display:none;
     position:fixed;
-    top:0;left:0;right:0;
+    top:0; left:0; right:0;
     z-index:9999;
-    padding:0 48px;
     height:68px;
+    padding:0 5%;
     align-items:center;
     gap:0;
-    background:linear-gradient(to bottom,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0) 100%);
-    transition:background 0.3s;
+    background:linear-gradient(to bottom,rgba(20,20,20,0.95) 0%,rgba(20,20,20,0) 100%);
+    transition:background 0.4s;
 }
-#tvNav.scrolled{background:rgba(20,20,20,0.97);}
-body.mode-tv #tvNav{display:flex !important;}
+#tvNav.bg-solid{ background:rgba(20,20,20,0.97) !important; }
+body.mode-tv #tvNav{ display:flex !important; }
 
-/* Logo OtAkU+ dans tvNav */
+/* Logo */
 .tv-nav-logo{
-    font-size:28px;
+    font-size:26px;
     font-weight:900;
     color:var(--primary);
-    letter-spacing:-1px;
+    letter-spacing:-1.5px;
     cursor:pointer;
-    margin-right:36px;
+    margin-right:40px;
     flex-shrink:0;
-    transition:filter 0.2s;
+    user-select:none;
 }
-.tv-nav-logo:hover{filter:brightness(1.2);}
 
-/* Liens de navigation TV */
+/* Liens nav TV */
 .tv-nav-links{
     display:flex;
     align-items:center;
-    gap:0;
     flex:1;
 }
 .tv-nav-link{
-    padding:8px 18px;
-    font-size:15px;
-    font-weight:600;
-    color:rgba(255,255,255,0.75);
+    padding:6px 14px;
+    font-size:14px;
+    font-weight:500;
+    color:rgba(255,255,255,0.7);
     cursor:pointer;
-    border-radius:4px;
-    transition:color 0.2s,background 0.2s;
     white-space:nowrap;
-    letter-spacing:0.2px;
+    transition:color 0.15s;
+    position:relative;
+    border-radius:4px;
 }
-.tv-nav-link:hover,.tv-nav-link:focus{
-    color:white;
-    background:rgba(255,255,255,0.08);
+.tv-nav-link:hover,
+.tv-nav-link:focus{
+    color:#fff;
+    background:rgba(255,255,255,0.07);
     outline:none;
 }
 .tv-nav-link.tv-active{
-    color:white;
+    color:#fff;
     font-weight:700;
 }
+.tv-nav-link.tv-active::after{
+    content:'';
+    position:absolute;
+    bottom:-4px; left:50%;
+    transform:translateX(-50%);
+    width:20px; height:2px;
+    background:var(--primary);
+    border-radius:2px;
+}
 
-/* Côté droit tvNav : recherche + profil */
+/* Droite nav TV */
 .tv-nav-right{
     display:flex;
     align-items:center;
-    gap:16px;
+    gap:18px;
     flex-shrink:0;
 }
+
+/* Icône recherche */
+.tv-nav-search-wrap{ position:relative; display:flex; align-items:center; }
 .tv-nav-search-btn{
-    background:none;
-    border:none;
+    background:none; border:none;
     color:rgba(255,255,255,0.8);
     cursor:pointer;
-    padding:6px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    transition:color 0.2s,background 0.2s;
+    display:flex; align-items:center; justify-content:center;
+    padding:6px; border-radius:50%;
+    transition:color 0.15s, background 0.15s;
 }
-.tv-nav-search-btn:hover,.tv-nav-search-btn:focus{
-    color:white;
-    background:rgba(255,255,255,0.1);
-    outline:none;
-}
-/* Barre de recherche TV dépliable */
-.tv-nav-search-wrap{
-    position:relative;
-    display:flex;
-    align-items:center;
-}
-.tv-nav-search-input{
-    width:0;
-    opacity:0;
-    background:rgba(0,0,0,0.7);
-    border:1px solid rgba(255,255,255,0.4);
-    border-radius:4px;
-    padding:0;
-    color:white;
-    font-family:'Inter',sans-serif;
-    font-size:14px;
-    outline:none;
-    transition:width 0.3s,opacity 0.3s,padding 0.3s;
-    position:absolute;
-    right:36px;
-    top:50%;
-    transform:translateY(-50%);
-}
-.tv-nav-search-input.open{
-    width:280px;
-    opacity:1;
-    padding:8px 14px;
-}
-.tv-nav-search-input::placeholder{color:rgba(255,255,255,0.5);}
+.tv-nav-search-btn:hover,
+.tv-nav-search-btn:focus{ color:#fff; background:rgba(255,255,255,0.1); outline:none; }
 
-/* Avatar profil dans tvNav */
+/* Input recherche dépliable */
+.tv-nav-search-input{
+    position:absolute;
+    right:38px; top:50%;
+    transform:translateY(-50%);
+    width:0; opacity:0; padding:0;
+    background:rgba(0,0,0,0.85);
+    border:1px solid rgba(255,255,255,0.35);
+    border-radius:4px;
+    color:#fff;
+    font-size:14px;
+    font-family:'Inter',sans-serif;
+    outline:none;
+    transition:width 0.3s, opacity 0.3s, padding 0.3s;
+    white-space:nowrap;
+}
+.tv-nav-search-input.open{ width:300px; opacity:1; padding:8px 14px; }
+.tv-nav-search-input::placeholder{ color:rgba(255,255,255,0.4); }
+
+/* Cloche notif */
+.tv-nav-bell{
+    background:none; border:none;
+    color:rgba(255,255,255,0.8);
+    cursor:pointer;
+    display:flex; align-items:center;
+    padding:6px; border-radius:50%;
+    position:relative;
+    transition:color 0.15s;
+}
+.tv-nav-bell:hover{ color:#fff; }
+.tv-nav-bell-dot{
+    position:absolute;
+    top:4px; right:4px;
+    width:7px; height:7px;
+    background:var(--primary);
+    border-radius:50%;
+    border:1.5px solid #141414;
+}
+
+/* Avatar TV */
+.tv-nav-avatar-wrap{ position:relative; }
 .tv-nav-avatar{
-    width:36px;height:36px;
-    border-radius:6px;
-    background:linear-gradient(45deg,var(--primary),#fbbf24);
-    display:flex;align-items:center;justify-content:center;
-    font-weight:900;font-size:15px;
+    width:32px; height:32px;
+    border-radius:4px;
+    background:linear-gradient(135deg,var(--primary),#fbbf24);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:900; font-size:13px; color:#000;
     cursor:pointer;
     overflow:hidden;
-    position:relative;
     border:2px solid transparent;
-    transition:border-color 0.2s,transform 0.2s;
+    transition:border-color 0.15s, transform 0.15s;
+    position:relative;
     flex-shrink:0;
 }
-.tv-nav-avatar:hover,.tv-nav-avatar:focus{
-    border-color:white;
-    transform:scale(1.06);
-    outline:none;
-}
+.tv-nav-avatar:hover,
+.tv-nav-avatar:focus{ border-color:rgba(255,255,255,0.6); transform:scale(1.05); outline:none; }
 .tv-nav-avatar img{
-    width:100%;height:100%;
-    object-fit:cover;position:absolute;inset:0;
-    border-radius:4px;
+    width:100%; height:100%;
+    object-fit:cover;
+    position:absolute; inset:0;
+    border-radius:3px;
 }
 
-/* Dropdown profil TV */
+/* Flèche dropdown */
+.tv-nav-avatar-caret{
+    color:rgba(255,255,255,0.6);
+    font-size:10px;
+    cursor:pointer;
+    transition:transform 0.2s;
+    user-select:none;
+}
+.tv-nav-avatar-caret.open{ transform:rotate(180deg); }
+
+/* Dropdown profil */
 .tv-nav-profile-drop{
     position:absolute;
-    top:calc(100% + 10px);
+    top:calc(100% + 12px);
     right:0;
-    background:rgba(20,20,20,0.98);
-    border:1px solid rgba(255,255,255,0.15);
-    border-radius:6px;
-    min-width:200px;
-    padding:8px 0;
+    background:rgba(16,16,16,0.98);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:4px;
+    min-width:220px;
+    padding:6px 0;
     display:none;
-    z-index:1001;
-    box-shadow:0 8px 32px rgba(0,0,0,0.6);
+    z-index:10000;
+    box-shadow:0 12px 40px rgba(0,0,0,0.7);
 }
-.tv-nav-profile-drop.open{display:block;}
+.tv-nav-profile-drop.open{ display:block; }
+
+/* Profils en haut du dropdown */
+.tv-drop-profiles{
+    display:flex;
+    gap:8px;
+    padding:12px 14px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    overflow-x:auto;
+}
+.tv-drop-profile{
+    display:flex; flex-direction:column; align-items:center; gap:5px;
+    cursor:pointer; flex-shrink:0;
+}
+.tv-drop-profile-avatar{
+    width:38px; height:38px;
+    border-radius:4px;
+    background:linear-gradient(135deg,#475569,#1e293b);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-weight:900; color:#fff;
+    border:2px solid transparent;
+    transition:border-color 0.15s;
+    overflow:hidden; position:relative;
+}
+.tv-drop-profile:hover .tv-drop-profile-avatar{ border-color:white; }
+.tv-drop-profile-name{
+    font-size:10px; color:rgba(255,255,255,0.7);
+    max-width:48px; text-align:center;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+/* Items dropdown */
 .tv-nav-drop-item{
-    padding:11px 16px;
+    padding:10px 16px;
     font-size:13px;
-    color:rgba(255,255,255,0.8);
+    color:rgba(255,255,255,0.75);
     cursor:pointer;
-    display:flex;align-items:center;gap:10px;
-    transition:background 0.15s;
+    display:flex; align-items:center; gap:10px;
+    transition:background 0.12s, color 0.12s;
     font-family:'Inter',sans-serif;
 }
-.tv-nav-drop-item:hover{background:rgba(255,255,255,0.08);color:white;}
-.tv-nav-drop-sep{height:1px;background:rgba(255,255,255,0.12);margin:6px 0;}
-.tv-nav-drop-item.danger{color:#ef4444;}
-.tv-nav-drop-item.danger:hover{background:rgba(239,68,68,0.1);}
-
-/* Wrappeur relatif pour le dropdown */
-.tv-nav-avatar-wrap{position:relative;}
+.tv-nav-drop-item:hover{ background:rgba(255,255,255,0.07); color:#fff; }
+.tv-nav-drop-sep{ height:1px; background:rgba(255,255,255,0.1); margin:4px 0; }
+.tv-nav-drop-item.danger{ color:#ef4444; }
+.tv-nav-drop-item.danger:hover{ background:rgba(239,68,68,0.08); }
 
 /* ================================================
    EFFET MIROIR — Uniquement cartes + assistant IA
@@ -1641,49 +1880,64 @@ var firebaseReady = false;
 <!-- TV NAV NETFLIX STYLE — visible uniquement en mode TV -->
 <div id="tvNav">
     <!-- Logo -->
-    <div class="tv-nav-logo focusable" tabindex="0" onclick="loadHome()">OtAkU+</div>
+    <div class="tv-nav-logo focusable" tabindex="0" onclick="tvNavGo('home')">OtAkU+</div>
 
-    <!-- Liens -->
+    <!-- Liens navigation -->
     <div class="tv-nav-links">
-        <div class="tv-nav-link tv-active focusable" tabindex="0" id="tvNavHome" onclick="tvNavGo('home')">Accueil</div>
-        <div class="tv-nav-link focusable" tabindex="0" id="tvNavDiscover" onclick="tvNavGo('discover')">Séries</div>
-        <div class="tv-nav-link focusable" tabindex="0" id="tvNavBiblio" onclick="tvNavGo('biblio')">Manga</div>
-        <div class="tv-nav-link focusable" tabindex="0" id="tvNavFavoris" onclick="tvNavGo('favoris')">Mes favoris</div>
-        <div class="tv-nav-link focusable" tabindex="0" id="tvNavCal" onclick="tvNavGo('calendar')">Calendrier</div>
+        <div class="tv-nav-link tv-active focusable" tabindex="0" id="tvNavHome"     onclick="tvNavGo('home')">Accueil</div>
+        <div class="tv-nav-link focusable"           tabindex="0" id="tvNavDiscover" onclick="tvNavGo('discover')">Séries</div>
+        <div class="tv-nav-link focusable"           tabindex="0" id="tvNavBiblio"   onclick="tvNavGo('biblio')">Manga</div>
+        <div class="tv-nav-link focusable"           tabindex="0" id="tvNavFavoris"  onclick="tvNavGo('favoris')">Mes favoris</div>
+        <div class="tv-nav-link focusable"           tabindex="0" id="tvNavCal"      onclick="tvNavGo('calendar')">Calendrier</div>
     </div>
 
-    <!-- Droite : recherche + profil -->
+    <!-- Droite -->
     <div class="tv-nav-right">
-        <!-- Recherche dépliable -->
+        <!-- Recherche -->
         <div class="tv-nav-search-wrap">
-            <input class="tv-nav-search-input focusable" id="tvNavSearchInput" tabindex="0" type="text" placeholder="Titres, animes, mangas..." autocomplete="off">
-            <button class="tv-nav-search-btn focusable" tabindex="0" id="tvNavSearchBtn" onclick="toggleTvSearch()">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input class="tv-nav-search-input focusable" id="tvNavSearchInput" tabindex="0"
+                type="text" placeholder="Rechercher un anime, manga..." autocomplete="off">
+            <button class="tv-nav-search-btn focusable" tabindex="0" onclick="toggleTvSearch()" title="Rechercher">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
             </button>
         </div>
 
+        <!-- Cloche -->
+        <button class="tv-nav-bell focusable" tabindex="0" title="Notifications">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            <span class="tv-nav-bell-dot"></span>
+        </button>
+
         <!-- Avatar + dropdown -->
         <div class="tv-nav-avatar-wrap">
-            <div class="tv-nav-avatar focusable" tabindex="0" id="tvNavAvatar" onclick="toggleTvProfileDrop()">
-                <span id="tvNavAvatarLetter">D</span>
-                <img id="tvNavAvatarImg" src="" alt="" style="display:none;">
+            <div style="display:flex;align-items:center;gap:6px;cursor:pointer;" onclick="toggleTvProfileDrop()">
+                <div class="tv-nav-avatar focusable" tabindex="0" id="tvNavAvatar">
+                    <span id="tvNavAvatarLetter">D</span>
+                    <img id="tvNavAvatarImg" src="" alt="" style="display:none;">
+                </div>
+                <span class="tv-nav-avatar-caret" id="tvNavCaret">▾</span>
             </div>
+
             <div class="tv-nav-profile-drop" id="tvNavProfileDrop">
+                <!-- Mini profils -->
+                <div class="tv-drop-profiles" id="tvDropProfiles"></div>
+
+                <!-- Actions -->
                 <div class="tv-nav-drop-item focusable" tabindex="0" onclick="showProfileSelector();closeTvProfileDrop();">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
                     Changer de profil
                 </div>
-                <div class="tv-nav-drop-item focusable" tabindex="0" onclick="loadHistorique();closeTvProfileDrop();">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
-                    Historique
-                </div>
                 <div class="tv-nav-drop-item focusable" tabindex="0" onclick="loadSettings();closeTvProfileDrop();">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-                    Paramètres
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                    Gérer les profils
+                </div>
+                <div class="tv-nav-drop-item focusable" tabindex="0" onclick="loadHistorique();closeTvProfileDrop();">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+                    Historique
                 </div>
                 <div class="tv-nav-drop-sep"></div>
                 <div class="tv-nav-drop-item danger focusable" tabindex="0" onclick="logoutAuth();closeTvProfileDrop();">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
                     Se déconnecter
                 </div>
             </div>
@@ -6215,17 +6469,32 @@ function syncTvNavAvatar(){
         letter.style.display = '';
         letter.textContent = name.charAt(0).toUpperCase();
     }
+    // Populer mini-profils dans le dropdown
+    var container = document.getElementById('tvDropProfiles');
+    if(container){
+        var profiles = JSON.parse(localStorage.getItem('otaku_profiles') || '[]');
+        if(profiles.length === 0) profiles = [{name: name, avatar: savedImg}];
+        container.innerHTML = profiles.map(function(p){
+            var av = p.avatar
+                ? '<img src="'+p.avatar+'" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:3px;">'
+                : '<span style="font-size:15px;font-weight:900;">'+( (p.name||'?').charAt(0).toUpperCase() )+'</span>';
+            return '<div class="tv-drop-profile" onclick="closeTvProfileDrop();">'+
+                '<div class="tv-drop-profile-avatar" style="position:relative;">'+av+'</div>'+
+                '<div class="tv-drop-profile-name">'+(p.name||'Profil')+'</div>'+
+                '</div>';
+        }).join('');
+    }
 }
 
-// Fond progressif quand on scrolle (comme Netflix)
+// Fond solide quand on scrolle (remplace .scrolled par .bg-solid)
 function setupTvNavScroll(){
     var nav = document.getElementById('tvNav');
     if(!nav) return;
     window.addEventListener('scroll', function(){
-        if(window.scrollY > 50){
-            nav.classList.add('scrolled');
+        if(window.scrollY > 60){
+            nav.classList.add('bg-solid');
         } else {
-            nav.classList.remove('scrolled');
+            nav.classList.remove('bg-solid');
         }
     }, {passive: true});
 }
@@ -6292,13 +6561,18 @@ document.addEventListener('DOMContentLoaded', function(){
 
 // Dropdown profil TV
 function toggleTvProfileDrop(){
-    var drop = document.getElementById('tvNavProfileDrop');
+    var drop  = document.getElementById('tvNavProfileDrop');
+    var caret = document.getElementById('tvNavCaret');
     if(!drop) return;
-    drop.classList.toggle('open');
+    var isOpen = drop.classList.toggle('open');
+    if(caret) caret.classList.toggle('open', isOpen);
+    if(isOpen) syncTvNavAvatar();
 }
 function closeTvProfileDrop(){
-    var drop = document.getElementById('tvNavProfileDrop');
-    if(drop) drop.classList.remove('open');
+    var drop  = document.getElementById('tvNavProfileDrop');
+    var caret = document.getElementById('tvNavCaret');
+    if(drop)  drop.classList.remove('open');
+    if(caret) caret.classList.remove('open');
 }
 // Fermer dropdown en cliquant ailleurs
 document.addEventListener('click', function(e){
@@ -6355,26 +6629,51 @@ var _origSV = window.sV || null;
 
     // ── Domaines / patterns pub ──
     var AD_PATTERNS = [
+        // Paris / casino / jeux
+        '1xbet','1xlite','1xbet','xbet','bet365','betway','betwinner',
+        'casino','poker','slots','gambling','paris','pari','bookie',
+        'crash','aviator','sportybet','melbet','mostbet','1win',
+        'parimatch','22bet','linebet','fonbet','olimpbet',
+        // Réseaux pub classiques
         'popads','popcash','exoclick','trafficjunky','juicyads',
         'hilltopads','adsterra','propellerads','richpush','pushprofit',
         'adcash','clickadu','revcontent','mgid','outbrain','taboola',
         'coinzilla','a-ads','yllix','bidvertiser','adfly','shorte.st',
         'adf.ly','shrinkearn','linkvertise','exe.io','fc.lc',
-        'doubleclick','googlesyndication','adsystem','popunder','popunder'
+        'doubleclick','googlesyndication','adsystem',
+        // Domaines pub génériques
+        'popunder','redirect','clicktrack','adclick','clkrev',
+        'trk.','track.','click.','go.','redir.'
     ];
 
-    // URLs légitimes à ne jamais bloquer
+    // URLs légitimes — JAMAIS bloquées
     var SAFE_PATTERNS = [
         'vidsrc','youtube','youtu.be','davideo','github','jikan',
         'mangadex','myanimelist','onrender.com','qrserver','wa.me',
-        'blob:','about:blank','data:'
+        'blob:','about:blank','data:','localhost','127.0.0.1',
+        'marcelaagbassi','otakuplus','googleapis.com/fonts',
+        'cdnjs.cloudflare','unpkg.com','jsdelivr'
     ];
 
     function isAdUrl(url){
         if(!url || url === '' || url === 'about:blank') return false;
         var u = url.toLowerCase();
+        // Toujours autoriser les URLs sûres
         if(SAFE_PATTERNS.some(function(s){ return u.indexOf(s) > -1; })) return false;
-        return AD_PATTERNS.some(function(p){ return u.indexOf(p) > -1; });
+        // Bloquer si correspond à un pattern pub
+        if(AD_PATTERNS.some(function(p){ return u.indexOf(p) > -1; })) return true;
+        // Bloquer toute URL externe qui s'ouvre via window.open
+        // (les lecteurs vidéo n'ont pas besoin d'ouvrir de nouvelles fenêtres)
+        return false;
+    }
+
+    // Version stricte pour window.open — bloquer TOUT ce qui n'est pas safe
+    function isAdOpen(url){
+        if(!url || url === '' || url === 'about:blank') return false;
+        var u = url.toLowerCase();
+        if(SAFE_PATTERNS.some(function(s){ return u.indexOf(s) > -1; })) return false;
+        // Toute nouvelle fenêtre depuis un lecteur = pub
+        return true;
     }
 
     // ════════════════════════════════════════════
@@ -6383,10 +6682,13 @@ var _origSV = window.sV || null;
     var _origOpen = window.open;
     window.open = function(url, name, features){
         if(!url) return null;
-        if(!isAdUrl(url)) return _origOpen.apply(window, arguments);
-        console.warn('[OtAkU+] Popup capturé → bannière:', url);
-        loadUrlInBanner(url);
-        return { closed:false, focus:function(){}, close:function(){} };
+        // Bloquer TOUTE nouvelle fenêtre sauf URLs safe
+        if(isAdOpen(url)){
+            console.warn('[OtAkU+] window.open capturé → bannière:', url);
+            loadUrlInBanner(url);
+            return { closed:false, focus:function(){}, close:function(){} };
+        }
+        return _origOpen.apply(window, arguments);
     };
 
     // ════════════════════════════════════════════
