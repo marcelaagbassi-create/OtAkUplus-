@@ -149,15 +149,19 @@ body.mode-tv #profileSelector > div:nth-child(2){
     ) !important;
 }
 
-/* Titre anime TV — centré à droite */
+/* Titre anime TV — côté droit style Netflix */
 body.mode-tv #profileSelector #ps-anime-title{
-    font-size:32px !important;
+    font-size:clamp(24px,3.5vw,52px) !important;
     text-align:right !important;
-    padding-right:5% !important;
+    text-shadow:2px 2px 20px rgba(0,0,0,1) !important;
 }
 body.mode-tv #profileSelector #ps-anime-badge{
     text-align:right !important;
-    padding-right:5% !important;
+}
+body.mode-tv #profileSelector #ps-anime-synopsis{
+    display:block !important;
+    text-align:right !important;
+    font-size:13px !important;
 }
 
 /* GALERIE AVATARS MANGA */
@@ -1810,16 +1814,17 @@ var firebaseReady = false;
 <div id="profileSelector">
     <!-- IMAGE ANIME PLEIN ÉCRAN qui défile -->
     <div id="ps-hero-img" style="position:absolute;inset:0;background-size:cover;background-position:center top;transition:background-image 1s ease;"></div>
-    <!-- Dégradé bas -->
-    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(2,6,23,0.1) 0%,rgba(2,6,23,0.2) 40%,rgba(2,6,23,0.85) 65%,rgba(2,6,23,0.98) 100%);"></div>
+    <!-- Dégradé cinématique — gauche opaque, droite transparent -->
+    <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.5) 35%,rgba(0,0,0,0.15) 60%,rgba(0,0,0,0.05) 100%),linear-gradient(to top,rgba(0,0,0,0.4) 0%,transparent 30%);z-index:1;"></div>
 
     <!-- BADGE OtAkU+ en haut -->
     <div style="position:absolute;top:28px;left:50%;transform:translateX(-50%);font-size:22px;font-weight:900;color:var(--primary);letter-spacing:-1px;z-index:2;">OtAkU+</div>
 
-    <!-- TITRE ANIME en bas de l'image -->
-    <div style="position:absolute;top:52%;left:50%;transform:translateX(-50%);text-align:center;z-index:2;width:90%;">
-        <div id="ps-anime-badge" style="font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;"></div>
-        <div id="ps-anime-title" style="font-size:22px;font-weight:900;line-height:1.2;text-shadow:0 2px 12px rgba(0,0,0,0.8);"></div>
+    <!-- TITRE ANIME + infos style Netflix -->
+    <div style="position:absolute;bottom:22%;right:5%;z-index:2;max-width:45%;text-align:right;">
+        <div id="ps-anime-badge" style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.85);letter-spacing:1px;margin-bottom:10px;"></div>
+        <div id="ps-anime-title" style="font-size:22px;font-weight:900;line-height:1.2;text-shadow:0 2px 12px rgba(0,0,0,0.8);margin-bottom:10px;"></div>
+        <div id="ps-anime-synopsis" style="font-size:12px;color:rgba(255,255,255,0.7);line-height:1.5;display:none;max-width:420px;margin-left:auto;text-shadow:1px 1px 6px rgba(0,0,0,0.9);"></div>
     </div>
 
     <!-- CONTENU BAS — Profils compacts style Netflix -->
@@ -5006,22 +5011,54 @@ var psSliderIdx=0;var psSliderTimer=null;var psAnimeData=[];
 
 async function startProfileHeroSlider(){
     clearInterval(psSliderTimer);
-    // Charger images via Jikan
     if(psAnimeData.length===0){
         for(var i=0;i<PS_ANIME_LIST.length;i++){
             try{
+                // 1. Récupérer les infos de base
                 var r=await fetch('https://api.jikan.moe/v4/anime/'+PS_ANIME_LIST[i].id);
                 var d=await r.json();
-                if(d.data){
-                    psAnimeData.push({
-                        title:d.data.title||PS_ANIME_LIST[i].title,
-                        img:d.data.images.jpg.large_image_url||d.data.images.jpg.image_url,
-                        score:d.data.score,
-                        year:d.data.year||''
-                    });
+                if(!d.data) throw new Error('no data');
+
+                var cinemaImg='';
+
+                // 2. Chercher une image landscape via /pictures
+                try{
+                    var rp=await fetch('https://api.jikan.moe/v4/anime/'+PS_ANIME_LIST[i].id+'/pictures');
+                    var dp=await rp.json();
+                    var pics=dp.data||[];
+                    // Filtrer pour trouver une image large (landscape)
+                    // Les images de fond/bannière sont souvent les dernières dans la liste
+                    for(var p=pics.length-1;p>=0;p--){
+                        var url=pics[p].jpg.large_image_url||pics[p].jpg.image_url||'';
+                        if(url){
+                            // Vérifier le ratio en créant une image temporaire
+                            cinemaImg=url;
+                            break;
+                        }
+                    }
+                }catch(e2){}
+
+                // 3. Fallback : image YouTube thumbnail si ytId disponible
+                if(!cinemaImg && PS_ANIME_LIST[i].ytId){
+                    cinemaImg='https://img.youtube.com/vi/'+PS_ANIME_LIST[i].ytId+'/maxresdefault.jpg';
                 }
+
+                // 4. Dernier fallback : image Jikan standard
+                if(!cinemaImg){
+                    cinemaImg=d.data.images.jpg.large_image_url||d.data.images.jpg.image_url||'';
+                }
+
+                psAnimeData.push({
+                    title     : d.data.title||PS_ANIME_LIST[i].title,
+                    titleEn   : d.data.title_english||d.data.title||'',
+                    img       : cinemaImg,
+                    score     : d.data.score,
+                    year      : d.data.year||'',
+                    genres    : (d.data.genres||[]).slice(0,3).map(function(g){return g.name;}).join(' • '),
+                    synopsis  : (d.data.synopsis||'').substring(0,120)+'...'
+                });
             }catch(e){
-                psAnimeData.push({title:PS_ANIME_LIST[i].title,img:'',score:'',year:''});
+                psAnimeData.push({title:PS_ANIME_LIST[i].title,img:'',score:'',year:'',genres:'',synopsis:''});
             }
         }
     }
@@ -5032,24 +5069,57 @@ async function startProfileHeroSlider(){
         if(!ps||!ps.classList.contains('open')){clearInterval(psSliderTimer);return;}
         psSliderIdx=(psSliderIdx+1)%psAnimeData.length;
         showPsSlide(psSliderIdx);
-    },6000);
+    },7000);
 }
 
 function showPsSlide(idx){
     var a=psAnimeData[idx];
     if(!a)return;
+
+    // Image plein écran cinématique
     var hero=document.getElementById('ps-hero-img');
     if(hero&&a.img){
         hero.style.backgroundImage='url('+a.img+')';
         hero.style.backgroundSize='cover';
-        hero.style.backgroundPosition='center top';
+        hero.style.backgroundPosition='center center';
     }
+
     var titleEl=document.getElementById('ps-anime-title');
     var badgeEl=document.getElementById('ps-anime-badge');
-    if(titleEl)titleEl.textContent=a.title;
+
+    // Badge : score + année + genres style Netflix
     if(badgeEl){
-        if(a.score)badgeEl.innerHTML='<span style="color:var(--primary);">* '+a.score+'</span>'+(a.year?' &nbsp;·&nbsp; '+a.year:'');
-        else badgeEl.textContent='';
+        var parts=[];
+        if(a.score) parts.push('<span style="color:var(--primary);font-weight:900;">★ '+a.score+'</span>');
+        if(a.year)  parts.push(a.year);
+        if(a.genres) parts.push(a.genres);
+        badgeEl.innerHTML=parts.join(' &nbsp;·&nbsp; ');
+    }
+
+    // Titre : en mode TV on essaie le logo image, sinon texte stylisé
+    if(titleEl){
+        if(document.body.classList.contains('mode-tv') && a.logoUrl){
+            titleEl.innerHTML='<img src="'+a.logoUrl+'" alt="'+a.title+'" '+
+                'style="max-height:110px;max-width:500px;object-fit:contain;object-position:left;'+
+                'filter:drop-shadow(0 4px 20px rgba(0,0,0,0.9));display:block;" '+
+                'onerror="this.style.display=\'none\';">';
+        } else {
+            // Texte avec style cinématique
+            var displayTitle = a.titleEn || a.title;
+            titleEl.innerHTML='<span style="'+
+                'font-size:'+(document.body.classList.contains('mode-tv')?'clamp(22px,3vw,48px)':'22px')+';'+
+                'font-weight:900;'+
+                'letter-spacing:-0.5px;'+
+                'line-height:1.1;'+
+                'text-shadow:2px 2px 20px rgba(0,0,0,1),0 0 40px rgba(0,0,0,0.8);'+
+                'display:block;">'+displayTitle+'</span>';
+        }
+    }
+
+    // Synopsis (mode TV uniquement)
+    var synEl=document.getElementById('ps-anime-synopsis');
+    if(synEl){
+        synEl.textContent = document.body.classList.contains('mode-tv') ? (a.synopsis||'') : '';
     }
 }
 
