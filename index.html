@@ -109,20 +109,20 @@ body.mode-tv #profileSelector #psGrid{
 }
 body.mode-tv #profileSelector .ps-card{
     flex-direction:row !important;
-    width:auto !important;
-    gap:12px !important;
-    padding:6px 10px !important;
-    border-radius:8px !important;
-    width:200px !important;
+    width:220px !important;
+    gap:14px !important;
+    padding:8px 12px !important;
+    border-radius:10px !important;
 }
 body.mode-tv #profileSelector .ps-avatar{
-    width:52px !important;
-    height:52px !important;
-    font-size:22px !important;
+    width:64px !important;
+    height:64px !important;
+    font-size:26px !important;
     flex-shrink:0 !important;
+    border-radius:8px !important;
 }
 body.mode-tv #profileSelector .ps-name{
-    font-size:14px !important;
+    font-size:16px !important;
     width:auto !important;
     text-align:left !important;
     flex:1;
@@ -3170,57 +3170,13 @@ async function showHeroSlide(idx){
     heroData.title=a.title;
     heroData.malId=a.mal_id;
 
-    // ── Titre : afficher le logo/image du titre (style Netflix) ──
+    // Titre : texte stylisé (évite les appels /pictures qui ralentissent Jikan)
     var heroTitleEl = document.getElementById('heroTitle');
-    // Chercher le logo du titre via Jikan
-    fetch('https://api.jikan.moe/v4/anime/'+a.mal_id+'/pictures')
-        .then(function(r){return r.json();})
-        .then(function(d){
-            // Utiliser la 2ème image si dispo (souvent le logo)
-            var pics = d.data||[];
-            // On cherche une image paysage (logo)
-            var logoUrl = '';
-            if(pics.length > 1) logoUrl = pics[1].jpg.large_image_url || pics[1].jpg.image_url || '';
-            if(!logoUrl && pics.length > 0) logoUrl = pics[0].jpg.large_image_url || '';
-
-            if(logoUrl && document.body.classList.contains('mode-tv')){
-                // Mode TV : afficher image logo
-                heroTitleEl.innerHTML = '<img src="'+logoUrl+'" alt="'+a.title+'" '+
-                    'style="max-height:120px;max-width:480px;object-fit:contain;object-position:left bottom;'+
-                    'filter:drop-shadow(0 4px 16px rgba(0,0,0,0.8));display:block;" '+
-                    'onerror="this.parentElement.textContent=\''+a.title.replace(/'/g,"\\'")+'\';">';
-            } else {
-                heroTitleEl.textContent = a.title;
-            }
-        })
-        .catch(function(){
-            heroTitleEl.textContent = a.title;
-        });
+    if(heroTitleEl) heroTitleEl.textContent = a.title;
 
     // Pareil pour le sélecteur profil
     var psTitleEl = document.getElementById('ps-anime-title');
-    if(psTitleEl){
-        if(document.body.classList.contains('mode-tv')){
-            fetch('https://api.jikan.moe/v4/anime/'+a.mal_id+'/pictures')
-                .then(function(r){return r.json();})
-                .then(function(d){
-                    var pics=d.data||[];
-                    var logoUrl='';
-                    if(pics.length>1) logoUrl=pics[1].jpg.large_image_url||pics[1].jpg.image_url||'';
-                    if(!logoUrl&&pics.length>0) logoUrl=pics[0].jpg.large_image_url||'';
-                    if(logoUrl){
-                        psTitleEl.innerHTML='<img src="'+logoUrl+'" alt="'+a.title+'" '+
-                            'style="max-height:100px;max-width:500px;object-fit:contain;'+
-                            'filter:drop-shadow(0 4px 16px rgba(0,0,0,0.9));display:block;margin:0 auto;" '+
-                            'onerror="this.parentElement.textContent=\''+a.title.replace(/'/g,"\\'")+'\';">';
-                    } else {
-                        psTitleEl.textContent=a.title;
-                    }
-                }).catch(function(){ psTitleEl.textContent=a.title; });
-        } else {
-            psTitleEl.textContent=a.title;
-        }
-    }
+    if(psTitleEl) psTitleEl.textContent = a.title;
 
     document.getElementById('heroBadge').textContent='EN CE MOMENT';
 
@@ -5012,58 +4968,52 @@ var psSliderIdx=0;var psSliderTimer=null;var psAnimeData=[];
 async function startProfileHeroSlider(){
     clearInterval(psSliderTimer);
     if(psAnimeData.length===0){
+        // Charger UNE seule anime d'abord pour afficher rapidement
+        // puis charger les autres en arrière-plan avec délai
+        var loaded=0;
         for(var i=0;i<PS_ANIME_LIST.length;i++){
+            // Délai entre chaque requête pour ne pas épuiser Jikan
+            if(i>0) await new Promise(function(res){setTimeout(res,800);});
             try{
-                // 1. Récupérer les infos de base
                 var r=await fetch('https://api.jikan.moe/v4/anime/'+PS_ANIME_LIST[i].id);
                 var d=await r.json();
                 if(!d.data) throw new Error('no data');
 
-                var cinemaImg='';
+                // Image : utiliser l'image Jikan standard (portrait ok, on gère en CSS)
+                // On évite /pictures pour ne pas multiplier les requêtes
+                var img = d.data.images.jpg.large_image_url||d.data.images.jpg.image_url||'';
 
-                // 2. Chercher une image landscape via /pictures
-                try{
-                    var rp=await fetch('https://api.jikan.moe/v4/anime/'+PS_ANIME_LIST[i].id+'/pictures');
-                    var dp=await rp.json();
-                    var pics=dp.data||[];
-                    // Filtrer pour trouver une image large (landscape)
-                    // Les images de fond/bannière sont souvent les dernières dans la liste
-                    for(var p=pics.length-1;p>=0;p--){
-                        var url=pics[p].jpg.large_image_url||pics[p].jpg.image_url||'';
-                        if(url){
-                            // Vérifier le ratio en créant une image temporaire
-                            cinemaImg=url;
-                            break;
-                        }
-                    }
-                }catch(e2){}
-
-                // 3. Fallback : image YouTube thumbnail si ytId disponible
-                if(!cinemaImg && PS_ANIME_LIST[i].ytId){
-                    cinemaImg='https://img.youtube.com/vi/'+PS_ANIME_LIST[i].ytId+'/maxresdefault.jpg';
-                }
-
-                // 4. Dernier fallback : image Jikan standard
-                if(!cinemaImg){
-                    cinemaImg=d.data.images.jpg.large_image_url||d.data.images.jpg.image_url||'';
+                // Si ytId dispo, utiliser thumbnail YouTube (landscape, cinématique)
+                if(PS_ANIME_LIST[i].ytId){
+                    img='https://img.youtube.com/vi/'+PS_ANIME_LIST[i].ytId+'/maxresdefault.jpg';
                 }
 
                 psAnimeData.push({
-                    title     : d.data.title||PS_ANIME_LIST[i].title,
-                    titleEn   : d.data.title_english||d.data.title||'',
-                    img       : cinemaImg,
-                    score     : d.data.score,
-                    year      : d.data.year||'',
-                    genres    : (d.data.genres||[]).slice(0,3).map(function(g){return g.name;}).join(' • '),
-                    synopsis  : (d.data.synopsis||'').substring(0,120)+'...'
+                    title   : d.data.title||PS_ANIME_LIST[i].title,
+                    titleEn : d.data.title_english||d.data.title||'',
+                    img     : img,
+                    score   : d.data.score,
+                    year    : d.data.year||'',
+                    genres  : (d.data.genres||[]).slice(0,3).map(function(g){return g.name;}).join(' · '),
+                    synopsis: (d.data.synopsis||'').substring(0,110)+'...'
                 });
+                loaded++;
+                // Afficher dès le premier chargé
+                if(loaded===1){
+                    psSliderIdx=0;
+                    showPsSlide(0);
+                }
             }catch(e){
-                psAnimeData.push({title:PS_ANIME_LIST[i].title,img:'',score:'',year:'',genres:'',synopsis:''});
+                psAnimeData.push({
+                    title:PS_ANIME_LIST[i].title,img:'',score:'',year:'',genres:'',synopsis:''
+                });
             }
         }
+    } else {
+        psSliderIdx=Math.floor(Math.random()*psAnimeData.length);
+        showPsSlide(psSliderIdx);
     }
-    psSliderIdx=Math.floor(Math.random()*psAnimeData.length);
-    showPsSlide(psSliderIdx);
+    // Démarrer le slider automatique
     psSliderTimer=setInterval(function(){
         var ps=document.getElementById('profileSelector');
         if(!ps||!ps.classList.contains('open')){clearInterval(psSliderTimer);return;}
