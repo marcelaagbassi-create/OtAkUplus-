@@ -5126,6 +5126,15 @@ function editProfile(i){
 function selectProfile(idx){
     currentProfile=currentUser.profiles[idx];
     document.getElementById('profileSelector').classList.remove('open');
+
+    // ── STOPPER le slider profil immédiatement ──
+    // Libère le rate limit Jikan pour que loadHome() puisse charger
+    clearInterval(psSliderTimer);
+    psSliderTimer = null;
+    // Vider les données pour libérer la mémoire
+    // (sera rechargé à la prochaine ouverture du sélecteur)
+    psAnimeData = [];
+
     var dispName = currentProfile.name || 'Profil';
     document.getElementById('profileNameDisplay').textContent=dispName;
     if(document.getElementById('avatarLetter'))
@@ -5141,7 +5150,8 @@ function selectProfile(idx){
     // Synchroniser favoris depuis serveur
     syncFavsFromServer();
     updateHeroProfil();
-    loadHome();
+    // Petit délai pour laisser Jikan respirer avant loadHome
+    setTimeout(function(){ loadHome(); }, 300);
     xpDailyLogin();
     setTimeout(xpInjectMenu,600);
 }
@@ -6444,12 +6454,14 @@ function detectDevice(){
     var ua = navigator.userAgent.toLowerCase();
     var isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
-    // Détection TV
+    // Détection TV — aussi via subdomain tv. ou /tv
     var isTV = /smart-tv|smarttv|tv|tizen|webos|vidaa|hbbtv|netcast|nettv|philips|panasonic|sony\s*tv|samsung|viera|hisense|roku|appletv|apple\s*tv|googletv|androidtv|crkey|chromecast|firetv|fire\s*tv|aquos|bravia|netrangemmh|nettv|ce-html|largescreentest/.test(ua)
         || window.navigator.userAgent.indexOf('TV') > -1
         || window.navigator.userAgent.indexOf('Hisense') > -1
         || window.location.search.indexOf('tv=1') > -1
-        || localStorage.getItem('otaku_force_tv') === '1'
+        || window.location.pathname.indexOf('/tv') > -1
+        // otaku_force_tv seulement si écran >= 900px (jamais sur mobile)
+        || (localStorage.getItem('otaku_force_tv') === '1' && w >= 900)
         || (w >= 1920 && h >= 1000 && !isTouch)
         || (typeof window.matchMedia === 'function' && window.matchMedia('tv').matches);
 
